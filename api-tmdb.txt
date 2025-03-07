@@ -1,0 +1,18 @@
+Api example:
+
+https://api.themoviedb.org/3/movie/popular?api_key=38744b6c459ddd6f2e5e97a7d598773e
+
+Change page:
+
+https://api.themoviedb.org/3/movie/popular?api_key=38744b6c459ddd6f2e5e97a7d598773e&page=2
+
+
+Images api:
+
+https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg
+
+
+Genre:
+
+https://api.themoviedb.org/3/genre/movie/list?api_key=38744b6c459ddd6f2e5e97a7d598773e&language=en-US
+

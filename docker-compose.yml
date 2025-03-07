@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Servei per a la base de dades
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: aniol
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movies
+    ports:
+      - "5432:5432"
+
+  # Servei per al backend (Node.js)
+  backend:
+    build:
+      context: .  # El directori arrel on es troben les carpetes frontend, backend, etc.
+      dockerfile: backend/Dockerfile
+    container_name: backend_container
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=aniol
+      - DB_PASSWORD=password
+      - DB_NAME=movies
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+  # Servei per al frontend (React Native)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    ports:
+      - "19000:19000"
+      - "19001:19001"
+    volumes:
+      - ./frontend:/app
+      - ./frontend/assets:/app/assets:delegated
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+    depends_on:
+      - backend
+    networks:
+      - backend_network
+
+volumes:
+  postgres_data:
+
+networks:
+  backend_network:
+    driver: bridge
