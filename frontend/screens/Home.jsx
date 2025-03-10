@@ -1,5 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from "react";
+import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -23,6 +25,34 @@ const films = [
 export default function Home() {
   const navigation = useNavigation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [name, setName] = useState('')
+  const [image, setImage] = useState('')
+
+  const getUserInfo = async () => {
+    const token = await AsyncStorage.getItem('authToken')
+  
+    try {
+      const respose = await axios.get('http://172.20.10.2:3000/api/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const name = respose.data.name.split(" ")[0]
+    
+      setName(name)
+      setImage(respose.data.image)
+  
+      return respose.data
+      
+    } catch (error) {
+      console.error("Errror en obtenir les dades del usuari: " + error)
+    }
+  }
+  
+  useEffect(() => {
+    getUserInfo()
+  }, [])
   
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
@@ -33,7 +63,7 @@ export default function Home() {
           <Icon name="menu" size={50} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <Image style={styles.menuIconAvatar} source={{ uri: robertPattinson }} />
+          {image ? <Image style={styles.menuIconAvatar} source={{ uri: image }} /> : <Icon name="person-circle-outline" size={50} style={styles.menuIconAvatarNone} />}
         </TouchableOpacity>
       </View>
 
@@ -42,7 +72,7 @@ export default function Home() {
 
           <View>
             <Text style={[globalStyles.textBase, styles.welcomeback]}>
-              Hello, <Text style={styles.welcomebackUser}>Robert</Text>!
+              Hello, <Text style={styles.welcomebackUser}>{name}</Text>!
             </Text>
 
             <Text style={[globalStyles.textBase, styles.newToday]}>
@@ -112,6 +142,12 @@ const styles = {
     borderRadius: "50%",
     borderWidth: 1,
     borderColor: 'white',
+  },
+
+  menuIconAvatarNone: {
+    color: "white",
+    width: 50,
+    height: 50,
   },
 
   main: {

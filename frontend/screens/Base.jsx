@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-const API_URL = "http://192.168.1.41:5000/text";
+const API_URL = "http://172.20.10.2:5000/text";
 
 const App = () => {
   const [message, setMessage] = useState("");

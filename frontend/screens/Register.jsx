@@ -12,6 +12,7 @@ import lalaland from '../assets/films/lalaland.jpg';
 export default function Register() {
   const navigation = useNavigation();
 
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +21,7 @@ export default function Register() {
   const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
     return regex.test(password);
   }
 
@@ -48,7 +49,8 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post("http://192.168.1.41:3000/api/users/register", {
+      const response = await axios.post("http://172.20.10.2:3000/api/users/register", {
+        name,
         username,
         email,
         password,
@@ -100,6 +102,14 @@ export default function Register() {
               </View>
 
               <View style={styles.buttonsSign}>
+                <InputLogin
+                  text="Name"
+                  icon="person-circle-outline"
+                  type="default"
+                  value={name}
+                  onChange={setName}
+                />
+
                 <InputLogin
                   text="Username"
                   icon="person-circle-outline"

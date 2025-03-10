@@ -1,10 +1,11 @@
-import React from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, View } from 'react-native';
+import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 
 const theBatmanBackground = "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg"
-
-const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
 
 const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
 const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
@@ -22,14 +23,43 @@ const lists = [
 ]
 
 export default function Profile() {
+  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
+  const [image, setImage] = useState('')
+
+  const getUserInfo = async () => {
+    const token = await AsyncStorage.getItem('authToken')
+  
+    try {
+      const respose = await axios.get('http://172.20.10.2:3000/api/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+    
+      setName(respose.data.name)
+      setUsername(respose.data.username)
+      setImage(respose.data.image)
+  
+      return respose.data
+      
+    } catch (error) {
+      console.error("Error en obtenir les dades del usuari: " + error)
+    }
+  }
+  
+  useEffect(() => {
+    getUserInfo()
+  }, [])
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={[globalStyles.container, styles.mainContainer]}>
       <Image source={{uri: theBatmanBackground}} style={styles.backgroundImage} />
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
-          <Image style={styles.avatar} source={{uri: robertPattinson}}/>
-          <Text style={[globalStyles.textBase, styles.name]}>Robert</Text>
-          <Text style={[globalStyles.textBase, styles.username]}>@robertpattinson</Text>
+          {image ? <Image style={styles.avatar} source={{ uri: image }} /> : <Icon name="person-circle-outline" size={120} style={styles.menuIconAvatarNone} />}
+          <Text style={[globalStyles.textBase, styles.name]}>{name}</Text>
+          <Text style={[globalStyles.textBase, styles.username]}>@{username}</Text>
         </View>
 
         <View style={styles.stats}>
@@ -112,10 +142,19 @@ const styles = {
     top: -120,
   },
 
+  menuIconAvatarNone: {
+    color: "white",
+    width: 120,
+    height: 120,
+    position: 'absolute',
+    top: -120,
+  },
+
   name: {
     fontSize: 25,
     fontWeight: 'bold',
-    marginVertical: 5
+    marginVertical: 5,
+    color: "#E9A6A6"
   },
 
   username: {

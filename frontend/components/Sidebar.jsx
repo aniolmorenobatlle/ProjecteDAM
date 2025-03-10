@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useRef } from "react";
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -13,7 +14,37 @@ export default function Sidebar({ isOpen, closeMenu }) {
   const translateX = useRef(new Animated.Value(-width * 0.6)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
+  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
+  const [image, setImage] = useState(robertPattinson)
+  
+  const getUserInfo = async () => {
+    const token = await AsyncStorage.getItem('authToken')
+  
+    try {
+      const respose = await axios.get('http://172.20.10.2:3000/api/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      // get only the first part of the name
+      const name = respose.data.name.split(" ")[0]
+    
+      setName(name)
+      setUsername(respose.data.username)
+      setImage(respose.data.image)
+  
+      return respose.data
+      
+    } catch (error) {
+      console.error("Errror en obtenir les dades del usuari: " + error)
+    }
+  }
+
   useEffect(() => {
+    getUserInfo()
+
     if (isOpen) {
       Animated.parallel([
         Animated.timing(translateX, {
@@ -71,27 +102,23 @@ export default function Sidebar({ isOpen, closeMenu }) {
             </TouchableOpacity>
 
             <View style={styles.avatar}>
-              <Image style={styles.menuIconAvatar} source={{ uri: robertPattinson }} />
+              {image ? <Image style={styles.menuIconAvatar} source={{ uri: image }} /> : <Icon name="person-circle-outline" size={80} style={styles.menuIconAvatarNone} />}
               <View style={styles.avatarTexts}>
-                <Text style={[styles.username, { color: "#e9a6a6" }]}>Robert</Text>
-                <Text style={styles.handle}>@robert_pattinson</Text>
+                <Text style={[styles.username, { color: "#e9a6a6" }]}>{name}</Text>
+                <Text style={styles.handle}>@{username}</Text>
               </View>
             </View>
 
             <View style={styles.menu}>
-              <TouchableOpacity style={styles.menuItem} onPress={closeMenu}>
+              <TouchableOpacity activeOpacity={0.8} style={styles.menuItem} onPress={closeMenu}>
                 <Icon name="home-outline" size={24} color="white" style={styles.icon} />
                 <Text style={styles.menuText}>Home</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={closeMenu}>
+              <TouchableOpacity activeOpacity={0.8} style={styles.menuItem} onPress={closeMenu}>
                 <Icon name="film-outline" size={24} color="white" style={styles.icon} />
                 <Text style={styles.menuText}>Films</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={closeMenu}>
-                <Icon name="book-outline" size={24} color="white" style={styles.icon} />
-                <Text style={styles.menuText}>Diary</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={closeMenu}>
+              <TouchableOpacity activeOpacity={0.8} style={styles.menuItem} onPress={closeMenu}>
                 <Icon name="heart-outline" size={24} color="white" style={styles.icon} />
                 <Text style={styles.menuText}>Likes</Text>
               </TouchableOpacity>
@@ -144,6 +171,12 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderWidth: 1,
     borderColor: 'white',
+  },
+
+  menuIconAvatarNone: {
+    color: "white",
+    width: 80,
+    height: 80,
   },
 
   username: {

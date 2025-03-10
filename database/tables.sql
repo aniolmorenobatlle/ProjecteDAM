@@ -24,6 +24,7 @@ CREATE TABLE "Movies" (
   "cover2" varchar,
   "synopsis" text,
   "director_id" int,
+  "popularity", NUMERIC DEFAULT 0,
   "created_at" TIMESTAMP
 );
 
