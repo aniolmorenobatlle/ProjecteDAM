@@ -95,7 +95,6 @@ CREATE TABLE lists (
 CREATE TABLE director (
   id SERIAL PRIMARY KEY,
   name varchar,
-  surname varchar,
   created_at TIMESTAMP
 );
 

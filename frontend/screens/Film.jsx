@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -13,6 +13,7 @@ const paulDano = "https://image.tmdb.org/t/p/w500/zEJJsm0z07EPNl2Pi1h67xuCmcA.jp
 const zoeKravitz = "https://image.tmdb.org/t/p/w500/tiQ3TBSvU4YAyrWMmVk6MTrKBAi.jpg"
 const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
 
+import axios from "axios";
 import appleTv from '../assets/sites/appletv.png';
 import disneyPlus from '../assets/sites/disney-plus.png';
 import max from '../assets/sites/max.png';
@@ -27,20 +28,38 @@ const reviews = [
   { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." }
 ]
 
-export default function Film({ route }) {
-  const { title } = route.params;
-
+export default function Film() {
+  const route = useRoute();
+  const { filmId } = route.params;
+  const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("casts");
+  const [movieDetails, setMovieDetails] = useState({});
+  const [year, setYear] = useState('');
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
   }
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    const fetchMovieDetails = async () => {
+      try {
+        const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}`);
+        setMovieDetails(response.data);
+
+        const date = response.data.release_year;
+        const year = date.split("-")[0];
+        setYear(year);
+      } catch (error) {
+        console.error("Error obtenint les dades de la pel·lícula: " + error);
+      }
+    }
+
+    fetchMovieDetails();
+  }, [filmId])
 
   return (
     <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ backgroundColor: "#1F1D36" }} contentContainerStyle={{ paddingBottom: 10}}>
-      <ImageBackground source={{uri: thebatmanBackground}} style={styles.imageBackground}>
+      <ImageBackground source={{ uri: movieDetails.cover2 }} style={styles.imageBackground}>
         <SafeAreaView style={styles.overlay}>
           <View style={styles.backButton}>
             <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.goBack()}>
@@ -52,39 +71,39 @@ export default function Film({ route }) {
 
       <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
         <View style={styles.filmHeader}>
-          <Image style={styles.poster} source={{uri: thebatmanPoster}} />
-
-          <View style={styles.textContainer}>
-            <Text style={[globalStyles.textBase, styles.filmTitle]}>
-              The Batman <Text style={styles.filmYear}>2022</Text>
-            </Text>
-            <Text style={[globalStyles.textBase, styles.filmDirector]}>
-              Directed by <Text style={{ fontWeight: "bold" }}>Matt Reeves</Text>
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.body}>
-          <View style={styles.buttons}>
-            <View style={styles.button}>
-              <Icon name="duplicate-outline" size={20} style={styles.buttonImage} />
-              <Text style={[globalStyles.textBase, styles.buttonText]}>Rate</Text>
-            </View>
-            <View style={styles.button}>
-              <Icon name="list-outline" size={20} style={styles.buttonImage} />
-              <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Lists</Text>
-            </View>
-            <View style={styles.button}>
-              <Icon name="document-outline" size={20} style={styles.buttonImage} />
-              <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Watchlist</Text>
+          <View style={styles.bodyLeft}>
+            <Image style={styles.poster} source={{ uri: movieDetails.cover }} />
+            <View style={styles.buttons}>
+              <View style={styles.button}>
+                <Icon name="duplicate-outline" size={20} style={styles.buttonImage} />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>Rate</Text>
+              </View>
+              <View style={styles.button}>
+                <Icon name="list-outline" size={20} style={styles.buttonImage} />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Lists</Text>
+              </View>
+              <View style={styles.button}>
+                <Icon name="document-outline" size={20} style={styles.buttonImage} />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Watchlist</Text>
+              </View>
             </View>
           </View>
 
-          <View style={styles.description}>
-            <Text style={[globalStyles.textBase, styles.descriptionText]}>
-              UNMASK THE TRUTH.
-              In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.</Text>
-          </View>
+          <View style={styles.bodyRight}>
+            <View style={styles.textContainer}>
+              <Text style={[globalStyles.textBase, styles.filmTitle]}>
+                {movieDetails.name} <Text style={styles.filmYear}>{year}</Text>
+              </Text>
+              <Text style={[globalStyles.textBase, styles.filmDirector]}>
+                Directed by <Text style={{ fontWeight: "bold" }}>Matt Reeves</Text>
+              </Text>
+            </View>
+            <View style={styles.description}>
+              <Text style={[globalStyles.textBase, styles.descriptionText]} numberOfLines={10}>
+                {movieDetails.synopsis}
+              </Text>
+            </View>
+          </View>  
         </View>
 
         <View style={styles.castContainer}>
@@ -218,25 +237,31 @@ const styles = {
 
   mainContainer: {
     paddingHorizontal: 15,
-    paddingTop: 10,
   },
 
   filmHeader: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 15
+  },
+
+  bodyLeft: {
+    flexDirection: "column",
+    marginTop: -120,
+    gap: 20
+  },
+
+  bodyRight: {
+    flex: 1,
+    flexDirection: "column",
+    marginTop: -20,
+    gap: 15
   },
 
   poster: {
     width: 150,
     height: 200,
     borderRadius: 10,
-    marginTop: -150,
-  },
-
-  textContainer: {
-    flex: 1,
-    marginTop: -80,
-    marginLeft: 20,
   },
 
   filmTitle: {
@@ -253,19 +278,17 @@ const styles = {
 
   filmDirector: {
     fontSize: 12,
-    marginTop: 5,
+    marginTop: 5
   },
 
   body: {
     flex: 1,
     flexDirection: "row",
-    marginTop: 10,
   },
 
   buttons: {
     flex: 1,
     flexDirection: "column",
-    justifyContent: "space-between",
   },
 
   button: {
@@ -295,8 +318,6 @@ const styles = {
   descriptionText: {
     fontSize: 14,
     color: "#fff",
-    marginTop: -35,
-    marginLeft: -10,
     textAlign: "justify",
   },
 

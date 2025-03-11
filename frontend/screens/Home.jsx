@@ -132,9 +132,9 @@ export default function Home() {
 
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
               <View style={styles.latestFilms}>
-                {films.map((film, index) => (
+                {films.map((film, index) => ( 
                   <View key={index} style={styles.filmsCard}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { film })}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { filmId: film.id })}>
                       <Image style={styles.filmCardImage} source={{ uri: film.cover }} />
                     </TouchableOpacity>
                     <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.name}</Text>

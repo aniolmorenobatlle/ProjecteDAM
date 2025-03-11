@@ -20,4 +20,11 @@ const getMovieByTitle = async (title) => {
   return result.rows[0];
 };
 
-module.exports = { getMovies, getMoviesCount, getMovieByTitle };
+const getMovieById = async (id) => {
+  const query = 'SELECT * FROM "movies" WHERE id = $1 LIMIT 1';
+  const result = await pool.query(query, [id]);
+  
+  return result.rows[0];
+}
+
+module.exports = { getMovies, getMoviesCount, getMovieByTitle, getMovieById };
