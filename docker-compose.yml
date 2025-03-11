@@ -11,22 +11,32 @@ services:
       POSTGRES_DB: movies
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_network
 
   # Servei per al backend (Node.js)
   backend:
     build:
-      context: .  # El directori arrel on es troben les carpetes frontend, backend, etc.
+      context: .
       dockerfile: backend/Dockerfile
     container_name: backend_container
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=aniol
-      - DB_PASSWORD=password
-      - DB_NAME=movies
+    env_file:
+      - ./backend/.env
     ports:
       - "3000:3000"
     depends_on:
       - postgres
+    networks:
+      - backend_network  # Add to backend_network
+    environment:
+      DB_USER: aniol
+      DB_HOST: postgres
+      DB_NAME: movies
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      API_KEY: 38744b6c459ddd6f2e5e97a7d598773e
 
   # Servei per al frontend (React Native)
   frontend:
@@ -45,7 +55,7 @@ services:
     depends_on:
       - backend
     networks:
-      - backend_network
+      - backend_network  # frontend on the same network as backend
 
 volumes:
   postgres_data:

@@ -1,19 +1,22 @@
 FROM node:18
 
-# Estableix el directori de treball al contenidor
+# Instal·lar psql
+RUN apt-get update && apt-get install -y postgresql-client
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copia els fitxers de dependències al directori de treball
+# Copy package.json and package-lock.json to the container first to install dependencies
 COPY ./backend/package.json ./backend/package-lock.json /app/
 
-# Instal·la les dependències
+# Install application dependencies
 RUN npm install
 
-# Copia tot el codi de l'aplicació al contenidor
+# Copy the rest of the application code to the container
 COPY ./backend /app/
 
-# Exposa el port 3000
+# Expose port 3000 for the backend
 EXPOSE 3000
 
-# Inicia l'aplicació
+# Run the application
 CMD ["npm", "start"]

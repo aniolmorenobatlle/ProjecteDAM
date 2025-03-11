@@ -1,6 +1,9 @@
-import express, { json } from 'express';
-import movieRoutes from './routes/movieRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+// server.js
+const express = require('express');
+const { json } = require('express');
+const movieRoutes = require('./routes/movieRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+
 const app = express();
 
 const PORT = 3000;

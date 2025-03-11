@@ -1,9 +1,10 @@
-import { compare, hash } from 'bcrypt';
-import dotenv from 'dotenv';
-import { Router } from 'express';
-import pkg from 'jsonwebtoken';
-import pool from '../config/db.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+// userRoutes.js
+const { compare, hash } = require('bcrypt');
+const dotenv = require('dotenv');
+const { Router } = require('express');
+const pkg = require('jsonwebtoken');
+const pool = require('../config/db.js');
+const authMiddleware = require('../middleware/authMiddleware.js');
 
 const { sign } = pkg;
 dotenv.config();
@@ -14,12 +15,13 @@ const SECRET_KEY = process.env.SECRET_KEY;
 // Registre
 router.post('/register', async (req, res) => {
   const { name, username, email, password } = req.body;
+  console.log("Secret", SECRET_KEY)
 
   try {
     const hashedPassword = await hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO "User" ("name", "username", "email", "password", "created_at") 
+      `INSERT INTO "user" ("name", "username", "email", "password", "created_at") 
        VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
       [name, username, email, hashedPassword]
     );
@@ -47,7 +49,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT * FROM "User" WHERE "username" = $1`,
+      `SELECT * FROM "user" WHERE "username" = $1`,
       [username]
     );
 
@@ -77,10 +79,11 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// User info
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT name, username, email, image FROM "User" WHERE id = $1`,
+      `SELECT name, username, email, image FROM "user" WHERE id = $1`,
       [req.user.userId]
     )
 
@@ -96,4 +99,4 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 })
 
-export default router;
+module.exports = router;  // Export using module.exports

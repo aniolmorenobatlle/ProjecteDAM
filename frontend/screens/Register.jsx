@@ -103,7 +103,7 @@ export default function Register() {
 
               <View style={styles.buttonsSign}>
                 <InputLogin
-                  text="Name"
+                  text="Full Name"
                   icon="person-circle-outline"
                   type="default"
                   value={name}

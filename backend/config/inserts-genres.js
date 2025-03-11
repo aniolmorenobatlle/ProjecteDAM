@@ -1,36 +1,40 @@
-import { get } from 'axios';
-import dotenv from 'dotenv';
-import pool from './db.js';
+const axios = require('axios');
+const { exec } = require('child_process');
 
-dotenv.config();
+const apiKey = '38744b6c459ddd6f2e5e97a7d598773e';
+const genresURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en-US`;
 
-// La teva clau API de TMDb
-const apiKey = process.env.API_KEY;
-const genresURL = 'https://api.themoviedb.org/3/genre/movie/list?api_key=' + apiKey + '&language=en-US';
+// Configura les credencials de PostgreSQL
+const dbUser = 'aniol';
+const dbHost = 'postgres';
+const dbName = 'movies';
+const dbPassword = 'password';
+const dbPort = 5432;
 
 async function fetchAndInsertGenres() {
-  const client = await pool.connect();
   try {
-    // Obtenir la llista de gèneres
-    const response = await get(genresURL);
+    // 1. Fer la petició a l'API
+    const response = await axios.get(genresURL);
     const genres = response.data.genres;
 
-    // Inserir cada gènere a la taula "Genres"
+    // 2. Insertar cada gènere a la base de dades
     for (let genre of genres) {
       const { id, name } = genre;
+      const query = `INSERT INTO "genres"("id", "name", "created_at") VALUES(${id}, '${name.replace("'", "''")}', NOW());`;
+      const command = `PGPASSWORD=${dbPassword} psql -h ${dbHost} -U ${dbUser} -d ${dbName} -c "${query}"`;
 
-      // Inserir el gènere a la base de dades
-      const query = 'INSERT INTO "Genres"("id", "name", "created_at") VALUES($1, $2, NOW())';
-      const values = [id, name];
-      await client.query(query, values);
-      console.log(`Gènere ${name} afegit correctament.`);
+      // Executar la comanda
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error: ${stderr}`);
+        } else {
+          console.log(`Gènere ${name} afegit correctament.`);
+        }
+      });
     }
   } catch (error) {
-    console.error('Error al fer la petició o insertar a la base de dades:', error);
-  } finally {
-    client.release();
+    console.error('Error al fer la petició a l\'API:', error);
   }
 }
 
-// Cridem la funció per executar-ho
 fetchAndInsertGenres();

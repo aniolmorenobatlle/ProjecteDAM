@@ -13,3 +13,10 @@ psql -U aniol -d movies
 docker cp database/tables.sql postgres_container:/tables.sql
 
 psql -U aniol -d movies -f /tables.sql
+
+
+------------------------------------------------------
+
+docker compose exec backend node config/inserts-genres.js
+
+docker compose exec backend node config/inserts-movies.js

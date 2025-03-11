@@ -8,14 +8,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Sidebar from '../components/Sidebar';
 import { globalStyles } from "../globalStyles";
 
-const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
 
 const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
 const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
 const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg"
 const avatar = "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg"
 
-const films = [
+const movies = [
   { name: "The Batman", image: theBatman, year: 2022, duration: "175 min" },
   { name: "The Gorge", image: theGorge, year: 2025, duration: "127 min" },
   { name: "Avatar", image: avatar, year: 2009, duration: "162 min" },
@@ -27,6 +26,7 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [name, setName] = useState('')
   const [image, setImage] = useState('')
+  const [films, setFilms] = useState([])
 
   const getUserInfo = async () => {
     const token = await AsyncStorage.getItem('authToken')
@@ -49,9 +49,50 @@ export default function Home() {
       console.error("Errror en obtenir les dades del usuari: " + error)
     }
   }
+
+  const getPopularFilms = async () => {
+    try {
+      let allMovies = [];
+  
+      for (let page = 1; page <= 501; page++) {
+        console.log(`Carregant la pàgina ${page}...`);
+  
+        const response = await axios.get(`http://172.20.10.2:3000/api/movies?page=${page}`);
+        const movies = response.data.movies;
+  
+        // Evitar repetisions
+        movies.forEach(movie => {
+          if (!allMovies.some(existingMovie => existingMovie.id === movie.id || existingMovie.name === movie.name)) {
+            allMovies.push(movie);
+          }
+        });
+      }
+  
+      const lastMonth = new Date();
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+  
+      // Filtrar pelicules per ultim mes
+      const filteredMovies = allMovies.filter(movie => {
+        // Comprova si release_year és una data vàlida
+        const releaseDate = new Date(movie.release_year); 
+  
+        // Mirar data valida
+        return !isNaN(releaseDate.getTime()) && releaseDate >= lastMonth;
+      });
+  
+      // Ordenar per popularitat
+      const sortedMovies = filteredMovies.sort((a, b) => b.popularity - a.popularity);
+  
+      // Seleccionar les 5 pel·lícules més populars
+      setFilms(sortedMovies.slice(0, 5));
+    } catch (error) {
+      console.error("Error en obtenir les pel·lícules populars: " + error);
+    }
+  };
   
   useEffect(() => {
-    getUserInfo()
+    getUserInfo(),
+    getPopularFilms()
   }, [])
   
   return (
@@ -88,7 +129,7 @@ export default function Home() {
                 {films.map((film, index) => (
                   <View key={index} style={styles.filmsCard}>
                     <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { film })}>
-                      <Image style={styles.filmCardImage} source={{uri: film.image}} />
+                      <Image style={styles.filmCardImage} source={{ uri: film.cover }} />
                     </TouchableOpacity>
                     <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.name}</Text>
                   </View>
@@ -101,7 +142,7 @@ export default function Home() {
             <Text style={[globalStyles.textBase, styles.latestTitle]}>Favorite</Text>
 
             <View style={styles.favoriteFilms}>
-              {films.map((film, index) => (
+              {movies.map((film, index) => (
                 <TouchableOpacity key={index} activeOpacity={0.8} onPress={() => navigation.navigate('Film', { film })}>
                 <View key={index} style={styles.favoriteCard}>
                   <Image style={styles.favoriteCardImage} source={{uri: film.image}} /> 
@@ -170,7 +211,7 @@ const styles = {
   },
 
   latest: {
-    marginTop: 30,
+    marginTop: 20,
   },
 
   latestTitle: {
@@ -183,7 +224,7 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
-    height: 260
+    height: 280
   },
 
   filmCardImage: {
@@ -195,6 +236,7 @@ const styles = {
   filmCardName: {
     fontSize: 14,
     marginTop: 10,
+    width: 150,
   },
 
   favoriteCard: {

@@ -1,5 +1,6 @@
-import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
+// authMiddleware.js
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -23,4 +24,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+module.exports = authMiddleware;
