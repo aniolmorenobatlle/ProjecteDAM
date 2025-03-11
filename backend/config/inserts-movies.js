@@ -17,24 +17,36 @@ async function fetchAndInsertMovies() {
       const movies = response.data.results;
 
       for (let movie of movies) {
-        const { title, release_date, genre_ids, popularity } = movie;
+        const { title, release_date, genre_ids, vote_average } = movie;
         const cover = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null;
         const cover2 = movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : null;
         const synopsis = movie.overview || '';
+        
+        // Extreure l'any de la data de llançament (release_date)
+        const releaseYear = release_date ? release_date.split('-')[0] : null;
+        
+        // Comprovar si la pel·lícula ja existeix (per títol i any de llançament)
+        const checkMovieQuery = `
+          SELECT 1 FROM "movies" WHERE "name" = $1 AND EXTRACT(YEAR FROM "release_year") = $2 LIMIT 1;
+        `;
+        
+        const checkMovieValues = [title, releaseYear];
+        const checkResult = await client.query(checkMovieQuery, checkMovieValues);
 
+        if (checkResult.rowCount > 0) {
+          console.log(`La pel·lícula ${title} (${releaseYear}) ja existeix, saltant...`);
+          continue;  // Si ja existeix, continuem amb la següent pel·lícula
+        }
+
+        // Si la pel·lícula no existeix, la inserim
         const movieQuery = `
-          INSERT INTO "movies"("name", "release_year", "cover", "cover2", "synopsis", "popularity", "created_at")
+          INSERT INTO "movies"("name", "release_year", "cover", "cover2", "synopsis", "vote_average", "created_at")
           VALUES($1, $2, $3, $4, $5, $6, NOW())
           RETURNING id;
         `;
         
-        let releaseYear = release_date || null;
-        
-        if (releaseYear && !Date.parse(releaseYear)) {
-          releaseYear = null;
-        }
-        
-        const movieValues = [title, releaseYear, cover, cover2, synopsis, popularity];
+        // Si la release_date és buida, passar 'null' per al camp de release_year
+        const movieValues = [title, release_date || null, cover, cover2, synopsis, vote_average];
         const result = await client.query(movieQuery, movieValues);
         const newMovieId = result.rows[0].id;
 

@@ -25,7 +25,7 @@ CREATE TABLE movies (
   cover2 varchar,
   synopsis text,
   director_id int,
-  popularity NUMERIC DEFAULT 0,
+  vote_average DECIMAL(3, 1),
   created_at TIMESTAMP
 );
 

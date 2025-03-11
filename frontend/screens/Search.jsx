@@ -1,26 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { globalStyles } from "../globalStyles";
-
-
-
-const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
-const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
-const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg"
-const avatar = "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg"
-
-const films = [
-  { title: "The Batman", image: theBatman },
-  { title: "The Gorge", image: theGorge },
-  { title: "Avatar", image: avatar },
-  { title: "Baby Driver", image: babyDriver },
-];
-
-// llista 4x8
-const repeatedFilms = Array.from({ length: 32 }, (_, i) => films[i % films.length]);
 
 const numColumns = 4;
 const screenWidth = Dimensions.get("window").width;
@@ -28,6 +13,46 @@ const itemSize = screenWidth / numColumns - 10;
 
 export default function Search() {
   const navigation = useNavigation();
+  const [movies, setMovies] = useState([]);
+
+  // const clearStoredMovies = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem("mostPopularMovies");
+  //     await AsyncStorage.removeItem("moviesTimestamp");
+  //     console.log("Dades esborrades. Es tornaran a carregar.");
+  //   } catch (error) {
+  //     console.error("Error en esborrar les dades: ", error);
+  //   }
+  // };
+  
+  const getPopularFilms = async () => {
+    try {
+      const storedMovies = await AsyncStorage.getItem("mostPopularMovies");
+      const storedTimestamp = await AsyncStorage.getItem("moviesTimestamp");
+  
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+  
+      if (storedMovies && storedTimestamp && now - Number(storedTimestamp) < oneDay) {
+        setMovies(JSON.parse(storedMovies));
+        return;
+      }
+    
+      const response = await axios.get(`http://172.20.10.2:3000/api/movies/most_popular`);
+      const films = response.data.movies;
+  
+      setMovies(films);
+  
+      await AsyncStorage.setItem("mostPopularMovies", JSON.stringify(films));
+      await AsyncStorage.setItem("moviesTimestamp", JSON.stringify(now));
+    } catch (error) {
+      console.error("Error getting popular films: " + error);
+    }
+  };
+  
+  useEffect(() => {
+    getPopularFilms()
+  }, [])
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
@@ -44,10 +69,10 @@ export default function Search() {
         <Text style={[globalStyles.textBase, styles.popularTitle]}>Most popular</Text>
 
         <View style={styles.movieGrid}>
-          {repeatedFilms.map((item, index) => (
+          {movies.map((item, index) => (
             <View key={index} style={[styles.movieItem, { width: itemSize, height: itemSize * 1.5 }]}>
-              <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate("Film", { title: item.title })}>
-                <Image source={{uri: item.image}} style={styles.movieImage} />
+              <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate("Film", { title: item.name })}>
+                <Image source={{ uri: item.cover }} style={styles.movieImage} />
               </TouchableOpacity>
             </View>
           ))}

@@ -13,4 +13,11 @@ const getMoviesCount = async () => {
   return parseInt(result.rows[0].count);
 };
 
-module.exports = { getMovies, getMoviesCount };
+const getMovieByTitle = async (title) => {
+  const query = 'SELECT * FROM "movies" WHERE name = $1 LIMIT 1';
+  const result = await pool.query(query, [title]);
+  
+  return result.rows[0];
+};
+
+module.exports = { getMovies, getMoviesCount, getMovieByTitle };

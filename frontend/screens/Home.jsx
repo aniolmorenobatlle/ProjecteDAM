@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useEffect, useState } from "react";
@@ -52,15 +52,20 @@ export default function Home() {
 
   const getPopularFilms = async () => {
     try {
+      const storedMovies = await AsyncStorage.getItem("popularMovies");
+  
+      if (storedMovies) {
+        setFilms(JSON.parse(storedMovies));
+        return;
+      }
+  
       let allMovies = [];
   
       for (let page = 1; page <= 501; page++) {
-        console.log(`Carregant la pàgina ${page}...`);
-  
         const response = await axios.get(`http://172.20.10.2:3000/api/movies?page=${page}`);
         const movies = response.data.movies;
   
-        // Evitar repetisions
+        // Evitar repeticions
         movies.forEach(movie => {
           if (!allMovies.some(existingMovie => existingMovie.id === movie.id || existingMovie.name === movie.name)) {
             allMovies.push(movie);
@@ -71,29 +76,30 @@ export default function Home() {
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
   
-      // Filtrar pelicules per ultim mes
+      // Filtrar pel·lícules de l'últim mes
       const filteredMovies = allMovies.filter(movie => {
-        // Comprova si release_year és una data vàlida
-        const releaseDate = new Date(movie.release_year); 
-  
-        // Mirar data valida
+        const releaseDate = new Date(movie.release_year);
         return !isNaN(releaseDate.getTime()) && releaseDate >= lastMonth;
       });
   
       // Ordenar per popularitat
-      const sortedMovies = filteredMovies.sort((a, b) => b.popularity - a.popularity);
+      const sortedMovies = filteredMovies.sort((a, b) => b.vote_average - a.vote_average);
   
-      // Seleccionar les 5 pel·lícules més populars
-      setFilms(sortedMovies.slice(0, 5));
+      // Seleccionar les 5 més populars
+      const topMovies = sortedMovies.slice(0, 5);
+      setFilms(topMovies);
+  
+      // Guardar en AsyncStorage perquè no es carregui de nou
+      await AsyncStorage.setItem("popularMovies", JSON.stringify(topMovies));
     } catch (error) {
       console.error("Error en obtenir les pel·lícules populars: " + error);
     }
   };
   
   useEffect(() => {
-    getUserInfo(),
-    getPopularFilms()
-  }, [])
+    getUserInfo();
+    getPopularFilms();
+  }, []);  
   
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
