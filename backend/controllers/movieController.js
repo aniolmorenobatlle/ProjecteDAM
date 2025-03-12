@@ -81,6 +81,16 @@ exports.fetchMostPopularMovies = async (_, res) => {
   }
 };
 
+exports.fetchLastMostPopularMovies = async (_, res) => {
+  try {
+    const movies = await movieModel.getLastMostPopularMovies();
+    res.json({ movies });
+  } catch (error) {
+    console.error("Error obtenint les pel·lícules més populars del darrer mes:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
 exports.fetchMovieDetails = async (req, res) => {
   try {
     const { id } = req.params;

@@ -53,44 +53,21 @@ export default function Home() {
   const getPopularFilms = async () => {
     try {
       const storedMovies = await AsyncStorage.getItem("popularMovies");
-  
-      if (storedMovies) {
+      const storedTimestamp = await AsyncStorage.getItem("lastPopularTimestamp");
+
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+
+      if (storedMovies && storedTimestamp && now - Number(storedTimestamp) < oneDay) {
         setFilms(JSON.parse(storedMovies));
         return;
       }
   
-      let allMovies = [];
+      const response = await axios.get("http://172.20.10.2:3000/api/movies/last_most_popular");
+      setFilms(response.data.movies);
   
-      for (let page = 1; page <= 501; page++) {
-        const response = await axios.get(`http://172.20.10.2:3000/api/movies?page=${page}`);
-        const movies = response.data.movies;
-  
-        // Evitar repeticions
-        movies.forEach(movie => {
-          if (!allMovies.some(existingMovie => existingMovie.id === movie.id || existingMovie.name === movie.name)) {
-            allMovies.push(movie);
-          }
-        });
-      }
-  
-      const lastMonth = new Date();
-      lastMonth.setMonth(lastMonth.getMonth() - 1);
-  
-      // Filtrar pel·lícules de l'últim mes
-      const filteredMovies = allMovies.filter(movie => {
-        const releaseDate = new Date(movie.release_year);
-        return !isNaN(releaseDate.getTime()) && releaseDate >= lastMonth;
-      });
-  
-      // Ordenar per popularitat
-      const sortedMovies = filteredMovies.sort((a, b) => b.vote_average - a.vote_average);
-  
-      // Seleccionar les 5 més populars
-      const topMovies = sortedMovies.slice(0, 5);
-      setFilms(topMovies);
-  
-      // Guardar en AsyncStorage perquè no es carregui de nou
-      await AsyncStorage.setItem("popularMovies", JSON.stringify(topMovies));
+      await AsyncStorage.setItem("popularMovies", JSON.stringify(response.data.movies));
+      await AsyncStorage.setItem("lastPopularTimestamp", JSON.stringify(now));
     } catch (error) {
       console.error("Error en obtenir les pel·lícules populars: " + error);
     }
@@ -135,9 +112,9 @@ export default function Home() {
                 {films.map((film, index) => ( 
                   <View key={index} style={styles.filmsCard}>
                     <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { filmId: film.id })}>
-                      <Image style={styles.filmCardImage} source={{ uri: film.cover }} />
+                      <Image style={styles.filmCardImage} source={{ uri: film.poster }} />
                     </TouchableOpacity>
-                    <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.name}</Text>
+                    <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.title}</Text>
                   </View>
                 ))}
               </View>

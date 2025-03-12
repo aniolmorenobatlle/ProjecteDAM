@@ -72,7 +72,7 @@ export default function Search() {
           {movies.map((item, index) => (
             <View key={index} style={[styles.movieItem, { width: itemSize, height: itemSize * 1.5 }]}>
               <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate("Film", { filmId: item.id })}>
-                <Image source={{ uri: item.cover }} style={styles.movieImage} />
+                <Image source={{ uri: item.poster }} style={styles.movieImage} />
               </TouchableOpacity>
             </View>
           ))}

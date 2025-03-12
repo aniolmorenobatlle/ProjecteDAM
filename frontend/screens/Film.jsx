@@ -59,7 +59,7 @@ export default function Film() {
 
   return (
     <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ backgroundColor: "#1F1D36" }} contentContainerStyle={{ paddingBottom: 10}}>
-      <ImageBackground source={{ uri: movieDetails.cover2 }} style={styles.imageBackground}>
+      <ImageBackground source={{ uri: movieDetails.cover }} style={styles.imageBackground}>
         <SafeAreaView style={styles.overlay}>
           <View style={styles.backButton}>
             <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.goBack()}>
@@ -72,7 +72,7 @@ export default function Film() {
       <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
         <View style={styles.filmHeader}>
           <View style={styles.bodyLeft}>
-            <Image style={styles.poster} source={{ uri: movieDetails.cover }} />
+            <Image style={styles.poster} source={{ uri: movieDetails.poster }} />
             <View style={styles.buttons}>
               <View style={styles.button}>
                 <Icon name="duplicate-outline" size={20} style={styles.buttonImage} />
@@ -92,7 +92,10 @@ export default function Film() {
           <View style={styles.bodyRight}>
             <View style={styles.textContainer}>
               <Text style={[globalStyles.textBase, styles.filmTitle]}>
-                {movieDetails.name} <Text style={styles.filmYear}>{year}</Text>
+                {movieDetails.title}{" "}
+                <Text style={styles.filmYear}>
+                  {year}
+                </Text>
               </Text>
               <Text style={[globalStyles.textBase, styles.filmDirector]}>
                 Directed by <Text style={{ fontWeight: "bold" }}>Matt Reeves</Text>
@@ -209,7 +212,7 @@ export default function Film() {
 
 const styles = {
   imageBackground: {
-    height: 320,
+    height: 300,
     width: '100%',
     justifyContent: 'flex-start',
   },
@@ -227,7 +230,7 @@ const styles = {
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: -150,
+    marginTop: -130,
   },
 
   backArrow: {
@@ -247,14 +250,14 @@ const styles = {
 
   bodyLeft: {
     flexDirection: "column",
-    marginTop: -120,
+    marginTop: -100,
     gap: 20
   },
 
   bodyRight: {
     flex: 1,
     flexDirection: "column",
-    marginTop: -20,
+    marginTop: -30,
     gap: 15
   },
 

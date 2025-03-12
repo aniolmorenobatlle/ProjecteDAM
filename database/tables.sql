@@ -19,13 +19,14 @@ CREATE TABLE "user" (
 
 CREATE TABLE movies (
   id SERIAL PRIMARY KEY,
-  name varchar,
+  title varchar,
   release_year date,
+  poster varchar,
   cover varchar,
-  cover2 varchar,
   synopsis text,
-  director_id int,
   vote_average DECIMAL(3, 1),
+  director_id int,
+  id_api int UNIQUE,
   created_at TIMESTAMP
 );
 

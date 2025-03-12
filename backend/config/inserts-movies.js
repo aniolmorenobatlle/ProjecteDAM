@@ -17,9 +17,9 @@ async function fetchAndInsertMovies() {
       const movies = response.data.results;
 
       for (let movie of movies) {
-        const { title, release_date, genre_ids, vote_average } = movie;
-        const cover = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null;
-        const cover2 = movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : null;
+        const { title, release_date, genre_ids, vote_average, id } = movie;
+        const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null;
+        const cover = movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : null;
         const synopsis = movie.overview || '';
         
         // Extreure l'any de la data de llançament (release_date)
@@ -27,7 +27,7 @@ async function fetchAndInsertMovies() {
         
         // Comprovar si la pel·lícula ja existeix (per títol i any de llançament)
         const checkMovieQuery = `
-          SELECT 1 FROM "movies" WHERE "name" = $1 AND EXTRACT(YEAR FROM "release_year") = $2 LIMIT 1;
+          SELECT 1 FROM "movies" WHERE "title" = $1 AND EXTRACT(YEAR FROM "release_year") = $2 LIMIT 1;
         `;
         
         const checkMovieValues = [title, releaseYear];
@@ -35,18 +35,18 @@ async function fetchAndInsertMovies() {
 
         if (checkResult.rowCount > 0) {
           console.log(`La pel·lícula ${title} (${releaseYear}) ja existeix, saltant...`);
-          continue;  // Si ja existeix, continuem amb la següent pel·lícula
+          continue;
         }
 
         // Si la pel·lícula no existeix, la inserim
         const movieQuery = `
-          INSERT INTO "movies"("name", "release_year", "cover", "cover2", "synopsis", "vote_average", "created_at")
-          VALUES($1, $2, $3, $4, $5, $6, NOW())
+          INSERT INTO "movies"("title", "release_year", "poster", "cover", "synopsis", "vote_average", "id_api",  "created_at")
+          VALUES($1, $2, $3, $4, $5, $6, $7, NOW())
           RETURNING id;
         `;
         
         // Si la release_date és buida, passar 'null' per al camp de release_year
-        const movieValues = [title, release_date || null, cover, cover2, synopsis, vote_average];
+        const movieValues = [title, release_date || null, poster, cover, synopsis, vote_average, id];
         const result = await client.query(movieQuery, movieValues);
         const newMovieId = result.rows[0].id;
 
