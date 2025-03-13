@@ -50,8 +50,19 @@ export default function Home() {
     }
   }
 
+  // const clearStoredMovies = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem("popularMovies");
+  //     await AsyncStorage.removeItem("lastPopularTimestamp");
+  //     console.log("Dades esborrades. Es tornaran a carregar.");
+  //   } catch (error) {
+  //     console.error("Error en esborrar les dades: ", error);
+  //   }
+  // };
+  
   const getPopularFilms = async () => {
     try {
+      // await clearStoredMovies();
       const storedMovies = await AsyncStorage.getItem("popularMovies");
       const storedTimestamp = await AsyncStorage.getItem("lastPopularTimestamp");
 
@@ -93,7 +104,6 @@ export default function Home() {
 
       <ScrollView style={globalStyles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.main}>
-
           <View>
             <Text style={[globalStyles.textBase, styles.welcomeback]}>
               Hello, <Text style={styles.welcomebackUser}>{name}</Text>!
@@ -111,7 +121,7 @@ export default function Home() {
               <View style={styles.latestFilms}>
                 {films.map((film, index) => ( 
                   <View key={index} style={styles.filmsCard}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { filmId: film.id })}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { filmId: film.id_api })}>
                       <Image style={styles.filmCardImage} source={{ uri: film.poster }} />
                     </TouchableOpacity>
                     <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.title}</Text>
@@ -157,7 +167,6 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingBottom: 10,
   },
 
   menuIconAvatar: {

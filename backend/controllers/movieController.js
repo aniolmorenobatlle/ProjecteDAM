@@ -91,6 +91,64 @@ exports.fetchLastMostPopularMovies = async (_, res) => {
   }
 };
 
+exports.fetchMovieCast = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const credits = await movieModel.getMovieCreditsCast(id_api);
+
+    if (!credits.length) {
+      return res.status(404).json({ message: 'Crèdits no trobats' });
+    }
+
+    const cast = credits
+      .filter(credit => credit.actor_profile_path)
+      .map(credit => ({
+        id: credit.actor_id,
+        known_for_department: 'Acting',
+        name: credit.actor_name,
+        profile_path: credit.actor_profile_path ? `https://image.tmdb.org/t/p/w500${credit.actor_profile_path}` : null,
+        cast_id: credit.actor_id,
+        credit_id: `actor_${credit.actor_id}`,
+    }));
+
+    const creditsResponse = {
+      id: id_api,
+      cast: cast,
+    };
+
+    res.json(creditsResponse);
+
+  } catch (error) {
+    console.error('Error obtenint els crèdits de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}
+
+exports.fetchMovieDirector = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const director = await movieModel.getMovieCreditsDirector(id_api);
+
+    if (!director.length) {
+      return res.status(404).json({ message: 'Director no trobat' });
+    }
+
+    const directorResponse = director.map(credit => ({
+      id: credit.director_id,
+      known_for_department: 'Directing',
+      name: credit.director_name,
+      job: 'Director',
+    }));
+
+    res.json({ id: id_api, crew: directorResponse });
+
+  } catch (error) {
+    console.error('Error obtenint el director de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}
+
+
 exports.fetchMovieDetails = async (req, res) => {
   try {
     const { id } = req.params;

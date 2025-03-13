@@ -33,8 +33,8 @@ CREATE TABLE movies (
 CREATE TABLE actors (
   id SERIAL PRIMARY KEY,
   name varchar,
-  surname varchar,
   image varchar,
+  id_api int UNIQUE,
   created_at TIMESTAMP
 );
 
@@ -96,6 +96,7 @@ CREATE TABLE lists (
 CREATE TABLE director (
   id SERIAL PRIMARY KEY,
   name varchar,
+  id_api int UNIQUE,
   created_at TIMESTAMP
 );
 
@@ -159,12 +160,12 @@ ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
 
+ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES director(id);
+
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
 ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
-ALTER TABLE director ADD FOREIGN KEY (id) REFERENCES movies (director_id);
-
-ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);
 
 ALTER TABLE movies_genres ADD FOREIGN KEY (movie_id) REFERENCES movies (id);

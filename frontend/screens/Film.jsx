@@ -257,7 +257,7 @@ const styles = {
   bodyRight: {
     flex: 1,
     flexDirection: "column",
-    marginTop: -30,
+    marginTop: -10,
     gap: 15
   },
 

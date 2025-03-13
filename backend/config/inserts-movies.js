@@ -22,34 +22,39 @@ async function fetchAndInsertMovies() {
         const cover = movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : null;
         const synopsis = movie.overview || '';
         
-        // Extreure l'any de la data de llançament (release_date)
-        const releaseYear = release_date ? release_date.split('-')[0] : null;
+        // Comprovar si la data de llançament és vàlida, si no, utilitzar una data per defecte
+        let releaseDate = release_date || '1900-01-01';  // Si no hi ha data, posar una per defecte
         
-        // Comprovar si la pel·lícula ja existeix (per títol i any de llançament)
+        // Si només tens l'any, crea una data completa amb l'any
+        if (release_date && release_date.length === 4) {
+          releaseDate = `${release_date}-01-01`;
+        }
+
+        // Comprovar si la pel·lícula ja existeix per id_api
         const checkMovieQuery = `
-          SELECT 1 FROM "movies" WHERE "title" = $1 AND EXTRACT(YEAR FROM "release_year") = $2 LIMIT 1;
+          SELECT 1 FROM "movies" WHERE "id_api" = $1 LIMIT 1;
         `;
         
-        const checkMovieValues = [title, releaseYear];
+        const checkMovieValues = [id];
         const checkResult = await client.query(checkMovieQuery, checkMovieValues);
 
         if (checkResult.rowCount > 0) {
-          console.log(`La pel·lícula ${title} (${releaseYear}) ja existeix, saltant...`);
+          console.log(`La pel·lícula amb id_api ${id} ja existeix, saltant...`);
           continue;
         }
 
         // Si la pel·lícula no existeix, la inserim
         const movieQuery = `
-          INSERT INTO "movies"("title", "release_year", "poster", "cover", "synopsis", "vote_average", "id_api",  "created_at")
+          INSERT INTO "movies"("title", "release_year", "poster", "cover", "synopsis", "vote_average", "id_api", "created_at")
           VALUES($1, $2, $3, $4, $5, $6, $7, NOW())
           RETURNING id;
         `;
         
-        // Si la release_date és buida, passar 'null' per al camp de release_year
-        const movieValues = [title, release_date || null, poster, cover, synopsis, vote_average, id];
+        const movieValues = [title, releaseDate, poster, cover, synopsis, vote_average, id];
         const result = await client.query(movieQuery, movieValues);
         const newMovieId = result.rows[0].id;
 
+        // Inserir els gèneres associats a la pel·lícula
         for (let genreId of genre_ids) {
           const genreQuery = 'INSERT INTO "movies_genres"("movie_id", "genre_id", "created_at") VALUES($1, $2, NOW())';
           const genreValues = [newMovieId, genreId];
