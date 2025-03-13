@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO "user" ("name", "username", "email", "password", "created_at") 
+      `INSERT INTO "users" ("name", "username", "email", "password", "created_at") 
        VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
       [name, username, email, hashedPassword]
     );
@@ -49,7 +49,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT * FROM "user" WHERE "username" = $1`,
+      `SELECT * FROM "users" WHERE "username" = $1`,
       [username]
     );
 
@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT name, username, email, image FROM "user" WHERE id = $1`,
+      `SELECT name, username, email, image FROM "users" WHERE id = $1`,
       [req.user.userId]
     )
 
@@ -99,4 +99,4 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 })
 
-module.exports = router;  // Export using module.exports
+module.exports = router;

@@ -35,26 +35,50 @@ export default function Film() {
   const [activeButton, setActiveButton] = useState("casts");
   const [movieDetails, setMovieDetails] = useState({});
   const [year, setYear] = useState('');
+  const [casts, setCasts] = useState([]);
+  const [director, setDirector] = useState({});
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
   }
 
-  useEffect(() => {
-    const fetchMovieDetails = async () => {
-      try {
-        const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}`);
-        setMovieDetails(response.data);
+  const fetchMovieDetails = async () => {
+    try {
+      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}`);
+      setMovieDetails(response.data);
 
-        const date = response.data.release_year;
-        const year = date.split("-")[0];
-        setYear(year);
-      } catch (error) {
-        console.error("Error obtenint les dades de la pel·lícula: " + error);
-      }
+      const date = response.data.release_year;
+      const year = date.split("-")[0];
+      setYear(year);
+    } catch (error) {
+      console.error("Error obtenint les dades de la pel·lícula: " + error);
     }
+  }
 
+  const fetchMovieDetailsCast = async () => {
+    try {
+      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/credits/cast`)
+      const sortedCasts = response.data.cast.sort((a, b) => a.order - b.order);
+      setCasts(sortedCasts);
+    } catch (error) {
+      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+    }
+  }
+
+  const fetchMovieDetailsDirector = async () => {
+    try {
+      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/credits/director`)
+      setDirector(response.data.crew[0]);
+    } catch (error) {
+      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+    }
+  }
+
+
+  useEffect(() => {
     fetchMovieDetails();
+    fetchMovieDetailsCast();
+    fetchMovieDetailsDirector();
   }, [filmId])
 
   return (
@@ -98,7 +122,7 @@ export default function Film() {
                 </Text>
               </Text>
               <Text style={[globalStyles.textBase, styles.filmDirector]}>
-                Directed by <Text style={{ fontWeight: "bold" }}>Matt Reeves</Text>
+                Directed by <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
               </Text>
             </View>
             <View style={styles.description}>
@@ -128,54 +152,25 @@ export default function Film() {
           </View>
 
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {activeButton === "casts" && (
+            {activeButton === "casts" && 
               <View style={styles.cast}>
-                <View>
-                  <Image style={styles.castImage} source={{uri: robertPattinson}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Robert</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Pattinson</Text>
-                  </View>
-                </View>
-                <View>
-                  <Image style={styles.castImage} source={{uri: zoeKravitz}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Zoë</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Kravitz</Text>
-                  </View>
-                </View>
-                <View>
-                  <Image style={styles.castImage} source={{uri: paulDano}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Paul</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Dano</Text>
-                  </View>
-                </View>
+                {casts.map((cast, index) => {
+                  const nameParts = cast.name.split(" ");
+                  const firstName = nameParts[0];
+                  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
-                <View>
-                  <Image style={styles.castImage} source={{uri: robertPattinson}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Robert</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Pattinson</Text>
-                  </View>
-                </View>
-                <View>
-                  <Image style={styles.castImage} source={{uri: zoeKravitz}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Zoë</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Kravitz</Text>
-                  </View>
-                </View>
-
-                <View>
-                  <Image style={styles.castImage} source={{uri: paulDano}} />
-                  <View style={styles.castNameContainer}>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Paul</Text>
-                    <Text style={[globalStyles.textBase, styles.castName]}>Dano</Text>
-                  </View>
-                </View>
+                  return (
+                    <View key={index} style={{ flexDirection: "column", alignItems: "center" }}>
+                      <Image style={styles.castImage} source={{ uri: cast.profile_path }} />
+                      <View style={styles.castNameContainer}>
+                        <Text style={[globalStyles.textBase, styles.castName]}>{firstName}</Text>
+                        {lastName && <Text style={[globalStyles.textBase, styles.castName]}>{lastName}</Text>}
+                      </View>
+                    </View>
+                  );
+                })}
               </View>
-            )}
+            }
 
             {activeButton === "watch" && (
               <View style={{ flexDirection: "row", gap: 10 }}>

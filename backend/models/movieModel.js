@@ -38,7 +38,7 @@ const getLastMostPopularMovies = async () => {
 
 const getMovieCreditsCast = async (id) => {
   const query = `
-    SELECT 
+    SELECT
       m.id_api,
       a.id AS actor_id, 
       a.name AS actor_name, 
@@ -60,7 +60,7 @@ const getMovieCreditsDirector = async (id) => {
       d.id AS director_id, 
       d.name AS director_name 
     FROM "movies" m 
-    LEFT JOIN "director" d 
+    LEFT JOIN "directors" d 
     ON m.director_id = d.id 
     WHERE m.id_api = $1;
   `;

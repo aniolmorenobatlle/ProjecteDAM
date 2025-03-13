@@ -102,6 +102,7 @@ exports.fetchMovieCast = async (req, res) => {
 
     const cast = credits
       .filter(credit => credit.actor_profile_path)
+      .sort((a, b) => a.order - b.order)
       .map(credit => ({
         id: credit.actor_id,
         known_for_department: 'Acting',
@@ -109,6 +110,7 @@ exports.fetchMovieCast = async (req, res) => {
         profile_path: credit.actor_profile_path ? `https://image.tmdb.org/t/p/w500${credit.actor_profile_path}` : null,
         cast_id: credit.actor_id,
         credit_id: `actor_${credit.actor_id}`,
+        order: credit.order,
     }));
 
     const creditsResponse = {

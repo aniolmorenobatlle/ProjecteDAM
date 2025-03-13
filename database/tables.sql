@@ -7,7 +7,7 @@ BEGIN
 END$$;
 
 -- Creació de les taules
-CREATE TABLE "user" (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
@@ -34,6 +34,7 @@ CREATE TABLE actors (
   id SERIAL PRIMARY KEY,
   name varchar,
   image varchar,
+  order int,
   id_api int UNIQUE,
   created_at TIMESTAMP
 );
@@ -44,7 +45,7 @@ CREATE TABLE genres (
   created_at TIMESTAMP
 );
 
-CREATE TABLE comment (
+CREATE TABLE comments (
   id SERIAL PRIMARY KEY,
   user_id int,
   movie_id int,
@@ -93,7 +94,7 @@ CREATE TABLE lists (
   created_at TIMESTAMP
 );
 
-CREATE TABLE director (
+CREATE TABLE directors (
   id SERIAL PRIMARY KEY,
   name varchar,
   id_api int UNIQUE,
@@ -132,7 +133,7 @@ CREATE TABLE user_chat (
   created_at TIMESTAMP
 );
 
-CREATE TABLE message (
+CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
   chat_id int,
   user_id int,
@@ -142,25 +143,25 @@ CREATE TABLE message (
 );
 
 -- Afegir les claus foranes
-ALTER TABLE comment ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
-ALTER TABLE comment ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
-ALTER TABLE ratings ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
+ALTER TABLE ratings ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE ratings ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
-ALTER TABLE notifications ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
-ALTER TABLE notifications ADD FOREIGN KEY (friend_id) REFERENCES "user" (id);
+ALTER TABLE notifications ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE notifications ADD FOREIGN KEY (friend_id) REFERENCES users (id);
 ALTER TABLE notifications ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
-ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
-ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES "user" (id);
+ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id);
 
-ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
+ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
-ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
+ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 
-ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES director(id);
+ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
 
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
 ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
@@ -171,8 +172,8 @@ ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);
 ALTER TABLE movies_genres ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 ALTER TABLE movies_genres ADD FOREIGN KEY (genre_id) REFERENCES genres (id);
 
-ALTER TABLE user_chat ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
+ALTER TABLE user_chat ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE user_chat ADD FOREIGN KEY (chat_id) REFERENCES chat (id);
 
-ALTER TABLE message ADD FOREIGN KEY (chat_id) REFERENCES chat (id);
-ALTER TABLE message ADD FOREIGN KEY (user_id) REFERENCES "user" (id);
+ALTER TABLE messages ADD FOREIGN KEY (chat_id) REFERENCES chat (id);
+ALTER TABLE messages ADD FOREIGN KEY (user_id) REFERENCES users (id);
