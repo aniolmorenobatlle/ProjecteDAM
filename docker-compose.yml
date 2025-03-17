@@ -29,14 +29,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - backend_network  # Add to backend_network
-    environment:
-      DB_USER: aniol
-      DB_HOST: postgres
-      DB_NAME: movies
-      DB_PASSWORD: password
-      DB_PORT: 5432
-      API_KEY: 38744b6c459ddd6f2e5e97a7d598773e
+      - backend_network
 
   # Servei per al frontend (React Native)
   frontend:
@@ -44,18 +37,18 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend_container
+    env_file:
+      - ./frontend/.env
     ports:
       - "19000:19000"
       - "19001:19001"
     volumes:
       - ./frontend:/app
       - ./frontend/assets:/app/assets:delegated
-    environment:
-      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
     depends_on:
       - backend
     networks:
-      - backend_network  # frontend on the same network as backend
+      - backend_network
 
 volumes:
   postgres_data:

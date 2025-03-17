@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "RecommendMe",
+    "slug": "RecommendMe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

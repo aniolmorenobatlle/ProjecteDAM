@@ -1,10 +1,8 @@
-// userRoutes.js
-const { compare, hash } = require('bcrypt');
 const dotenv = require('dotenv');
 const { Router } = require('express');
 const pkg = require('jsonwebtoken');
-const pool = require('../config/db.js');
 const authMiddleware = require('../middleware/authMiddleware.js');
+const userModel = require('../models/userModel.js');
 
 const { sign } = pkg;
 dotenv.config();
@@ -12,22 +10,12 @@ dotenv.config();
 const router = Router();
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// Registre
 router.post('/register', async (req, res) => {
   const { name, username, email, password } = req.body;
-  console.log("Secret", SECRET_KEY)
 
   try {
-    const hashedPassword = await hash(password, 10);
+    const userId = await userModel.createUser(name, username, email, password);
 
-    const result = await pool.query(
-      `INSERT INTO "users" ("name", "username", "email", "password", "created_at") 
-       VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
-      [name, username, email, hashedPassword]
-    );
-
-    const userId = result.rows[0].id;
-    
     // Crear token JWS
     const token = sign({ userId }, SECRET_KEY, { expiresIn: '7d' });
 
@@ -43,23 +31,17 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const result = await pool.query(
-      `SELECT * FROM "users" WHERE "username" = $1`,
-      [username]
-    );
+    const user = await userModel.findUserByUsername(username);
 
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(401).json({ message: 'Usuari no trobat' });
     }
 
-    const user = result.rows[0];
-
-    const isMatch = await compare(password, user.password);
+    const isMatch = await userModel.comparePasswords(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Contrasenya incorrecta' });
@@ -79,24 +61,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// User info
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT name, username, email, image FROM "users" WHERE id = $1`,
-      [req.user.userId]
-    )
+    const user = await userModel.findUserById(req.user.userId);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Usuari no trobat' })
+    if (!user) {
+      return res.status(404).json({ message: 'Usuari no trobat' });
     }
 
-    const user = result.rows[0]
-    res.json(user)
+    res.json(user);
   } catch (error) {
-    console.log("Error en crear l'informació de l'usuari")
-    res.status(500).json({ message: 'Error en el servidor' })
+    console.log("Error en crear l'informació de l'usuari");
+    res.status(500).json({ message: 'Error en el servidor' });
   }
-})
+});
 
 module.exports = router;

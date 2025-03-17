@@ -5,20 +5,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { globalStyles } from "../globalStyles";
 
-const thebatmanBackground = "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg"
-const thebatmanPoster = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
-
-
-const paulDano = "https://image.tmdb.org/t/p/w500/zEJJsm0z07EPNl2Pi1h67xuCmcA.jpg"
-const zoeKravitz = "https://image.tmdb.org/t/p/w500/tiQ3TBSvU4YAyrWMmVk6MTrKBAi.jpg"
-const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
-
 import axios from "axios";
 import appleTv from '../assets/sites/appletv.png';
 import disneyPlus from '../assets/sites/disney-plus.png';
 import max from '../assets/sites/max.png';
 import netflix from '../assets/sites/netflix.png';
 import primeVideo from '../assets/sites/prime.png';
+
+const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
 
 const reviews = [
   { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." },
@@ -32,11 +26,12 @@ export default function Film() {
   const route = useRoute();
   const { filmId } = route.params;
   const navigation = useNavigation();
-  const [activeButton, setActiveButton] = useState("casts");
+  const [activeButton, setActiveButton] = useState("cast");
   const [movieDetails, setMovieDetails] = useState({});
   const [year, setYear] = useState('');
-  const [casts, setCasts] = useState([]);
+  const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
+  const [streaming, setStreaming] = useState([]);
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
@@ -58,8 +53,7 @@ export default function Film() {
   const fetchMovieDetailsCast = async () => {
     try {
       const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/credits/cast`)
-      const sortedCasts = response.data.cast.sort((a, b) => a.order - b.order);
-      setCasts(sortedCasts);
+      setCast(response.data.cast);
     } catch (error) {
       console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
     }
@@ -74,11 +68,21 @@ export default function Film() {
     }
   }
 
+  const fetchMovieStreaming = async () => {
+    try {
+      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/streaming`)
+      setStreaming(response.data.flatrate);
+    } catch (error) {
+      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+    }
+  }
+
 
   useEffect(() => {
     fetchMovieDetails();
     fetchMovieDetailsCast();
     fetchMovieDetailsDirector();
+    fetchMovieStreaming();
   }, [filmId])
 
   return (
@@ -137,10 +141,10 @@ export default function Film() {
           <View style={styles.buttonOptions}>
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles.buttonCast, activeButton === 'casts' && styles.buttonCastActive]}
-              onPress={() => handleButtonPress('casts')}
+              style={[styles.buttonCast, activeButton === 'cast' && styles.buttonCastActive]}
+              onPress={() => handleButtonPress('cast')}
             >
-              <Text style={[globalStyles.textBase, styles.buttonCastText]}>Casts</Text>
+              <Text style={[globalStyles.textBase, styles.buttonCastText]}>Cast</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={1}
@@ -152,9 +156,9 @@ export default function Film() {
           </View>
 
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {activeButton === "casts" && 
+            {activeButton === "cast" && 
               <View style={styles.cast}>
-                {casts.map((cast, index) => {
+                {cast.map((cast, index) => {
                   const nameParts = cast.name.split(" ");
                   const firstName = nameParts[0];
                   const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
@@ -240,7 +244,8 @@ const styles = {
   filmHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 15
+    gap: 15,
+    height: 280,
   },
 
   bodyLeft: {
@@ -252,8 +257,8 @@ const styles = {
   bodyRight: {
     flex: 1,
     flexDirection: "column",
-    marginTop: -10,
-    gap: 15
+    marginTop: -30,
+    gap: 15,
   },
 
   poster: {
@@ -311,6 +316,7 @@ const styles = {
 
   description: {
     flex: 1,
+    height: 200
   },
   
   descriptionText: {

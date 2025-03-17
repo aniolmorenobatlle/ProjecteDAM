@@ -1,4 +1,3 @@
-// movieController.js
 const movieModel = require('../models/movieModel.js');
 
 const mostPopularMovies = [
@@ -91,6 +90,22 @@ exports.fetchLastMostPopularMovies = async (_, res) => {
   }
 };
 
+exports.fetchMovieStreaming = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const movie = await movieModel.getMovieStreaming(id_api);
+
+    if (!movie) {
+      return res.status(404).json({ message: 'Pel·lícula no trobada' });
+    }
+
+    res.json(movie);
+  } catch (error) {
+    console.error('Error obtenint la pel·lícula en streaming:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}
+
 exports.fetchMovieCast = async (req, res) => {
   try {
     const { id_api } = req.params;
@@ -149,7 +164,6 @@ exports.fetchMovieDirector = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 }
-
 
 exports.fetchMovieDetails = async (req, res) => {
   try {

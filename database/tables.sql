@@ -34,7 +34,6 @@ CREATE TABLE actors (
   id SERIAL PRIMARY KEY,
   name varchar,
   image varchar,
-  order int,
   id_api int UNIQUE,
   created_at TIMESTAMP
 );
@@ -108,9 +107,28 @@ CREATE TABLE movie_list (
   created_at TIMESTAMP
 );
 
+CREATE TABLE streaming (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL UNIQUE,
+  logo VARCHAR,
+  id_api INT UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE movies_streaming (
+  movie_id INT,
+  streaming_id INT,
+  display_priority INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (movie_id, streaming_id),
+  FOREIGN KEY (movie_id) REFERENCES movies (id_api),
+  FOREIGN KEY (streaming_id) REFERENCES streaming (id_api)
+);
+
 CREATE TABLE movies_actors (
   movie_id int,
   actor_id int,
+  "order" int,
   created_at TIMESTAMP,
   PRIMARY KEY (movie_id, actor_id)
 );

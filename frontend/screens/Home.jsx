@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Sidebar from '../components/Sidebar';
 import { globalStyles } from "../globalStyles";
 
-
 const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
 const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
 const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg"

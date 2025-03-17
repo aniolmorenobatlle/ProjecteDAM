@@ -47,7 +47,8 @@ async function fetchAndInsertMovies() {
         const movieQuery = `
           INSERT INTO "movies"("title", "release_year", "poster", "cover", "synopsis", "vote_average", "id_api", "created_at")
           VALUES($1, $2, $3, $4, $5, $6, $7, NOW())
-          RETURNING id;
+          RETURNING id
+          ON CONFLICT ("id_api") DO NOTHING;
         `;
         
         const movieValues = [title, releaseDate, poster, cover, synopsis, vote_average, id];
@@ -56,7 +57,7 @@ async function fetchAndInsertMovies() {
 
         // Inserir els gèneres associats a la pel·lícula
         for (let genreId of genre_ids) {
-          const genreQuery = 'INSERT INTO "movies_genres"("movie_id", "genre_id", "created_at") VALUES($1, $2, NOW())';
+          const genreQuery = 'INSERT INTO "movies_genres"("movie_id", "genre_id", "created_at") VALUES($1, $2, NOW()) ON CONFLICT DO NOTHING;';
           const genreValues = [newMovieId, genreId];
           await client.query(genreQuery, genreValues);
           console.log(`Genere associat a la pel·lícula ${title}`);

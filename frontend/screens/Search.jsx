@@ -2,10 +2,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { globalStyles } from "../globalStyles";
+
 
 const numColumns = 4;
 const screenWidth = Dimensions.get("window").width;
@@ -55,13 +56,17 @@ export default function Search() {
   }, [])
 
   return (
-    <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
+    <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>      
       <View style={styles.header}>
         <Text style={[globalStyles.textBase, styles.headerTitle]}>Search</Text>
-
+      
         <View style={styles.searchBar}>
           <Icon name="search-outline" color="#c3c3c3" size={20} style={styles.searchIcon} />
-          <Text style={[globalStyles.textBase, styles.searchText]}>Search for a movie</Text>
+          <TextInput
+            style={[globalStyles.textBase, styles.searchText]}
+            placeholder="Search for a movie"
+            placeholderTextColor="#c3c3c3"
+          />
         </View>
       </View>
 

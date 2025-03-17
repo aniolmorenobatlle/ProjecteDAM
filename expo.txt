@@ -2,7 +2,7 @@ docker exec -it frontend_container bash
 
 npx expo start --tunnel
 
-npx react-native start --reset-cache
+npx expo start --tunnel --clear
 
 ------------------------------------------------------
 
@@ -20,3 +20,5 @@ psql -U aniol -d movies -f /tables.sql
 docker compose exec backend node config/inserts-genres.js
 
 docker compose exec backend node config/inserts-movies.js
+
+docker compose exec backend node config/inserts-cast.js

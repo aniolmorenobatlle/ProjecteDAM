@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const { json } = require('express');
 const movieRoutes = require('./routes/movieRoutes.js');
@@ -11,8 +10,8 @@ const PORT = 3000;
 app.use(json());
 
 // Registra les rutes
-app.use(movieRoutes); // Rutes de pelis
-app.use('/api/users', userRoutes); // Ruta per a usuaris
+app.use('/api/movies', movieRoutes);
+app.use('/api/users', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor en funcionament a http://localhost:${PORT}`);
