@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { fetchMovies, fetchMostPopularMovies, fetchLastMostPopularMovies, fetchMovieStreaming,fetchMovieCast, fetchMovieDirector, fetchMovieDetails  } = require('../controllers/movieController.js');
+const { fetchMovies, fetchMostPopularMovies, fetchLastMostPopularMovies, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails } = require('../controllers/movieController.js');
 const router = Router();
 
 router.get('/', fetchMovies);

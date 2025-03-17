@@ -126,7 +126,7 @@ exports.fetchMovieCast = async (req, res) => {
         cast_id: credit.actor_id,
         credit_id: `actor_${credit.actor_id}`,
         order: credit.order,
-    }));
+      }));
 
     const creditsResponse = {
       id: id_api,

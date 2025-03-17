@@ -50,10 +50,10 @@ router.post('/login', async (req, res) => {
     // Crear token JWS
     const token = sign({ userId: user.id }, SECRET_KEY, { expiresIn: '7d' });
 
-    res.status(200).json({ 
-      message: 'Login correcte', 
+    res.status(200).json({
+      message: 'Login correcte',
       userId: user.id,
-      token: token 
+      token: token
     });
   } catch (error) {
     console.error(error);

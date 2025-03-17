@@ -15,7 +15,7 @@ const getMoviesCount = async () => {
 const getMovieByTitle = async (title) => {
   const query = 'SELECT * FROM "movies" WHERE title = $1 LIMIT 1';
   const result = await pool.query(query, [title]);
-  
+
   return result.rows[0];
 };
 
@@ -78,8 +78,8 @@ const getMovieCreditsDirector = async (id) => {
 const getMovieById = async (id) => {
   const query = 'SELECT * FROM "movies" WHERE id_api = $1 LIMIT 1';
   const result = await pool.query(query, [id]);
-  
+
   return result.rows[0];
 };
 
-module.exports = { getMovies, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieStreaming,getMovieCreditsCast, getMovieCreditsDirector, getMovieById };
+module.exports = { getMovies, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };

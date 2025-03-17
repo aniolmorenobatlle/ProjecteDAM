@@ -21,10 +21,10 @@ async function fetchAndInsertMovies() {
         const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null;
         const cover = movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : null;
         const synopsis = movie.overview || '';
-        
+
         // Comprovar si la data de llançament és vàlida, si no, utilitzar una data per defecte
         let releaseDate = release_date || '1900-01-01';  // Si no hi ha data, posar una per defecte
-        
+
         // Si només tens l'any, crea una data completa amb l'any
         if (release_date && release_date.length === 4) {
           releaseDate = `${release_date}-01-01`;
@@ -34,7 +34,7 @@ async function fetchAndInsertMovies() {
         const checkMovieQuery = `
           SELECT 1 FROM "movies" WHERE "id_api" = $1 LIMIT 1;
         `;
-        
+
         const checkMovieValues = [id];
         const checkResult = await client.query(checkMovieQuery, checkMovieValues);
 
@@ -50,7 +50,7 @@ async function fetchAndInsertMovies() {
           RETURNING id
           ON CONFLICT ("id_api") DO NOTHING;
         `;
-        
+
         const movieValues = [title, releaseDate, poster, cover, synopsis, vote_average, id];
         const result = await client.query(movieQuery, movieValues);
         const newMovieId = result.rows[0].id;

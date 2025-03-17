@@ -8,7 +8,7 @@ const baseURL = 'https://api.themoviedb.org/3/';
 // Obtenir i afegir actors i director
 async function fetchAndInsertActorsAndDirector(movieId) {
   const client = await pool.connect();
-  
+
   try {
     const response = await axios.get(`${baseURL}movie/${movieId}/credits?api_key=${apiKey}`);
     const { cast, crew } = response.data;
