@@ -1,53 +1,56 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from 'react-native-vector-icons/Ionicons';
-import Sidebar from '../components/Sidebar';
+import Icon from "react-native-vector-icons/Ionicons";
+import Sidebar from "../components/Sidebar";
 import { globalStyles } from "../globalStyles";
 
-const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
-const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
-const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg"
-const avatar = "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg"
+const theGorge =
+  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
+const theBatman =
+  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
+const babyDriver =
+  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
+const avatar =
+  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
 
 const movies = [
   { name: "The Batman", image: theBatman, year: 2022, duration: "175 min" },
   { name: "The Gorge", image: theGorge, year: 2025, duration: "127 min" },
   { name: "Avatar", image: avatar, year: 2009, duration: "162 min" },
   { name: "Baby Driver", image: babyDriver, year: 2017, duration: "113 min" },
-]
+];
 
 export default function Home() {
   const navigation = useNavigation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [name, setName] = useState('')
-  const [image, setImage] = useState('')
-  const [films, setFilms] = useState([])
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("");
+  const [films, setFilms] = useState([]);
 
   const getUserInfo = async () => {
-    const token = await AsyncStorage.getItem('authToken')
-  
-    try {
-      const respose = await axios.get('http://172.20.10.2:3000/api/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
+    const token = await AsyncStorage.getItem("authToken");
 
-      const name = respose.data.name.split(" ")[0]
-    
-      setName(name)
-      setImage(respose.data.image)
-  
-      return respose.data
-      
+    try {
+      const respose = await axios.get("http://172.20.10.2:3000/api/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const name = respose.data.name.split(" ")[0];
+
+      setName(name);
+      setImage(respose.data.image);
+
+      return respose.data;
     } catch (error) {
-      console.error("Errror en obtenir les dades del usuari: " + error)
+      console.error("Errror en obtenir les dades del usuari: " + error);
     }
-  }
+  };
 
   // const clearStoredMovies = async () => {
   //   try {
@@ -58,50 +61,78 @@ export default function Home() {
   //     console.error("Error en esborrar les dades: ", error);
   //   }
   // };
-  
+
   const getPopularFilms = async () => {
     try {
       // await clearStoredMovies();
       const storedMovies = await AsyncStorage.getItem("popularMovies");
-      const storedTimestamp = await AsyncStorage.getItem("lastPopularTimestamp");
+      const storedTimestamp = await AsyncStorage.getItem(
+        "lastPopularTimestamp"
+      );
 
       const now = Date.now();
       const oneDay = 24 * 60 * 60 * 1000;
 
-      if (storedMovies && storedTimestamp && now - Number(storedTimestamp) < oneDay) {
+      if (
+        storedMovies &&
+        storedTimestamp &&
+        now - Number(storedTimestamp) < oneDay
+      ) {
         setFilms(JSON.parse(storedMovies));
         return;
       }
-  
-      const response = await axios.get("http://172.20.10.2:3000/api/movies/last_most_popular");
+
+      const response = await axios.get(
+        "http://172.20.10.2:3000/api/movies/last_most_popular"
+      );
       setFilms(response.data.movies);
-  
-      await AsyncStorage.setItem("popularMovies", JSON.stringify(response.data.movies));
+
+      await AsyncStorage.setItem(
+        "popularMovies",
+        JSON.stringify(response.data.movies)
+      );
       await AsyncStorage.setItem("lastPopularTimestamp", JSON.stringify(now));
     } catch (error) {
       console.error("Error en obtenir les pel·lícules populars: " + error);
     }
   };
-  
+
   useEffect(() => {
     getUserInfo();
     getPopularFilms();
-  }, []);  
-  
+  }, []);
+
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-      <Sidebar isOpen={isSidebarOpen} closeMenu={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        closeMenu={() => setIsSidebarOpen(false)}
+      />
 
       <View style={styles.header}>
-        <TouchableOpacity activeOpacity={0.8} onPress={() => setIsSidebarOpen(true)}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setIsSidebarOpen(true)}
+        >
           <Icon name="menu" size={50} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          {image ? <Image style={styles.menuIconAvatar} source={{ uri: image }} /> : <Icon name="person-circle-outline" size={50} style={styles.menuIconAvatarNone} />}
+        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          {image ? (
+            <Image style={styles.menuIconAvatar} source={{ uri: image }} />
+          ) : (
+            <Icon
+              name="person-circle-outline"
+              size={50}
+              style={styles.menuIconAvatarNone}
+            />
+          )}
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={globalStyles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={globalStyles.container}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.main}>
           <View>
             <Text style={[globalStyles.textBase, styles.welcomeback]}>
@@ -109,21 +140,38 @@ export default function Home() {
             </Text>
 
             <Text style={[globalStyles.textBase, styles.newToday]}>
-              See what's new today!  
+              See what's new today!
             </Text>
           </View>
 
           <View style={styles.latest}>
-            <Text style={[globalStyles.textBase, styles.latestTitle]}>Popular this month</Text>
+            <Text style={[globalStyles.textBase, styles.latestTitle]}>
+              Popular this month
+            </Text>
 
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
               <View style={styles.latestFilms}>
-                {films.map((film, index) => ( 
+                {films.map((film, index) => (
                   <View key={index} style={styles.filmsCard}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Film', { filmId: film.id_api })}>
-                      <Image style={styles.filmCardImage} source={{ uri: film.poster }} />
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      onPress={() =>
+                        navigation.navigate("Film", {
+                          filmId: film.id_api,
+                        })
+                      }
+                    >
+                      <Image
+                        style={styles.filmCardImage}
+                        source={{ uri: film.poster }}
+                      />
                     </TouchableOpacity>
-                    <Text style={[globalStyles.textBase, styles.filmCardName]}>{film.title}</Text>
+                    <Text style={[globalStyles.textBase, styles.filmCardName]}>
+                      {film.title}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -131,24 +179,59 @@ export default function Home() {
           </View>
 
           <View style={styles.latest}>
-            <Text style={[globalStyles.textBase, styles.latestTitle]}>Favorite</Text>
+            <Text style={[globalStyles.textBase, styles.latestTitle]}>
+              Favorite
+            </Text>
 
             <View style={styles.favoriteFilms}>
               {movies.map((film, index) => (
-                <TouchableOpacity key={index} activeOpacity={0.8} onPress={() => navigation.navigate('Film', { film })}>
-                <View key={index} style={styles.favoriteCard}>
-                  <Image style={styles.favoriteCardImage} source={{uri: film.image}} /> 
-                  <View style={styles.favoriteCardInfo}> 
-                    <Text style={[globalStyles.textBase, styles.favoriteCardInfoTitle]}>{film.name}</Text> 
-                    <Text style={[globalStyles.textBase, styles.favoriteCardInfoYear]}>{film.year}</Text> 
-                    <View style={styles.favoriteCardInfoDuration}>
-                      <Icon name="time-outline" color="white" size={20} style={styles.favoriteCardInfoDurationClock} />
-                      <Text style={[globalStyles.textBase, styles.favoriteCardInfoDurationText]}>{film.duration}</Text> 
-                    </View> 
-                  </View> 
-                </View>
+                <TouchableOpacity
+                  key={index}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate("Film", { film })}
+                >
+                  <View key={index} style={styles.favoriteCard}>
+                    <Image
+                      style={styles.favoriteCardImage}
+                      source={{ uri: film.image }}
+                    />
+                    <View style={styles.favoriteCardInfo}>
+                      <Text
+                        style={[
+                          globalStyles.textBase,
+                          styles.favoriteCardInfoTitle,
+                        ]}
+                      >
+                        {film.name}
+                      </Text>
+                      <Text
+                        style={[
+                          globalStyles.textBase,
+                          styles.favoriteCardInfoYear,
+                        ]}
+                      >
+                        {film.year}
+                      </Text>
+                      <View style={styles.favoriteCardInfoDuration}>
+                        <Icon
+                          name="time-outline"
+                          color="white"
+                          size={20}
+                          style={styles.favoriteCardInfoDurationClock}
+                        />
+                        <Text
+                          style={[
+                            globalStyles.textBase,
+                            styles.favoriteCardInfoDurationText,
+                          ]}
+                        >
+                          {film.duration}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
                 </TouchableOpacity>
-              ))} 
+              ))}
             </View>
           </View>
         </View>
@@ -173,7 +256,7 @@ const styles = {
     height: 50,
     borderRadius: "50%",
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: "white",
   },
 
   menuIconAvatarNone: {
@@ -215,7 +298,7 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
-    height: 280
+    height: 280,
   },
 
   filmCardImage: {

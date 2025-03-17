@@ -1,26 +1,59 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ImageBackground,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 
 import axios from "axios";
-import appleTv from '../assets/sites/appletv.png';
-import disneyPlus from '../assets/sites/disney-plus.png';
-import max from '../assets/sites/max.png';
-import netflix from '../assets/sites/netflix.png';
-import primeVideo from '../assets/sites/prime.png';
+import appleTv from "../assets/sites/appletv.png";
+import disneyPlus from "../assets/sites/disney-plus.png";
+import max from "../assets/sites/max.png";
+import netflix from "../assets/sites/netflix.png";
+import primeVideo from "../assets/sites/prime.png";
 
-const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
+const robertPattinson =
+  "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg";
 
 const reviews = [
-  { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." },
-  { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." },
-  { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." },
-  { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." },
-  { name: "David", image: robertPattinson, review: "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect." }
-]
+  {
+    name: "David",
+    image: robertPattinson,
+    review:
+      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
+  },
+  {
+    name: "David",
+    image: robertPattinson,
+    review:
+      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
+  },
+  {
+    name: "David",
+    image: robertPattinson,
+    review:
+      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
+  },
+  {
+    name: "David",
+    image: robertPattinson,
+    review:
+      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
+  },
+  {
+    name: "David",
+    image: robertPattinson,
+    review:
+      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
+  },
+];
 
 export default function Film() {
   const route = useRoute();
@@ -28,18 +61,20 @@ export default function Film() {
   const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("cast");
   const [movieDetails, setMovieDetails] = useState({});
-  const [year, setYear] = useState('');
+  const [year, setYear] = useState("");
   const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
   const [streaming, setStreaming] = useState([]);
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
-  }
+  };
 
   const fetchMovieDetails = async () => {
     try {
-      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}`);
+      const response = await axios.get(
+        `http://172.20.10.2:3000/api/movies/${filmId}`
+      );
       setMovieDetails(response.data);
 
       const date = response.data.release_year;
@@ -48,49 +83,71 @@ export default function Film() {
     } catch (error) {
       console.error("Error obtenint les dades de la pel·lícula: " + error);
     }
-  }
+  };
 
   const fetchMovieDetailsCast = async () => {
     try {
-      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/credits/cast`)
+      const response = await axios.get(
+        `http://172.20.10.2:3000/api/movies/${filmId}/credits/cast`
+      );
       setCast(response.data.cast);
     } catch (error) {
-      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+      console.error(
+        "Error obtenint els actors/actrius de la pel·lícula: " + error
+      );
     }
-  }
+  };
 
   const fetchMovieDetailsDirector = async () => {
     try {
-      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/credits/director`)
+      const response = await axios.get(
+        `http://172.20.10.2:3000/api/movies/${filmId}/credits/director`
+      );
       setDirector(response.data.crew[0]);
     } catch (error) {
-      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+      console.error(
+        "Error obtenint els actors/actrius de la pel·lícula: " + error
+      );
     }
-  }
+  };
 
   const fetchMovieStreaming = async () => {
     try {
-      const response = await axios.get(`http://172.20.10.2:3000/api/movies/${filmId}/streaming`)
+      const response = await axios.get(
+        `http://172.20.10.2:3000/api/movies/${filmId}/streaming`
+      );
       setStreaming(response.data.flatrate);
     } catch (error) {
-      console.error("Error obtenint els actors/actrius de la pel·lícula: " + error);
+      console.error(
+        "Error obtenint els actors/actrius de la pel·lícula: " + error
+      );
     }
-  }
-
+  };
 
   useEffect(() => {
     fetchMovieDetails();
     fetchMovieDetailsCast();
     fetchMovieDetailsDirector();
     fetchMovieStreaming();
-  }, [filmId])
+  }, [filmId]);
 
   return (
-    <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ backgroundColor: "#1F1D36" }} contentContainerStyle={{ paddingBottom: 10}}>
-      <ImageBackground source={{ uri: movieDetails.cover }} style={styles.imageBackground}>
+    <ScrollView
+      vertical={true}
+      showsVerticalScrollIndicator={false}
+      style={{ backgroundColor: "#1F1D36" }}
+      contentContainerStyle={{ paddingBottom: 10 }}
+    >
+      <ImageBackground
+        source={{ uri: movieDetails.cover }}
+        style={styles.imageBackground}
+      >
         <SafeAreaView style={styles.overlay}>
           <View style={styles.backButton}>
-            <TouchableOpacity activeOpacity={0.5} onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => navigation.goBack()}
+            >
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
           </View>
@@ -100,19 +157,40 @@ export default function Film() {
       <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
         <View style={styles.filmHeader}>
           <View style={styles.bodyLeft}>
-            <Image style={styles.poster} source={{ uri: movieDetails.poster }} />
+            <Image
+              style={styles.poster}
+              source={{ uri: movieDetails.poster }}
+            />
             <View style={styles.buttons}>
               <View style={styles.button}>
-                <Icon name="duplicate-outline" size={20} style={styles.buttonImage} />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>Rate</Text>
+                <Icon
+                  name="duplicate-outline"
+                  size={20}
+                  style={styles.buttonImage}
+                />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>
+                  Rate
+                </Text>
               </View>
               <View style={styles.button}>
-                <Icon name="list-outline" size={20} style={styles.buttonImage} />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Lists</Text>
+                <Icon
+                  name="list-outline"
+                  size={20}
+                  style={styles.buttonImage}
+                />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>
+                  Add to Lists
+                </Text>
               </View>
               <View style={styles.button}>
-                <Icon name="document-outline" size={20} style={styles.buttonImage} />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>Add to Watchlist</Text>
+                <Icon
+                  name="document-outline"
+                  size={20}
+                  style={styles.buttonImage}
+                />
+                <Text style={[globalStyles.textBase, styles.buttonText]}>
+                  Add to Watchlist
+                </Text>
               </View>
             </View>
           </View>
@@ -120,69 +198,100 @@ export default function Film() {
           <View style={styles.bodyRight}>
             <View style={styles.textContainer}>
               <Text style={[globalStyles.textBase, styles.filmTitle]}>
-                {movieDetails.title}{" "}
-                <Text style={styles.filmYear}>
-                  {year}
-                </Text>
+                {movieDetails.title} <Text style={styles.filmYear}>{year}</Text>
               </Text>
               <Text style={[globalStyles.textBase, styles.filmDirector]}>
-                Directed by <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
+                Directed by{" "}
+                <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
               </Text>
             </View>
             <View style={styles.description}>
-              <Text style={[globalStyles.textBase, styles.descriptionText]} numberOfLines={10}>
+              <Text
+                style={[globalStyles.textBase, styles.descriptionText]}
+                numberOfLines={10}
+              >
                 {movieDetails.synopsis}
               </Text>
             </View>
-          </View>  
+          </View>
         </View>
 
         <View style={styles.castContainer}>
           <View style={styles.buttonOptions}>
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles.buttonCast, activeButton === 'cast' && styles.buttonCastActive]}
-              onPress={() => handleButtonPress('cast')}
+              style={[
+                styles.buttonCast,
+                activeButton === "cast" && styles.buttonCastActive,
+              ]}
+              onPress={() => handleButtonPress("cast")}
             >
-              <Text style={[globalStyles.textBase, styles.buttonCastText]}>Cast</Text>
+              <Text style={[globalStyles.textBase, styles.buttonCastText]}>
+                Cast
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={1}
-              style={[styles.buttonCast, activeButton === 'watch' && styles.buttonCastActive]}
-              onPress={() => handleButtonPress('watch')}
+              style={[
+                styles.buttonCast,
+                activeButton === "watch" && styles.buttonCastActive,
+              ]}
+              onPress={() => handleButtonPress("watch")}
             >
-              <Text style={[globalStyles.textBase, styles.buttonCastText]}>Watch</Text>
+              <Text style={[globalStyles.textBase, styles.buttonCastText]}>
+                Watch
+              </Text>
             </TouchableOpacity>
           </View>
 
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {activeButton === "cast" && 
+            {activeButton === "cast" && (
               <View style={styles.cast}>
                 {cast.map((cast, index) => {
                   const nameParts = cast.name.split(" ");
                   const firstName = nameParts[0];
-                  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+                  const lastName =
+                    nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
                   return (
-                    <View key={index} style={{ flexDirection: "column", alignItems: "center" }}>
-                      <Image style={styles.castImage} source={{ uri: cast.profile_path }} />
+                    <View
+                      key={index}
+                      style={{
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        style={styles.castImage}
+                        source={{
+                          uri: cast.profile_path,
+                        }}
+                      />
                       <View style={styles.castNameContainer}>
-                        <Text style={[globalStyles.textBase, styles.castName]}>{firstName}</Text>
-                        {lastName && <Text style={[globalStyles.textBase, styles.castName]}>{lastName}</Text>}
+                        <Text style={[globalStyles.textBase, styles.castName]}>
+                          {firstName}
+                        </Text>
+                        {lastName && (
+                          <Text
+                            style={[globalStyles.textBase, styles.castName]}
+                          >
+                            {lastName}
+                          </Text>
+                        )}
                       </View>
                     </View>
                   );
                 })}
               </View>
-            }
+            )}
 
             {activeButton === "watch" && (
               <View style={{ flexDirection: "row", gap: 10 }}>
-                <Image style={styles.streamingImage} source={netflix}/>
-                <Image style={styles.streamingImage} source={primeVideo}/>
-                <Image style={styles.streamingImage} source={disneyPlus}/>
-                <Image style={styles.streamingImage} source={max}/>
-                <Image style={styles.streamingImage} source={appleTv}/>
+                <Image style={styles.streamingImage} source={netflix} />
+                <Image style={styles.streamingImage} source={primeVideo} />
+                <Image style={styles.streamingImage} source={disneyPlus} />
+                <Image style={styles.streamingImage} source={max} />
+                <Image style={styles.streamingImage} source={appleTv} />
               </View>
             )}
           </ScrollView>
@@ -197,10 +306,20 @@ export default function Film() {
           {reviews.map((review, index) => (
             <View key={index} style={styles.reviewContainer}>
               <View style={styles.reviewHeader}>
-                <Image style={styles.reviewImageUser} source={{uri: review.image}}/>
-                <Text style={[globalStyles.textBase, styles.reviewText]}>Review by <Text style={[globalStyles.textBase, styles.reviewTextUser]}>{review.name}</Text></Text>
+                <Image
+                  style={styles.reviewImageUser}
+                  source={{ uri: review.image }}
+                />
+                <Text style={[globalStyles.textBase, styles.reviewText]}>
+                  Review by{" "}
+                  <Text style={[globalStyles.textBase, styles.reviewTextUser]}>
+                    {review.name}
+                  </Text>
+                </Text>
               </View>
-              <Text style={[globalStyles.textBase, styles.reviewResult]}>{review.review}</Text>
+              <Text style={[globalStyles.textBase, styles.reviewResult]}>
+                {review.review}
+              </Text>
             </View>
           ))}
         </View>
@@ -212,13 +331,13 @@ export default function Film() {
 const styles = {
   imageBackground: {
     height: 300,
-    width: '100%',
-    justifyContent: 'flex-start',
+    width: "100%",
+    justifyContent: "flex-start",
   },
 
   overlay: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 15,
   },
 
@@ -251,7 +370,7 @@ const styles = {
   bodyLeft: {
     flexDirection: "column",
     marginTop: -100,
-    gap: 20
+    gap: 20,
   },
 
   bodyRight: {
@@ -281,7 +400,7 @@ const styles = {
 
   filmDirector: {
     fontSize: 12,
-    marginTop: 5
+    marginTop: 5,
   },
 
   body: {
@@ -316,9 +435,9 @@ const styles = {
 
   description: {
     flex: 1,
-    height: 200
+    height: 200,
   },
-  
+
   descriptionText: {
     fontSize: 14,
     color: "#fff",
@@ -335,7 +454,7 @@ const styles = {
   },
 
   castName: {
-    fontSize: 10
+    fontSize: 10,
   },
 
   streamingImage: {
@@ -377,7 +496,7 @@ const styles = {
 
   cast: {
     flexDirection: "row",
-    gap: 15
+    gap: 15,
   },
 
   castImage: {
@@ -421,13 +540,13 @@ const styles = {
   reviewText: {
     color: "rgba(255, 255, 255, 0.5)",
     marginLeft: 10,
-    fontSize: 12
+    fontSize: 12,
   },
 
   reviewTextUser: {
     color: "#E9A6A6",
     opacity: 1,
-    fontSize: 12
+    fontSize: 12,
   },
 
   reviewResult: {
@@ -435,5 +554,5 @@ const styles = {
     marginLeft: 60,
     fontSize: 14,
     marginTop: -8,
-  }
+  },
 };

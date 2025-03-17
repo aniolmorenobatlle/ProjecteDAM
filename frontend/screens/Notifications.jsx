@@ -4,95 +4,338 @@ import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { globalStyles } from "../globalStyles";
 
-const paulDano = "https://image.tmdb.org/t/p/w500/zEJJsm0z07EPNl2Pi1h67xuCmcA.jpg"
-const zoeKravitz = "https://image.tmdb.org/t/p/w500/tiQ3TBSvU4YAyrWMmVk6MTrKBAi.jpg"
-const robertPattinson = "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg"
+const paulDano =
+  "https://image.tmdb.org/t/p/w500/zEJJsm0z07EPNl2Pi1h67xuCmcA.jpg";
+const zoeKravitz =
+  "https://image.tmdb.org/t/p/w500/tiQ3TBSvU4YAyrWMmVk6MTrKBAi.jpg";
+const robertPattinson =
+  "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg";
 
 const friendsActivity = [
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
-  { avatar: paulDano, text: "Paul added The Batman to the watchlist", time: "1h" },
-  { avatar: robertPattinson, text: "Robert added The Batman to the watchlist", time: "2h" },
-  { avatar: zoeKravitz, text: "Zoe added The Batman to the watchlist", time: "3h" },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    text: "Paul added The Batman to the watchlist",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    text: "Robert added The Batman to the watchlist",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    text: "Zoe added The Batman to the watchlist",
+    time: "3h",
+  },
 ];
 
 const chatActivity = [
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-  { avatar: paulDano, name: "Paul Dano", message: "Hey, have you seen The Batman?", time: "1h" },
-  { avatar: robertPattinson, name: "Robert Pattinson", message: "Do you want to see some movie?", time: "2h" },
-  { avatar: zoeKravitz, name: "Zoe Kravitz", message: "I'm going to watch The Batman tonight", time: "3h" },
-]
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+  {
+    avatar: paulDano,
+    name: "Paul Dano",
+    message: "Hey, have you seen The Batman?",
+    time: "1h",
+  },
+  {
+    avatar: robertPattinson,
+    name: "Robert Pattinson",
+    message: "Do you want to see some movie?",
+    time: "2h",
+  },
+  {
+    avatar: zoeKravitz,
+    name: "Zoe Kravitz",
+    message: "I'm going to watch The Batman tonight",
+    time: "3h",
+  },
+];
 
 export default function Notifications() {
   const [activeButton, setActiveButton] = React.useState("friends");
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
-  }
+  };
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
       <View style={styles.header}>
-        <Text style={[globalStyles.textBase, styles.headerTitle]}>Notifications</Text>
+        <Text style={[globalStyles.textBase, styles.headerTitle]}>
+          Notifications
+        </Text>
       </View>
 
       <View style={styles.superiorNav}>
-        <TouchableOpacity 
-          activeOpacity={0.8} 
-          style={[styles.navButton, activeButton === "friends" ? styles.navButtonActive : {}]}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[
+            styles.navButton,
+            activeButton === "friends" ? styles.navButtonActive : {},
+          ]}
           onPress={() => handleButtonPress("friends")}
         >
-          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>Friends activity</Text>
+          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>
+            Friends activity
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          activeOpacity={0.8} 
-          style={[styles.navButton, activeButton === "chat" ? styles.navButtonActive : {}]}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[
+            styles.navButton,
+            activeButton === "chat" ? styles.navButtonActive : {},
+          ]}
           onPress={() => handleButtonPress("chat")}
         >
-          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>Chat</Text>
+          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>
+            Chat
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -100,9 +343,13 @@ export default function Notifications() {
         <ScrollView vertical={true} style={styles.body}>
           {friendsActivity.map((activity, index) => (
             <View key={index} style={styles.messageActivity}>
-              <Image style={styles.avatar} source={{uri: activity.avatar}} />
-              <Text style={[globalStyles.textBase, styles.notificationText]}>{activity.text}</Text>
-              <Text style={[globalStyles.textBase, styles.notificationTime]}>{activity.time}</Text>
+              <Image style={styles.avatar} source={{ uri: activity.avatar }} />
+              <Text style={[globalStyles.textBase, styles.notificationText]}>
+                {activity.text}
+              </Text>
+              <Text style={[globalStyles.textBase, styles.notificationTime]}>
+                {activity.time}
+              </Text>
             </View>
           ))}
         </ScrollView>
@@ -110,17 +357,23 @@ export default function Notifications() {
 
       {activeButton === "chat" && (
         <ScrollView vertical={true} style={styles.body}>
-        {chatActivity.map((activity, index) => (
-          <View key={index} style={styles.messageActivity}>
-            <Image style={styles.avatar} source={{uri: activity.avatar}} />
-            <View style={styles.chatTexts}>
-              <Text style={[globalStyles.textBase, styles.chatTextUser]}>{activity.name}</Text>
-              <Text style={[globalStyles.textBase, styles.chatTextMessage]}>{activity.message}</Text>
+          {chatActivity.map((activity, index) => (
+            <View key={index} style={styles.messageActivity}>
+              <Image style={styles.avatar} source={{ uri: activity.avatar }} />
+              <View style={styles.chatTexts}>
+                <Text style={[globalStyles.textBase, styles.chatTextUser]}>
+                  {activity.name}
+                </Text>
+                <Text style={[globalStyles.textBase, styles.chatTextMessage]}>
+                  {activity.message}
+                </Text>
+              </View>
+              <Text style={[globalStyles.textBase, styles.notificationTime]}>
+                {activity.time}
+              </Text>
             </View>
-            <Text style={[globalStyles.textBase, styles.notificationTime]}>{activity.time}</Text>
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
       )}
     </SafeAreaView>
   );
@@ -214,4 +467,3 @@ const styles = {
     paddingLeft: 10,
   },
 };
-

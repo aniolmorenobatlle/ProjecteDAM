@@ -1,75 +1,91 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 import React, { useState } from "react";
-import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import ButtonConfirm from '../components/ButtonConfirm';
-import InputLogin from '../components/InputLogin';
+import {
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import ButtonConfirm from "../components/ButtonConfirm";
+import InputLogin from "../components/InputLogin";
 import { globalStyles } from "../globalStyles";
 
-import lionKing from '../assets/films/lionking.jpg';
+import lionKing from "../assets/films/lionking.jpg";
 
 export default function Login() {
   const navigation = useNavigation();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [incorrectUser, setIncorrectUser] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://172.20.10.2:3000/api/users/login", {
-        username,
-        password,
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        "http://172.20.10.2:3000/api/users/login",
+        {
+          username,
+          password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });      
-  
+      );
+
       if (response.status === 200) {
         // Recuperar token
         const { token } = response.data;
 
         // Guardar token a AsyncStorage
-        await AsyncStorage.setItem('authToken', token)
+        await AsyncStorage.setItem("authToken", token);
 
         setIncorrectUser(false);
         setIncorrectPassword(false);
 
-        navigation.navigate('Home');
+        navigation.navigate("Home");
       } else {
-        console.error('Error en el login', response.data);
+        console.error("Error en el login", response.data);
       }
     } catch (error) {
       if (error.response.status === 401) {
         const errorMesage = error.response.data.message;
 
-        if (errorMesage.includes('username')) {
+        if (errorMesage.includes("username")) {
           setIncorrectUser(true);
           setIncorrectPassword(false);
-        } else if (errorMesage.includes('password')) {
+        } else if (errorMesage.includes("password")) {
           setIncorrectUser(false);
           setIncorrectPassword(true);
         } else {
           setIncorrectUser(true);
           setIncorrectPassword(true);
         }
-
       } else {
-        console.error('Error en el login:', error);
+        console.error("Error en el login:", error);
       }
     }
-  }
-  
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={globalStyles.container}>
             <Image style={styles.image} source={lionKing} />
 
@@ -77,8 +93,12 @@ export default function Login() {
               <Text style={styles.text}>RecomendMe</Text>
 
               <View style={styles.signUp}>
-                <Text style={[globalStyles.textBase, styles.signUpText]}>Sign In</Text>
-                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>Please sign in to continue.</Text>
+                <Text style={[globalStyles.textBase, styles.signUpText]}>
+                  Sign In
+                </Text>
+                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
+                  Please sign in to continue.
+                </Text>
               </View>
 
               <View style={styles.buttonsSign}>
@@ -115,7 +135,7 @@ export default function Login() {
                 Don't have an account? Please{" "}
                 <Text
                   style={styles.loginLink}
-                  onPress={() => navigation.navigate('Register')}
+                  onPress={() => navigation.navigate("Register")}
                 >
                   Sign up
                 </Text>{" "}
@@ -176,16 +196,16 @@ const styles = {
     alignSelf: "flex-start",
     marginLeft: 10,
     fontSize: 12,
-    color: '#E9A6A6',
+    color: "#E9A6A6",
     marginTop: -10,
   },
 
   haveAccount: {
     fontSize: 12,
-    color: '#E9A6A6',
+    color: "#E9A6A6",
   },
 
   loginLink: {
-    color: '#9C4A8B',
+    color: "#9C4A8B",
   },
 };

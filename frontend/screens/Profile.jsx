@@ -1,105 +1,162 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 
-const theBatmanBackground = "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg"
+const theBatmanBackground =
+  "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg";
 
-const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg"
-const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg"
-const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg"
-const avatar = "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg"
-
+const theGorge =
+  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
+const theBatman =
+  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
+const babyDriver =
+  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
+const avatar =
+  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
 
 const lists = [
-  { title: 'Watchlist', number: 10 },
-  { title: 'Watched', number: 30 },
-  { title: 'Films', number: 330 },
-  { title: 'Reviews', number: 30 },
-  { title: 'Likes', number: 302 },
-  { title: 'Friends', number: 5 },
-]
+  { title: "Watchlist", number: 10 },
+  { title: "Watched", number: 30 },
+  { title: "Films", number: 330 },
+  { title: "Reviews", number: 30 },
+  { title: "Likes", number: 302 },
+  { title: "Friends", number: 5 },
+];
 
 export default function Profile() {
-  const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
-  const [image, setImage] = useState('')
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [image, setImage] = useState("");
 
   const getUserInfo = async () => {
-    const token = await AsyncStorage.getItem('authToken')
-  
+    const token = await AsyncStorage.getItem("authToken");
+
     try {
-      const respose = await axios.get('http://172.20.10.2:3000/api/users/me', {
+      const respose = await axios.get("http://172.20.10.2:3000/api/users/me", {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-    
-      setName(respose.data.name)
-      setUsername(respose.data.username)
-      setImage(respose.data.image)
-  
-      return respose.data
-      
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setName(respose.data.name);
+      setUsername(respose.data.username);
+      setImage(respose.data.image);
+
+      return respose.data;
     } catch (error) {
-      console.error("Error en obtenir les dades del usuari: " + error)
+      console.error("Error en obtenir les dades del usuari: " + error);
     }
-  }
-  
+  };
+
   useEffect(() => {
-    getUserInfo()
-  }, [])
+    getUserInfo();
+  }, []);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={[globalStyles.container, styles.mainContainer]}>
-      <Image source={{uri: theBatmanBackground}} style={styles.backgroundImage} />
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={[globalStyles.container, styles.mainContainer]}
+    >
+      <Image
+        source={{ uri: theBatmanBackground }}
+        style={styles.backgroundImage}
+      />
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
-          {image ? <Image style={styles.avatar} source={{ uri: image }} /> : <Icon name="person-circle-outline" size={120} style={styles.menuIconAvatarNone} />}
+          {image ? (
+            <Image style={styles.avatar} source={{ uri: image }} />
+          ) : (
+            <Icon
+              name="person-circle-outline"
+              size={120}
+              style={styles.menuIconAvatarNone}
+            />
+          )}
           <Text style={[globalStyles.textBase, styles.name]}>{name}</Text>
-          <Text style={[globalStyles.textBase, styles.username]}>@{username}</Text>
+          <Text style={[globalStyles.textBase, styles.username]}>
+            @{username}
+          </Text>
         </View>
 
         <View style={styles.stats}>
           <View style={styles.statsContainer}>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}>445</Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>Total Films</Text>
+            <Text style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}>
+              445
+            </Text>
+            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+              Total Films
+            </Text>
           </View>
           <View style={styles.statsContainer}>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilmsYearNumber]}>33</Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>Films This Year</Text>
+            <Text
+              style={[globalStyles.textBase, styles.statsTotalFilmsYearNumber]}
+            >
+              33
+            </Text>
+            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+              Films This Year
+            </Text>
           </View>
           <View style={styles.statsContainer}>
-            <Text style={[globalStyles.textBase, styles.statsTotalReviewNumber]}>30</Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>Review</Text>
+            <Text
+              style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
+            >
+              30
+            </Text>
+            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+              Review
+            </Text>
           </View>
         </View>
 
         <View style={styles.favoritesContainer}>
-          <Text style={[globalStyles.textBase, styles.favoritesTitle]}>Robert's Favorite Films</Text>
+          <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
+            Robert's Favorite Films
+          </Text>
 
           <View style={styles.favorites}>
-            <Image style={styles.favoritesImage} source={{uri: theBatman}}/>
-            <Image style={styles.favoritesImage} source={{uri: avatar}}/>
-            <Image style={styles.favoritesImage} source={{uri: theGorge}}/>
-            <Image style={styles.favoritesImage} source={{uri: babyDriver}}/>
+            <Image style={styles.favoritesImage} source={{ uri: theBatman }} />
+            <Image style={styles.favoritesImage} source={{ uri: avatar }} />
+            <Image style={styles.favoritesImage} source={{ uri: theGorge }} />
+            <Image style={styles.favoritesImage} source={{ uri: babyDriver }} />
           </View>
         </View>
 
         <View style={styles.line}></View>
 
         <View style={styles.listInfo}>
-          <View style={styles.listInfoContainer} contentContainerStyle={{ alignItems: 'center' }}>
+          <View
+            style={styles.listInfoContainer}
+            contentContainerStyle={{ alignItems: "center" }}
+          >
             {lists.map((list, index) => (
-              <View key={index} style={{ width: '100%' }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                  <Text style={[globalStyles.textBase, styles.listInfoTitle]}>{list.title}</Text>
-                  <Text style={[globalStyles.textBase, styles.listInfoNumber]}>{list.number}</Text>
+              <View key={index} style={{ width: "100%" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
+                    {list.title}
+                  </Text>
+                  <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
+                    {list.number}
+                  </Text>
                 </View>
 
-                <View style={{ width: '100%', height: 1, backgroundColor: "rgba(255, 255, 255, 0.1)", marginVertical: 10 }}></View>
+                <View
+                  style={{
+                    width: "100%",
+                    height: 1,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    marginVertical: 10,
+                  }}
+                ></View>
               </View>
             ))}
           </View>
@@ -116,7 +173,7 @@ const styles = {
 
   backgroundImage: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     height: 250,
     width: "100%",
   },
@@ -127,9 +184,9 @@ const styles = {
   },
 
   avatarContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
 
   avatar: {
@@ -137,8 +194,8 @@ const styles = {
     height: 120,
     borderRadius: "50%",
     borderWidth: 2,
-    borderColor: 'white',
-    position: 'absolute',
+    borderColor: "white",
+    position: "absolute",
     top: -120,
   },
 
@@ -146,15 +203,15 @@ const styles = {
     color: "white",
     width: 120,
     height: 120,
-    position: 'absolute',
+    position: "absolute",
     top: -120,
   },
 
   name: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
-    color: "#E9A6A6"
+    color: "#E9A6A6",
   },
 
   username: {
@@ -163,33 +220,32 @@ const styles = {
 
   stats: {
     marginVertical: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     gap: 30,
   },
 
   statsContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   statsTotalFilmsNumber: {
     fontSize: 30,
     color: "#E9A6A6",
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   statsTotalFilmsYearNumber: {
     fontSize: 30,
     color: "#9C4A8B",
-    fontWeight: 'bold',
-
+    fontWeight: "bold",
   },
 
   statsTotalReviewNumber: {
     fontSize: 30,
     color: "#9C4A8B",
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   statsTotalFilms: {
@@ -197,20 +253,20 @@ const styles = {
   },
 
   favoritesContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 15,
   },
 
   favoritesTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   favorites: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 10,
     gap: 10,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
 
   favoritesImage: {
@@ -234,5 +290,5 @@ const styles = {
 
   listInfoNumber: {
     color: "#9C4A8B",
-  }
+  },
 };

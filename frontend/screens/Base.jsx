@@ -26,7 +26,11 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      {loading ? <ActivityIndicator size="large" color="#0000ff" /> : <Text style={styles.text}>{message}</Text>}
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Text style={styles.text}>{message}</Text>
+      )}
       <Text></Text>
     </View>
   );

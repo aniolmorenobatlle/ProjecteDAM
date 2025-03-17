@@ -1,21 +1,49 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 
-const theGorge = "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
-const theBatman = "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
-const babyDriver = "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
-const avatar = "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
+const theGorge =
+  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
+const theBatman =
+  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
+const babyDriver =
+  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
+const avatar =
+  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
 
 const marks = [
-  { name: "Watch", image: "eye-outline", activeImage: "eye", color: "#D3D3D3", colorActive: "#a9c9ff" },
-  { name: "Like", image: "heart-outline", activeImage: "heart", color: "#D3D3D3", colorActive: "red" },
-  { name: "Rate", image: "star-outline", activeImage: "star", color: "#D3D3D3", colorActive: "gold" },
-  { name: "Watchlist", image: "time-outline", activeImage: "time", color: "#D3D3D3", colorActive: "#ff007f" },
+  {
+    name: "Watch",
+    image: "eye-outline",
+    activeImage: "eye",
+    color: "#D3D3D3",
+    colorActive: "#a9c9ff",
+  },
+  {
+    name: "Like",
+    image: "heart-outline",
+    activeImage: "heart",
+    color: "#D3D3D3",
+    colorActive: "red",
+  },
+  {
+    name: "Rate",
+    image: "star-outline",
+    activeImage: "star",
+    color: "#D3D3D3",
+    colorActive: "gold",
+  },
+  {
+    name: "Watchlist",
+    image: "time-outline",
+    activeImage: "time",
+    color: "#D3D3D3",
+    colorActive: "#ff007f",
+  },
 ];
 
 const films = [
@@ -30,9 +58,9 @@ const carouselWidth = width - 30;
 
 export default function Recommend() {
   const navigation = useNavigation();
-  
+
   const [activeMarks, setActiveMarks] = useState({});
-  
+
   const handlePress = (name) => {
     setActiveMarks((prev) => ({
       ...prev,
@@ -53,7 +81,11 @@ export default function Recommend() {
         renderItem={({ index }) => (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('Film', { title: films[index].title })}
+            onPress={() =>
+              navigation.navigate("Film", {
+                title: films[index].title,
+              })
+            }
           >
             <View style={[styles.header, { width: carouselWidth }]}>
               <View style={styles.filmInfo}>
@@ -64,7 +96,10 @@ export default function Recommend() {
                   {films[index].year}
                 </Text>
               </View>
-              <Image style={styles.filmImage} source={{uri: films[index].image}} />
+              <Image
+                style={styles.filmImage}
+                source={{ uri: films[index].image }}
+              />
             </View>
           </TouchableOpacity>
         )}
@@ -73,14 +108,20 @@ export default function Recommend() {
       <View style={styles.marks}>
         {marks.map((mark, index) => (
           <View key={index} style={styles.mark}>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => handlePress(mark.name)} key={mark.name}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => handlePress(mark.name)}
+              key={mark.name}
+            >
               <Icon
                 name={activeMarks[mark.name] ? mark.activeImage : mark.image}
                 size={50}
                 color={activeMarks[mark.name] ? mark.colorActive : mark.color}
               />
             </TouchableOpacity>
-            <Text style={[globalStyles.textBase, styles.markName]}>{mark.name}</Text>
+            <Text style={[globalStyles.textBase, styles.markName]}>
+              {mark.name}
+            </Text>
           </View>
         ))}
       </View>

@@ -1,29 +1,40 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 import React, { useState } from "react";
-import { Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import ButtonConfirm from '../components/ButtonConfirm';
-import InputLogin from '../components/InputLogin';
+import {
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import ButtonConfirm from "../components/ButtonConfirm";
+import InputLogin from "../components/InputLogin";
 import { globalStyles } from "../globalStyles";
 
-import lalaland from '../assets/films/lalaland.jpg';
+import lalaland from "../assets/films/lalaland.jpg";
 
 export default function Register() {
   const navigation = useNavigation();
 
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [incorrectUser, setIncorrectUser] = useState(false);
   const [incorrectEmail, setIncorrectEmail] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
     return regex.test(password);
-  }
+  };
 
   // Handle per registre
   const handleRegister = async () => {
@@ -31,9 +42,9 @@ export default function Register() {
       setIncorrectUser(true);
       return;
     } else {
-      setIncorrectUser(false); 
+      setIncorrectUser(false);
     }
-  
+
     if (email.trim() === "") {
       setIncorrectEmail(true);
       return;
@@ -49,25 +60,28 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post("http://172.20.10.2:3000/api/users/register", {
-        name,
-        username,
-        email,
-        password,
-      })
+      const response = await axios.post(
+        "http://172.20.10.2:3000/api/users/register",
+        {
+          name,
+          username,
+          email,
+          password,
+        }
+      );
 
       if (response.status === 200) {
         const { token } = response.data;
 
         // Guardar token a AsyncStorage
-        await AsyncStorage.setItem('authToken', token);
+        await AsyncStorage.setItem("authToken", token);
 
-        navigation.navigate('Login');
+        navigation.navigate("Login");
       } else {
         if (error.response) {
           const errorMessage = error.response.data.message;
           console.error("Error al servidor:", errorMessage);
-  
+
           if (errorMessage.includes("username")) {
             setIncorrectUser(true);
             setIncorrectEmail(false);
@@ -83,22 +97,29 @@ export default function Register() {
     } catch (error) {
       console.error("Error en la petició de registre", error);
     }
-  }
-  
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={globalStyles.container}>
             <Image style={styles.image} source={lalaland} />
 
             <View style={styles.main}>
               <View style={styles.signUp}>
-                <Text style={[globalStyles.textBase, styles.signUpText]}>Sign Up</Text>
-                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>Create your account for free!</Text>
+                <Text style={[globalStyles.textBase, styles.signUpText]}>
+                  Sign Up
+                </Text>
+                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
+                  Create your account for free!
+                </Text>
               </View>
 
               <View style={styles.buttonsSign}>
@@ -119,7 +140,9 @@ export default function Register() {
                 />
                 {incorrectUser && (
                   <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    {username.trim() === "" ? "Username is required!" : "This username is already in use!"}
+                    {username.trim() === ""
+                      ? "Username is required!"
+                      : "This username is already in use!"}
                   </Text>
                 )}
 
@@ -132,10 +155,12 @@ export default function Register() {
                 />
                 {incorrectEmail && (
                   <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    {email.trim() === "" ? "Email is required!" : "This email is already in use!"}
+                    {email.trim() === ""
+                      ? "Email is required!"
+                      : "This email is already in use!"}
                   </Text>
                 )}
-                
+
                 {incorrectEmail && (
                   <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
                     This email is already in use!
@@ -150,7 +175,8 @@ export default function Register() {
                 />
                 {incorrectPassword && (
                   <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character!
+                    Password must be at least 8 characters long, with 1
+                    uppercase, 1 lowercase, 1 number, and 1 special character!
                   </Text>
                 )}
                 <TouchableOpacity activeOpacity={0.8} onPress={handleRegister}>
@@ -159,10 +185,10 @@ export default function Register() {
               </View>
 
               <Text style={styles.haveAccount}>
-                Already have an account? Go to the {" "}
+                Already have an account? Go to the{" "}
                 <Text
                   style={styles.loginLink}
-                  onPress={() => navigation.navigate('Login')}
+                  onPress={() => navigation.navigate("Login")}
                 >
                   Login page.
                 </Text>
@@ -221,16 +247,16 @@ const styles = {
     alignSelf: "flex-start",
     marginLeft: 10,
     fontSize: 12,
-    color: '#E9A6A6',
+    color: "#E9A6A6",
     marginTop: -10,
   },
 
   haveAccount: {
     fontSize: 12,
-    color: '#E9A6A6',
+    color: "#E9A6A6",
   },
 
   loginLink: {
-    color: '#9C4A8B',
+    color: "#9C4A8B",
   },
 };
