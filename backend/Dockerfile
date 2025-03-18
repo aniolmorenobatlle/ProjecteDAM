@@ -10,7 +10,7 @@ WORKDIR /app
 COPY ./backend/package.json ./backend/package-lock.json /app/
 
 # Install application dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code to the container
 COPY ./backend /app/

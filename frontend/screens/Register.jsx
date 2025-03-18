@@ -19,6 +19,8 @@ import { globalStyles } from "../globalStyles";
 
 import lalaland from "../assets/films/lalaland.jpg";
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Register() {
   const navigation = useNavigation();
 
@@ -60,15 +62,12 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post(
-        "http://172.20.10.2:3000/api/users/register",
-        {
-          name,
-          username,
-          email,
-          password,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/users/register`, {
+        name,
+        username,
+        email,
+        password,
+      });
 
       if (response.status === 200) {
         const { token } = response.data;

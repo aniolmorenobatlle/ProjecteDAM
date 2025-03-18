@@ -19,9 +19,13 @@ const numColumns = 4;
 const screenWidth = Dimensions.get("window").width;
 const itemSize = screenWidth / numColumns - 10;
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Search() {
   const navigation = useNavigation();
   const [movies, setMovies] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // const clearStoredMovies = async () => {
   //   try {
@@ -40,19 +44,18 @@ export default function Search() {
 
       const now = Date.now();
       const oneDay = 24 * 60 * 60 * 1000;
+      const oneMonth = 30 * oneDay;
 
       if (
         storedMovies &&
         storedTimestamp &&
-        now - Number(storedTimestamp) < oneDay
+        now - Number(storedTimestamp) < oneMonth
       ) {
         setMovies(JSON.parse(storedMovies));
         return;
       }
 
-      const response = await axios.get(
-        `http://172.20.10.2:3000/api/movies/most_popular`
-      );
+      const response = await axios.get(`${API_URL}/api/movies/most_popular`);
       const films = response.data.movies;
 
       setMovies(films);
@@ -64,9 +67,36 @@ export default function Search() {
     }
   };
 
+  const searchMovies = async () => {
+    if (!searchQuery) {
+      getPopularFilms();
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/movies?query=${searchQuery}`
+      );
+      setMovies(response.data.movies);
+    } catch (error) {
+      console.error("Error searching movies: " + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getPopularFilms();
+    if (!searchQuery) {
+      getPopularFilms();
+    }
   }, []);
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    searchMovies();
+  };
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
@@ -84,6 +114,8 @@ export default function Search() {
             style={[globalStyles.textBase, styles.searchText]}
             placeholder="Search for a movie"
             placeholderTextColor="#c3c3c3"
+            value={searchQuery}
+            onChangeText={handleSearch}
           />
         </View>
       </View>
@@ -93,34 +125,38 @@ export default function Search() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={[globalStyles.textBase, styles.popularTitle]}>
-          Most popular
+          {searchQuery ? "Search results" : "Popular movies"}
         </Text>
 
-        <View style={styles.movieGrid}>
-          {movies.map((item, index) => (
-            <View
-              key={index}
-              style={[
-                styles.movieItem,
-                { width: itemSize, height: itemSize * 1.5 },
-              ]}
-            >
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() =>
-                  navigation.navigate("Film", {
-                    filmId: item.id_api,
-                  })
-                }
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : (
+          <View style={styles.movieGrid}>
+            {movies.map((item, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.movieItem,
+                  { width: itemSize, height: itemSize * 1.5 },
+                ]}
               >
-                <Image
-                  source={{ uri: item.poster }}
-                  style={styles.movieImage}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigation.navigate("Film", {
+                      filmId: item.id_api,
+                    })
+                  }
+                >
+                  <Image
+                    source={{ uri: item.poster }}
+                    style={styles.movieImage}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

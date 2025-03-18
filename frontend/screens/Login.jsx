@@ -19,6 +19,8 @@ import { globalStyles } from "../globalStyles";
 
 import lionKing from "../assets/films/lionking.jpg";
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Login() {
   const navigation = useNavigation();
 
@@ -30,7 +32,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://172.20.10.2:3000/api/users/login",
+        `${API_URL}/api/users/login`,
         {
           username,
           password,

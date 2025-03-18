@@ -43,8 +43,19 @@ exports.fetchMovies = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20; // Limit de 20 pelis per pagina
     const offset = (page - 1) * limit; // Calcula l'offset
 
-    const movies = await movieModel.getMovies(limit, offset);
-    const totalMovies = await movieModel.getMoviesCount();
+    // Cerca pelis
+    const query = req.query.query || '';
+
+    let movies;
+    let totalMovies;
+
+    if (query) {
+      movies = await movieModel.getMoviesQuery(limit, offset, query);
+      totalMovies = await movieModel.getMoviesCount(query);
+    } else {
+      movies = await movieModel.getMovies(limit, offset);
+      totalMovies = await movieModel.getMoviesCount();
+    }
 
     // Retornar pelis
     res.json({

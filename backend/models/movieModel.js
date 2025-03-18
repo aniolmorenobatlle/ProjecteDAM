@@ -6,6 +6,17 @@ const getMovies = async (limit, offset) => {
   return result.rows;
 };
 
+const getMoviesQuery = async (limit, offset, query) => {
+  const movieQuery = `
+    SELECT *
+    FROM movies
+    WHERE LOWER(title) LIKE LOWER($1)
+    LIMIT $2 OFFSET $3
+  `;
+  const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
+  return result.rows;
+};
+
 const getMoviesCount = async () => {
   const query = 'SELECT COUNT(*) FROM "movies"';
   const result = await pool.query(query);
@@ -35,11 +46,19 @@ const getLastMostPopularMovies = async () => {
   return result.rows;
 };
 
-const getMovieStreaming = async (id) => {
-  const query = 'SELECT * FROM "movies" WHERE id_api = $1 LIMIT 1';
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
-}
+const getMovieStreaming = async (id_api) => {
+  const query = `
+    SELECT m.id_api, s.*, ms.display_priority
+    FROM streaming s
+    JOIN movies_streaming ms ON s.id = ms.streaming_id
+    JOIN movies m ON ms.movie_id = m.id_api
+    WHERE m.id_api = $1
+    ORDER BY ms.display_priority ASC;
+  `;
+
+  const result = await pool.query(query, [id_api]);
+  return result.rows;
+};
 
 const getMovieCreditsCast = async (id) => {
   const query = `
@@ -82,4 +101,4 @@ const getMovieById = async (id) => {
   return result.rows[0];
 };
 
-module.exports = { getMovies, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };
+module.exports = { getMovies, getMoviesQuery, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };

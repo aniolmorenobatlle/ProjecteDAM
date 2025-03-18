@@ -24,6 +24,8 @@ const movies = [
   { name: "Baby Driver", image: babyDriver, year: 2017, duration: "113 min" },
 ];
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Home() {
   const navigation = useNavigation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,7 +37,7 @@ export default function Home() {
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-      const respose = await axios.get("http://172.20.10.2:3000/api/users/me", {
+      const respose = await axios.get(`${API_URL}/api/users/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -72,18 +74,19 @@ export default function Home() {
 
       const now = Date.now();
       const oneDay = 24 * 60 * 60 * 1000;
+      const oneWeek = 7 * oneDay;
 
       if (
         storedMovies &&
         storedTimestamp &&
-        now - Number(storedTimestamp) < oneDay
+        now - Number(storedTimestamp) < oneWeek
       ) {
         setFilms(JSON.parse(storedMovies));
         return;
       }
 
       const response = await axios.get(
-        "http://172.20.10.2:3000/api/movies/last_most_popular"
+        `${API_URL}/api/movies/last_most_popular`
       );
       setFilms(response.data.movies);
 
@@ -180,7 +183,7 @@ export default function Home() {
 
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
-              Favorite
+              Favorites
             </Text>
 
             <View style={styles.favoriteFilms}>

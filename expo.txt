@@ -22,3 +22,5 @@ docker compose exec backend node config/inserts-genres.js
 docker compose exec backend node config/inserts-movies.js
 
 docker compose exec backend node config/inserts-cast.js
+
+docker compose exec backend node config/inserts-streaming.js

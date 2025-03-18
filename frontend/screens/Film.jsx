@@ -1,23 +1,20 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
-
-import axios from "axios";
-import appleTv from "../assets/sites/appletv.png";
-import disneyPlus from "../assets/sites/disney-plus.png";
-import max from "../assets/sites/max.png";
-import netflix from "../assets/sites/netflix.png";
-import primeVideo from "../assets/sites/prime.png";
 
 const robertPattinson =
   "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg";
@@ -55,6 +52,8 @@ const reviews = [
   },
 ];
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Film() {
   const route = useRoute();
   const { filmId } = route.params;
@@ -72,9 +71,7 @@ export default function Film() {
 
   const fetchMovieDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://172.20.10.2:3000/api/movies/${filmId}`
-      );
+      const response = await axios.get(`${API_URL}/api/movies/${filmId}`);
       setMovieDetails(response.data);
 
       const date = response.data.release_year;
@@ -88,7 +85,7 @@ export default function Film() {
   const fetchMovieDetailsCast = async () => {
     try {
       const response = await axios.get(
-        `http://172.20.10.2:3000/api/movies/${filmId}/credits/cast`
+        `${API_URL}/api/movies/${filmId}/credits/cast`
       );
       setCast(response.data.cast);
     } catch (error) {
@@ -101,7 +98,7 @@ export default function Film() {
   const fetchMovieDetailsDirector = async () => {
     try {
       const response = await axios.get(
-        `http://172.20.10.2:3000/api/movies/${filmId}/credits/director`
+        `${API_URL}/api/movies/${filmId}/credits/director`
       );
       setDirector(response.data.crew[0]);
     } catch (error) {
@@ -114,12 +111,12 @@ export default function Film() {
   const fetchMovieStreaming = async () => {
     try {
       const response = await axios.get(
-        `http://172.20.10.2:3000/api/movies/${filmId}/streaming`
+        `${API_URL}/api/movies/${filmId}/streaming`
       );
-      setStreaming(response.data.flatrate);
+      setStreaming(response.data);
     } catch (error) {
       console.error(
-        "Error obtenint els actors/actrius de la pel·lícula: " + error
+        "Error obtenint les plataformes d'streaming de la pel·lícula: " + error
       );
     }
   };
@@ -132,199 +129,255 @@ export default function Film() {
   }, [filmId]);
 
   return (
-    <ScrollView
-      vertical={true}
-      showsVerticalScrollIndicator={false}
-      style={{ backgroundColor: "#1F1D36" }}
-      contentContainerStyle={{ paddingBottom: 10 }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <ImageBackground
-        source={{ uri: movieDetails.cover }}
-        style={styles.imageBackground}
+      <ScrollView
+        vertical={true}
+        showsVerticalScrollIndicator={false}
+        style={{ backgroundColor: "#1F1D36" }}
+        contentContainerStyle={{ paddingBottom: 10, flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
       >
-        <SafeAreaView style={styles.overlay}>
-          <View style={styles.backButton}>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.backArrow}>←</Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
-
-      <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-        <View style={styles.filmHeader}>
-          <View style={styles.bodyLeft}>
-            <Image
-              style={styles.poster}
-              source={{ uri: movieDetails.poster }}
-            />
-            <View style={styles.buttons}>
-              <View style={styles.button}>
-                <Icon
-                  name="duplicate-outline"
-                  size={20}
-                  style={styles.buttonImage}
-                />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>
-                  Rate
-                </Text>
-              </View>
-              <View style={styles.button}>
-                <Icon
-                  name="list-outline"
-                  size={20}
-                  style={styles.buttonImage}
-                />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>
-                  Add to Lists
-                </Text>
-              </View>
-              <View style={styles.button}>
-                <Icon
-                  name="document-outline"
-                  size={20}
-                  style={styles.buttonImage}
-                />
-                <Text style={[globalStyles.textBase, styles.buttonText]}>
-                  Add to Watchlist
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.bodyRight}>
-            <View style={styles.textContainer}>
-              <Text style={[globalStyles.textBase, styles.filmTitle]}>
-                {movieDetails.title} <Text style={styles.filmYear}>{year}</Text>
-              </Text>
-              <Text style={[globalStyles.textBase, styles.filmDirector]}>
-                Directed by{" "}
-                <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
-              </Text>
-            </View>
-            <View style={styles.description}>
-              <Text
-                style={[globalStyles.textBase, styles.descriptionText]}
-                numberOfLines={10}
+        <ImageBackground
+          source={{ uri: movieDetails.cover }}
+          style={styles.imageBackground}
+        >
+          <SafeAreaView style={styles.overlay}>
+            <View style={styles.backButton}>
+              <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => navigation.goBack()}
               >
-                {movieDetails.synopsis}
-              </Text>
+                <Text style={styles.backArrow}>←</Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </ImageBackground>
+
+        <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
+          <View style={styles.filmHeader}>
+            <View style={styles.bodyLeft}>
+              <Image
+                style={styles.poster}
+                source={{ uri: movieDetails.poster }}
+              />
+              <View style={styles.buttons}>
+                <View style={styles.button}>
+                  <Icon
+                    name="duplicate-outline"
+                    size={20}
+                    style={styles.buttonImage}
+                  />
+                  <Text style={[globalStyles.textBase, styles.buttonText]}>
+                    Rate
+                  </Text>
+                </View>
+                <View style={styles.button}>
+                  <Icon
+                    name="list-outline"
+                    size={20}
+                    style={styles.buttonImage}
+                  />
+                  <Text style={[globalStyles.textBase, styles.buttonText]}>
+                    Add to Lists
+                  </Text>
+                </View>
+                <View style={styles.button}>
+                  <Icon
+                    name="document-outline"
+                    size={20}
+                    style={styles.buttonImage}
+                  />
+                  <Text style={[globalStyles.textBase, styles.buttonText]}>
+                    Add to Watchlist
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.bodyRight}>
+              <View style={styles.textContainer}>
+                <Text style={[globalStyles.textBase, styles.filmTitle]}>
+                  {movieDetails.title}{" "}
+                  <Text style={styles.filmYear}>{year}</Text>
+                </Text>
+                <Text style={[globalStyles.textBase, styles.filmDirector]}>
+                  Directed by{" "}
+                  <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
+                </Text>
+              </View>
+              <View style={styles.description}>
+                <Text
+                  style={[globalStyles.textBase, styles.descriptionText]}
+                  numberOfLines={10}
+                >
+                  {movieDetails.synopsis}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.castContainer}>
-          <View style={styles.buttonOptions}>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[
-                styles.buttonCast,
-                activeButton === "cast" && styles.buttonCastActive,
-              ]}
-              onPress={() => handleButtonPress("cast")}
+          <View>
+            <View style={styles.buttonOptions}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={[
+                  styles.buttonCast,
+                  activeButton === "cast" && styles.buttonCastActive,
+                ]}
+                onPress={() => handleButtonPress("cast")}
+              >
+                <Text style={[globalStyles.textBase, styles.buttonCastText]}>
+                  Cast
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={[
+                  styles.buttonCast,
+                  activeButton === "watch" && styles.buttonCastActive,
+                ]}
+                onPress={() => handleButtonPress("watch")}
+              >
+                <Text style={[globalStyles.textBase, styles.buttonCastText]}>
+                  Watch
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
             >
-              <Text style={[globalStyles.textBase, styles.buttonCastText]}>
-                Cast
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[
-                styles.buttonCast,
-                activeButton === "watch" && styles.buttonCastActive,
-              ]}
-              onPress={() => handleButtonPress("watch")}
-            >
-              <Text style={[globalStyles.textBase, styles.buttonCastText]}>
-                Watch
-              </Text>
-            </TouchableOpacity>
-          </View>
+              {activeButton === "cast" && (
+                <View style={styles.cast}>
+                  {cast.length > 0 ? (
+                    cast.map((cast, index) => {
+                      const nameParts = cast.name.split(" ");
+                      const firstName = nameParts[0];
+                      const lastName =
+                        nameParts.length > 1
+                          ? nameParts.slice(1).join(" ")
+                          : "";
 
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            {activeButton === "cast" && (
-              <View style={styles.cast}>
-                {cast.map((cast, index) => {
-                  const nameParts = cast.name.split(" ");
-                  const firstName = nameParts[0];
-                  const lastName =
-                    nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+                      return (
+                        <View
+                          key={index}
+                          style={{
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Image
+                            style={styles.castImage}
+                            source={{
+                              uri: cast.profile_path,
+                            }}
+                          />
+                          <View style={styles.castNameContainer}>
+                            <Text
+                              style={[globalStyles.textBase, styles.castName]}
+                            >
+                              {firstName}
+                            </Text>
+                            {lastName && (
+                              <Text
+                                style={[globalStyles.textBase, styles.castName]}
+                              >
+                                {lastName}
+                              </Text>
+                            )}
+                          </View>
+                        </View>
+                      );
+                    })
+                  ) : (
+                    <Text style={{ fontSize: 16, color: "gray" }}>
+                      The cast is not available
+                    </Text>
+                  )}
+                </View>
+              )}
 
-                  return (
-                    <View
-                      key={index}
+              {activeButton === "watch" && (
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  {streaming.length > 0 ? (
+                    streaming.map((streaming, index) => (
+                      <Image
+                        key={index}
+                        style={styles.streamingImage}
+                        source={{ uri: streaming.logo }}
+                      />
+                    ))
+                  ) : (
+                    <Text
                       style={{
-                        flexDirection: "column",
-                        alignItems: "center",
+                        fontSize: 16,
+                        color: "rgba(255, 255, 255, 0.5)",
                       }}
                     >
-                      <Image
-                        style={styles.castImage}
-                        source={{
-                          uri: cast.profile_path,
-                        }}
-                      />
-                      <View style={styles.castNameContainer}>
-                        <Text style={[globalStyles.textBase, styles.castName]}>
-                          {firstName}
-                        </Text>
-                        {lastName && (
-                          <Text
-                            style={[globalStyles.textBase, styles.castName]}
-                          >
-                            {lastName}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-
-            {activeButton === "watch" && (
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                <Image style={styles.streamingImage} source={netflix} />
-                <Image style={styles.streamingImage} source={primeVideo} />
-                <Image style={styles.streamingImage} source={disneyPlus} />
-                <Image style={styles.streamingImage} source={max} />
-                <Image style={styles.streamingImage} source={appleTv} />
-              </View>
-            )}
-          </ScrollView>
-        </View>
-
-        <View style={styles.reviews}>
-          <View style={styles.reviewTitles}>
-            <Text style={[globalStyles.textBase]}>All reviews</Text>
-            <Text style={[globalStyles.textBase, styles.seeAll]}>See all</Text>
+                      There's no streaming site yet!
+                    </Text>
+                  )}
+                </View>
+              )}
+            </ScrollView>
           </View>
 
-          {reviews.map((review, index) => (
-            <View key={index} style={styles.reviewContainer}>
-              <View style={styles.reviewHeader}>
-                <Image
-                  style={styles.reviewImageUser}
-                  source={{ uri: review.image }}
-                />
-                <Text style={[globalStyles.textBase, styles.reviewText]}>
-                  Review by{" "}
-                  <Text style={[globalStyles.textBase, styles.reviewTextUser]}>
-                    {review.name}
-                  </Text>
-                </Text>
-              </View>
-              <Text style={[globalStyles.textBase, styles.reviewResult]}>
-                {review.review}
+          <View style={styles.reviews}>
+            <View style={styles.reviewTitles}>
+              <Text style={[globalStyles.textBase]}>All reviews</Text>
+              <Text style={[globalStyles.textBase, styles.seeAll]}>
+                See all
               </Text>
             </View>
-          ))}
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+
+            {reviews.map((review, index) => (
+              <View key={index} style={styles.reviewContainer}>
+                <View style={styles.reviewHeader}>
+                  <Image
+                    style={styles.reviewImageUser}
+                    source={{ uri: review.image }}
+                  />
+                  <Text style={[globalStyles.textBase, styles.reviewText]}>
+                    Review by{" "}
+                    <Text
+                      style={[globalStyles.textBase, styles.reviewTextUser]}
+                    >
+                      {review.name}
+                    </Text>
+                  </Text>
+                </View>
+                <Text style={[globalStyles.textBase, styles.reviewResult]}>
+                  {review.review}
+                </Text>
+              </View>
+            ))}
+
+            <View style={styles.addReview}>
+              <TextInput
+                style={[globalStyles.textBase, styles.textWriteReview]}
+                placeholder="Write your review here"
+                placeholderTextColor="#E9A6A6"
+                multiline={true}
+                maxLength={400}
+              />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.buttonAddReview}
+              >
+                <Text style={[globalStyles.textBase, styles.buttonText]}>
+                  Submit Review
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </SafeAreaView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -461,6 +514,7 @@ const styles = {
     width: 60,
     height: 60,
     objectFit: "contain",
+    borderRadius: 50,
   },
 
   buttonOptions: {
@@ -503,10 +557,6 @@ const styles = {
     width: 60,
     height: 60,
     borderRadius: 50,
-  },
-
-  reviews: {
-    marginTop: 20,
   },
 
   reviewTitles: {
@@ -554,5 +604,23 @@ const styles = {
     marginLeft: 60,
     fontSize: 14,
     marginTop: -8,
+  },
+
+  textWriteReview: {
+    marginTop: 10,
+    backgroundColor: "#323048",
+    borderRadius: 10,
+    padding: 10,
+    paddingVertical: 20,
+    color: "white",
+    fontSize: 14,
+  },
+
+  buttonAddReview: {
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 10,
+    alignSelf: "flex-start",
   },
 };

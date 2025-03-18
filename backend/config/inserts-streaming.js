@@ -39,15 +39,20 @@ async function fetchAndInsertStreamingPlatforms(movieId) {
       let streamingId;
 
       if (checkStreamingResult.rowCount === 0) {
+        console.log(`Inserint nova plataforma: ${provider_name} (${provider_id})`);
+
         const insertStreamingQuery = `
           INSERT INTO "streaming" ("name", "logo", "id_api", "created_at")
-          VALUES($1, $2, $3, NOW()) RETURNING id;
+          VALUES ($1, $2, $3, NOW()) RETURNING id;
         `;
         const insertStreamingValues = [provider_name, providerLogo, provider_id];
         const insertStreamingResult = await client.query(insertStreamingQuery, insertStreamingValues);
         streamingId = insertStreamingResult.rows[0].id;
+
+        console.log(`✅ Plataforma inserida correctament: ${provider_name} amb id ${streamingId}`);
       } else {
         streamingId = checkStreamingResult.rows[0].id;
+        console.log(`🔄 Plataforma ja existent: ${provider_name} amb id ${streamingId}`);
       }
 
       // Inserir la relació a la taula "movies_streaming"
@@ -57,12 +62,14 @@ async function fetchAndInsertStreamingPlatforms(movieId) {
         ON CONFLICT ("movie_id", "streaming_id") DO NOTHING;
       `;
       const movieStreamingValues = [movieId, streamingId, display_priority];
+
+      console.log(`💾 Inserint relació movie_id=${movieId}, streaming_id=${streamingId}, display_priority=${display_priority}`);
       await client.query(movieStreamingQuery, movieStreamingValues);
 
-      console.log(`Afegida plataforma "${provider_name}" per a la pel·lícula ${movieId}`);
+      console.log(`✅ Afegida plataforma "${provider_name}" per a la pel·lícula ${movieId}`);
     }
   } catch (error) {
-    console.error(`Error al inserir streaming per a la pel·lícula ${movieId}:`, error);
+    console.error(`❌ Error al inserir streaming per a la pel·lícula ${movieId}:`, error);
   } finally {
     client.release();
   }

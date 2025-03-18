@@ -26,6 +26,8 @@ const lists = [
   { title: "Friends", number: 5 },
 ];
 
+const API_URL = "http://172.20.10.2:3000";
+
 export default function Profile() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -35,7 +37,7 @@ export default function Profile() {
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-      const respose = await axios.get("http://172.20.10.2:3000/api/users/me", {
+      const respose = await axios.get(`${API_URL}/api/users/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
