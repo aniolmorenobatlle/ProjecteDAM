@@ -16,42 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
-
-const robertPattinson =
-  "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg";
-
-const reviews = [
-  {
-    name: "@amoreno",
-    image: robertPattinson,
-    review:
-      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
-  },
-  {
-    name: "@amoreno",
-    image: robertPattinson,
-    review:
-      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
-  },
-  {
-    name: "@amoreno",
-    image: robertPattinson,
-    review:
-      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
-  },
-  {
-    name: "@amoreno",
-    image: robertPattinson,
-    review:
-      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
-  },
-  {
-    name: "@amoreno",
-    image: robertPattinson,
-    review:
-      "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
-  },
-];
+import { useUserInfo } from "../hooks/useUserInfo";
 
 const API_URL = "http://172.20.10.2:3000";
 
@@ -66,6 +31,8 @@ export default function Film() {
   const [director, setDirector] = useState({});
   const [streaming, setStreaming] = useState([]);
   const [comment, setComment] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const { userInfo, loading, error } = useUserInfo();
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
@@ -79,13 +46,14 @@ export default function Film() {
 
     try {
       await axios.post(`${API_URL}/api/movies/${filmId}/comments`, {
-        user_id: userId,
+        user_id: userInfo.id,
         content: comment,
       });
 
       Alert.alert("Success", "Your review has been added successfully");
 
       setComment("");
+      fetchMovieComments();
     } catch (error) {
       console.error("Error afegint el comentari: " + error);
       Alert.alert(
@@ -147,12 +115,27 @@ export default function Film() {
     }
   };
 
+  const fetchMovieComments = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/movies/${filmId}/comments`
+      );
+      setReviews(response.data);
+    } catch (error) {
+      console.error("Error obtenint els comentaris de la pel·lícula: " + error);
+    }
+  };
+
   useEffect(() => {
     fetchMovieDetails();
     fetchMovieDetailsCast();
     fetchMovieDetailsDirector();
     fetchMovieStreaming();
+    fetchMovieComments();
   }, [filmId]);
+
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>{error}</Text>;
 
   return (
     <KeyboardAvoidingView
@@ -361,24 +344,33 @@ export default function Film() {
               </Text>
             </View>
 
-            {reviews.map((review, index) => (
+            {reviews.slice(0, 5).map((review, index) => (
               <View key={index} style={styles.reviewContainer}>
                 <View style={styles.reviewHeader}>
-                  <Image
-                    style={styles.reviewImageUser}
-                    source={{ uri: review.image }}
-                  />
+                  {review.image ? (
+                    <Image
+                      style={styles.reviewImageUser}
+                      source={{ uri: review.image }}
+                    />
+                  ) : (
+                    <Icon
+                      name="person-circle-outline"
+                      size={50}
+                      style={styles.reviewImageUserNull}
+                    />
+                  )}
+
                   <Text style={[globalStyles.textBase, styles.reviewText]}>
                     Review by{" "}
                     <Text
                       style={[globalStyles.textBase, styles.reviewTextUser]}
                     >
-                      {review.name}
+                      {review.username}
                     </Text>
                   </Text>
                 </View>
                 <Text style={[globalStyles.textBase, styles.reviewResult]}>
-                  {review.review}
+                  {review.comment}
                 </Text>
               </View>
             ))}
@@ -611,6 +603,13 @@ const styles = {
   },
 
   reviewImageUser: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+  },
+
+  reviewImageUserNull: {
+    color: "white",
     width: 50,
     height: 50,
     borderRadius: 50,

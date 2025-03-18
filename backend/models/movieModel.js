@@ -59,22 +59,12 @@ const getMovieComments = async (id) => {
 };
 
 const addMovieComment = async (id_api, user_id, comment) => {
-  const movieQuery = `SELECT id FROM movies WHERE id_api = $1 LIMIT 1`;
-  const movieResult = await pool.query(movieQuery, [id_api]);
-
-  if (movieResult.rows.length === 0) {
-    throw new Error('Movie not found');
-  }
-
-  const movie_id = movieResult.rows[0].id;
-
-  // Afegir el comentari
   const query = `
     INSERT INTO comments (movie_id, user_id, comment, created_at)
     VALUES ($1, $2, $3, NOW())
     RETURNING *;
   `;
-  const result = await pool.query(query, [movie_id, user_id, comment]);
+  const result = await pool.query(query, [id_api, user_id, comment]);
   return result.rows[0];
 };
 

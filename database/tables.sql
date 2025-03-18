@@ -162,7 +162,7 @@ CREATE TABLE messages (
 
 -- Afegir les claus foranes
 ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 
 ALTER TABLE ratings ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE ratings ADD FOREIGN KEY (movie_id) REFERENCES movies (id);

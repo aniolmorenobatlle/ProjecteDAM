@@ -21,7 +21,7 @@ const findUserByUsername = async (username) => {
 
 const findUserById = async (userId) => {
   const result = await pool.query(
-    `SELECT name, username, email, image FROM "users" WHERE id = $1`,
+    `SELECT id, name, username, email, image FROM "users" WHERE id = $1`,
     [userId]
   );
   return result.rows[0];
