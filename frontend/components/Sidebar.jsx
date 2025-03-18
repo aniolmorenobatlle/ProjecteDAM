@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Animated,
   Dimensions,
@@ -13,9 +12,7 @@ import {
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-
-const robertPattinson =
-  "https://image.tmdb.org/t/p/w500/8A4PS5iG7GWEAVFftyqMZKl3qcr.jpg";
+import { useUserInfo } from "../hooks/useUserInfo";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,37 +20,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
   const navigation = useNavigation();
   const translateX = useRef(new Animated.Value(-width * 0.6)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
-
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [image, setImage] = useState(robertPattinson);
-
-  const getUserInfo = async () => {
-    const token = await AsyncStorage.getItem("authToken");
-
-    try {
-      const respose = await axios.get("http://172.20.10.2:3000/api/users/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // get only the first part of the name
-      const name = respose.data.name.split(" ")[0];
-
-      setName(name);
-      setUsername(respose.data.username);
-      setImage(respose.data.image);
-
-      return respose.data;
-    } catch (error) {
-      console.error("Errror en obtenir les dades del usuari: " + error);
-    }
-  };
+  const { userInfo, loading, error } = useUserInfo();
 
   useEffect(() => {
-    getUserInfo();
-
     if (isOpen) {
       Animated.parallel([
         Animated.timing(translateX, {
@@ -100,6 +69,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
     }
   };
 
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>{error}</Text>;
+
   return (
     <TouchableWithoutFeedback onPress={closeMenu}>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
@@ -112,8 +84,11 @@ export default function Sidebar({ isOpen, closeMenu }) {
             </TouchableOpacity>
 
             <View style={styles.avatar}>
-              {image ? (
-                <Image style={styles.menuIconAvatar} source={{ uri: image }} />
+              {userInfo.image ? (
+                <Image
+                  style={styles.menuIconAvatar}
+                  source={{ uri: userInfo.image }}
+                />
               ) : (
                 <Icon
                   name="person-circle-outline"
@@ -123,9 +98,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
               )}
               <View style={styles.avatarTexts}>
                 <Text style={[styles.username, { color: "#e9a6a6" }]}>
-                  {name}
+                  {userInfo.name.split(" ")[0]}
                 </Text>
-                <Text style={styles.handle}>@{username}</Text>
+                <Text style={styles.handle}>@{userInfo.username}</Text>
               </View>
             </View>
 

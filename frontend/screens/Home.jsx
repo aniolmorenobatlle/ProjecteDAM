@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import Sidebar from "../components/Sidebar";
 import { globalStyles } from "../globalStyles";
+import { useUserInfo } from "../hooks/useUserInfo";
 
 const theGorge =
   "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
@@ -29,52 +29,18 @@ const API_URL = "http://172.20.10.2:3000";
 export default function Home() {
   const navigation = useNavigation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [image, setImage] = useState("");
   const [films, setFilms] = useState([]);
-
-  const getUserInfo = async () => {
-    const token = await AsyncStorage.getItem("authToken");
-
-    try {
-      const respose = await axios.get(`${API_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const name = respose.data.name.split(" ")[0];
-
-      setName(name);
-      setImage(respose.data.image);
-
-      return respose.data;
-    } catch (error) {
-      console.error("Errror en obtenir les dades del usuari: " + error);
-    }
-  };
-
-  // const clearStoredMovies = async () => {
-  //   try {
-  //     await AsyncStorage.removeItem("popularMovies");
-  //     await AsyncStorage.removeItem("lastPopularTimestamp");
-  //     console.log("Dades esborrades. Es tornaran a carregar.");
-  //   } catch (error) {
-  //     console.error("Error en esborrar les dades: ", error);
-  //   }
-  // };
+  const { userInfo, loading, error } = useUserInfo();
 
   const getPopularFilms = async () => {
     try {
-      // await clearStoredMovies();
       const storedMovies = await AsyncStorage.getItem("popularMovies");
       const storedTimestamp = await AsyncStorage.getItem(
         "lastPopularTimestamp"
       );
 
       const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
-      const oneWeek = 7 * oneDay;
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
       if (
         storedMovies &&
@@ -101,9 +67,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    getUserInfo();
     getPopularFilms();
   }, []);
+
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>{error}</Text>;
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
@@ -111,7 +79,6 @@ export default function Home() {
         isOpen={isSidebarOpen}
         closeMenu={() => setIsSidebarOpen(false)}
       />
-
       <View style={styles.header}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -120,8 +87,11 @@ export default function Home() {
           <Icon name="menu" size={50} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          {image ? (
-            <Image style={styles.menuIconAvatar} source={{ uri: image }} />
+          {userInfo.image ? (
+            <Image
+              style={styles.menuIconAvatar}
+              source={{ uri: userInfo.image }}
+            />
           ) : (
             <Icon
               name="person-circle-outline"
@@ -131,7 +101,6 @@ export default function Home() {
           )}
         </TouchableOpacity>
       </View>
-
       <ScrollView
         style={globalStyles.container}
         showsVerticalScrollIndicator={false}
@@ -139,19 +108,20 @@ export default function Home() {
         <View style={styles.main}>
           <View>
             <Text style={[globalStyles.textBase, styles.welcomeback]}>
-              Hello, <Text style={styles.welcomebackUser}>{name}</Text>!
+              Hello,{" "}
+              <Text style={styles.welcomebackUser}>
+                {userInfo.name.split(" ")[0]}
+              </Text>
+              !
             </Text>
-
             <Text style={[globalStyles.textBase, styles.newToday]}>
               See what's new today!
             </Text>
           </View>
-
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
               Popular this month
             </Text>
-
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
@@ -162,9 +132,7 @@ export default function Home() {
                     <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={() =>
-                        navigation.navigate("Film", {
-                          filmId: film.id_api,
-                        })
+                        navigation.navigate("Film", { filmId: film.id_api })
                       }
                     >
                       <Image
@@ -180,12 +148,10 @@ export default function Home() {
               </View>
             </ScrollView>
           </View>
-
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
               Favorites
             </Text>
-
             <View style={styles.favoriteFilms}>
               {movies.map((film, index) => (
                 <TouchableOpacity

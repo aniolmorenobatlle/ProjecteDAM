@@ -46,6 +46,38 @@ const getLastMostPopularMovies = async () => {
   return result.rows;
 };
 
+const getMovieComments = async (id) => {
+  const query = `
+    SELECT c.*, u.username, u.image
+    FROM comments c
+    JOIN users u ON c.user_id = u.id
+    WHERE c.movie_id = $1
+    ORDER BY c.created_at DESC 
+  `;
+  const result = await pool.query(query, [id]);
+  return result.rows;
+};
+
+const addMovieComment = async (id_api, user_id, comment) => {
+  const movieQuery = `SELECT id FROM movies WHERE id_api = $1 LIMIT 1`;
+  const movieResult = await pool.query(movieQuery, [id_api]);
+
+  if (movieResult.rows.length === 0) {
+    throw new Error('Movie not found');
+  }
+
+  const movie_id = movieResult.rows[0].id;
+
+  // Afegir el comentari
+  const query = `
+    INSERT INTO comments (movie_id, user_id, comment, created_at)
+    VALUES ($1, $2, $3, NOW())
+    RETURNING *;
+  `;
+  const result = await pool.query(query, [movie_id, user_id, comment]);
+  return result.rows[0];
+};
+
 const getMovieStreaming = async (id_api) => {
   const query = `
     SELECT m.id_api, s.*, ms.display_priority
@@ -101,4 +133,4 @@ const getMovieById = async (id) => {
   return result.rows[0];
 };
 
-module.exports = { getMovies, getMoviesQuery, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };
+module.exports = { getMovies, getMoviesQuery, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieComments, addMovieComment, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };

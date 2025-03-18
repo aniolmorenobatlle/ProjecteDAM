@@ -101,6 +101,39 @@ exports.fetchLastMostPopularMovies = async (_, res) => {
   }
 };
 
+exports.fetchMovieComments = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const comments = await movieModel.getMovieComments(id_api);
+
+    if (!comments.length) {
+      return res.status(404).json({ message: 'Comentaris no trobats' });
+    }
+
+    res.json(comments);
+  } catch (error) {
+    console.error('Error obtenint els comentaris de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+exports.fetchAddMovieComment = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id, content } = req.body;
+
+    if (!user_id || !content) {
+      return res.status(400).json({ message: 'Falten camps obligatoris' });
+    }
+
+    await movieModel.addMovieComment(id_api, user_id, content);
+    res.json({ message: 'Comentari afegit correctament' });
+  } catch (error) {
+    console.error('Error afegint el comentari a la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
 exports.fetchMovieStreaming = async (req, res) => {
   try {
     const { id_api } = req.params;
@@ -115,7 +148,7 @@ exports.fetchMovieStreaming = async (req, res) => {
     console.error('Error obtenint la pel·lícula en streaming:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
-}
+};
 
 exports.fetchMovieCast = async (req, res) => {
   try {
@@ -150,7 +183,7 @@ exports.fetchMovieCast = async (req, res) => {
     console.error('Error obtenint els crèdits de la pel·lícula:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
-}
+};
 
 exports.fetchMovieDirector = async (req, res) => {
   try {
@@ -174,7 +207,7 @@ exports.fetchMovieDirector = async (req, res) => {
     console.error('Error obtenint el director de la pel·lícula:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
-}
+};
 
 exports.fetchMovieDetails = async (req, res) => {
   try {

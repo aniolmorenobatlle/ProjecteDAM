@@ -1,9 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
+import { useUserInfo } from "../hooks/useUserInfo";
 
 const theBatmanBackground =
   "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg";
@@ -26,36 +25,11 @@ const lists = [
   { title: "Friends", number: 5 },
 ];
 
-const API_URL = "http://172.20.10.2:3000";
-
 export default function Profile() {
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [image, setImage] = useState("");
+  const { userInfo, loading, error } = useUserInfo();
 
-  const getUserInfo = async () => {
-    const token = await AsyncStorage.getItem("authToken");
-
-    try {
-      const respose = await axios.get(`${API_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setName(respose.data.name);
-      setUsername(respose.data.username);
-      setImage(respose.data.image);
-
-      return respose.data;
-    } catch (error) {
-      console.error("Error en obtenir les dades del usuari: " + error);
-    }
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>{error}</Text>;
 
   return (
     <ScrollView
@@ -68,8 +42,8 @@ export default function Profile() {
       />
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
-          {image ? (
-            <Image style={styles.avatar} source={{ uri: image }} />
+          {userInfo.image ? (
+            <Image style={styles.avatar} source={{ uri: userInfo.image }} />
           ) : (
             <Icon
               name="person-circle-outline"
@@ -77,9 +51,12 @@ export default function Profile() {
               style={styles.menuIconAvatarNone}
             />
           )}
-          <Text style={[globalStyles.textBase, styles.name]}>{name}</Text>
+          <Text style={[globalStyles.textBase, styles.name]}>
+            {" "}
+            {userInfo.name}
+          </Text>
           <Text style={[globalStyles.textBase, styles.username]}>
-            @{username}
+            @{userInfo.username}
           </Text>
         </View>
 

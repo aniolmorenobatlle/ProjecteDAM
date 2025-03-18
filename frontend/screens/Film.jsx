@@ -2,6 +2,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -21,31 +22,31 @@ const robertPattinson =
 
 const reviews = [
   {
-    name: "David",
+    name: "@amoreno",
     image: robertPattinson,
     review:
       "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
   },
   {
-    name: "David",
+    name: "@amoreno",
     image: robertPattinson,
     review:
       "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
   },
   {
-    name: "David",
+    name: "@amoreno",
     image: robertPattinson,
     review:
       "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
   },
   {
-    name: "David",
+    name: "@amoreno",
     image: robertPattinson,
     review:
       "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
   },
   {
-    name: "David",
+    name: "@amoreno",
     image: robertPattinson,
     review:
       "The Batman is a great movie. I loved the action scenes and the plot. The actors were amazing and the soundtrack was perfect.",
@@ -64,9 +65,34 @@ export default function Film() {
   const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
   const [streaming, setStreaming] = useState([]);
+  const [comment, setComment] = useState("");
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
+  };
+
+  const handleAddComment = async () => {
+    if (!comment.trim()) {
+      Alert.alert("Error", "The comment cannot be empty");
+      return;
+    }
+
+    try {
+      await axios.post(`${API_URL}/api/movies/${filmId}/comments`, {
+        user_id: userId,
+        content: comment,
+      });
+
+      Alert.alert("Success", "Your review has been added successfully");
+
+      setComment("");
+    } catch (error) {
+      console.error("Error afegint el comentari: " + error);
+      Alert.alert(
+        "Error",
+        "There was an error submitting your comment. Please try again."
+      );
+    }
   };
 
   const fetchMovieDetails = async () => {
@@ -364,10 +390,13 @@ export default function Film() {
                 placeholderTextColor="#E9A6A6"
                 multiline={true}
                 maxLength={400}
+                value={comment}
+                onChangeText={setComment}
               />
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.buttonAddReview}
+                onPress={handleAddComment}
               >
                 <Text style={[globalStyles.textBase, styles.buttonText]}>
                   Submit Review
