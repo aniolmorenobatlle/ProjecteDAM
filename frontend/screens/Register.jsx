@@ -15,11 +15,10 @@ import {
 } from "react-native";
 import ButtonConfirm from "../components/ButtonConfirm";
 import InputLogin from "../components/InputLogin";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 
 import lalaland from "../assets/films/lalaland.jpg";
-
-const API_URL = "http://172.20.10.2:3000";
 
 export default function Register() {
   const navigation = useNavigation();

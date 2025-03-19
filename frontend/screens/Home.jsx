@@ -2,10 +2,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import Sidebar from "../components/Sidebar";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
@@ -24,8 +32,6 @@ const movies = [
   { name: "Avatar", image: avatar, year: 2009, duration: "162 min" },
   { name: "Baby Driver", image: babyDriver, year: 2017, duration: "113 min" },
 ];
-
-const API_URL = "http://172.20.10.2:3000";
 
 export default function Home() {
   const navigation = useNavigation();
@@ -71,8 +77,33 @@ export default function Home() {
     getPopularFilms();
   }, []);
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error}</Text>;
+  if (loading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+
+  if (error)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <Text style={{ color: "white" }}>Error: {error}</Text>
+      </View>
+    );
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>

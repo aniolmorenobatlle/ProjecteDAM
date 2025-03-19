@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
@@ -28,8 +28,33 @@ const lists = [
 export default function Profile() {
   const { userInfo, loading, error } = useUserInfo();
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error}</Text>;
+  if (loading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+
+  if (error)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <Text style={{ color: "white" }}>Error: {error}</Text>
+      </View>
+    );
 
   return (
     <ScrollView

@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   ScrollView,
@@ -13,13 +14,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 
 const numColumns = 4;
 const screenWidth = Dimensions.get("window").width;
 const itemSize = screenWidth / numColumns - 10;
-
-const API_URL = "http://172.20.10.2:3000";
 
 export default function Search() {
   const navigation = useNavigation();
@@ -129,7 +129,11 @@ export default function Search() {
         </Text>
 
         {loading ? (
-          <Text>Loading...</Text>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
         ) : (
           <View style={styles.movieGrid}>
             {movies.map((item, index) => (

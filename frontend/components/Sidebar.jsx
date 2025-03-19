@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useRef } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Image,
@@ -69,8 +70,33 @@ export default function Sidebar({ isOpen, closeMenu }) {
     }
   };
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error}</Text>;
+  if (loading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+
+  if (error)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <Text style={{ color: "white" }}>Error: {error}</Text>
+      </View>
+    );
 
   return (
     <TouchableWithoutFeedback onPress={closeMenu}>

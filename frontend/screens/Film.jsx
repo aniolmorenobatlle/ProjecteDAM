@@ -2,6 +2,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ImageBackground,
@@ -15,10 +16,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
-
-const API_URL = "http://172.20.10.2:3000";
 
 export default function Film() {
   const route = useRoute();
@@ -29,8 +29,10 @@ export default function Film() {
   const [year, setYear] = useState("");
   const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
+  const [expanded, setExpanded] = useState(false);
   const [streaming, setStreaming] = useState([]);
-  const [comment, setComment] = useState("");
+  const [review, setReview] = useState("");
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviews, setReviews] = useState([]);
   const { userInfo, loading, error } = useUserInfo();
 
@@ -39,7 +41,7 @@ export default function Film() {
   };
 
   const handleAddComment = async () => {
-    if (!comment.trim()) {
+    if (!review.trim()) {
       Alert.alert("Error", "The comment cannot be empty");
       return;
     }
@@ -52,7 +54,7 @@ export default function Film() {
 
       Alert.alert("Success", "Your review has been added successfully");
 
-      setComment("");
+      setReview("");
       fetchMovieComments();
     } catch (error) {
       console.error("Error afegint el comentari: " + error);
@@ -121,9 +123,7 @@ export default function Film() {
         `${API_URL}/api/movies/${filmId}/comments`
       );
       setReviews(response.data);
-    } catch (error) {
-      console.error("Error obtenint els comentaris de la pel·lícula: " + error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -134,8 +134,33 @@ export default function Film() {
     fetchMovieComments();
   }, [filmId]);
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>{error}</Text>;
+  if (loading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+
+  if (error)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <Text style={{ color: "white" }}>Error: {error}</Text>
+      </View>
+    );
 
   return (
     <KeyboardAvoidingView
@@ -166,7 +191,7 @@ export default function Film() {
         </ImageBackground>
 
         <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-          <View style={styles.filmHeader}>
+          <View style={[styles.filmHeader, expanded && { height: "auto" }]}>
             <View style={styles.bodyLeft}>
               <Image
                 style={styles.poster}
@@ -218,17 +243,24 @@ export default function Film() {
                 </Text>
               </View>
               <View style={styles.description}>
-                <Text
-                  style={[globalStyles.textBase, styles.descriptionText]}
-                  numberOfLines={10}
-                >
+                <Text style={[globalStyles.textBase, styles.descriptionText]}>
                   {movieDetails.synopsis}
+                </Text>
+                <Text
+                  style={[
+                    globalStyles.textBase,
+                    styles.descriptionText,
+                    { color: "#E9A6A6" },
+                  ]}
+                  onPress={() => setExpanded(!expanded)}
+                >
+                  {expanded ? "See less" : "See more"}
                 </Text>
               </View>
             </View>
           </View>
 
-          <View>
+          <View style={styles.castContainer}>
             <View style={styles.buttonOptions}>
               <TouchableOpacity
                 activeOpacity={1}
@@ -339,41 +371,46 @@ export default function Film() {
           <View style={styles.reviews}>
             <View style={styles.reviewTitles}>
               <Text style={[globalStyles.textBase]}>All reviews</Text>
-              <Text style={[globalStyles.textBase, styles.seeAll]}>
-                See all
+              <Text
+                style={[globalStyles.textBase, styles.seeAll]}
+                onPress={() => setShowAllReviews(!showAllReviews)}
+              >
+                {showAllReviews ? "See less" : "See all"}
               </Text>
             </View>
 
-            {reviews.slice(0, 5).map((review, index) => (
-              <View key={index} style={styles.reviewContainer}>
-                <View style={styles.reviewHeader}>
-                  {review.image ? (
-                    <Image
-                      style={styles.reviewImageUser}
-                      source={{ uri: review.image }}
-                    />
-                  ) : (
-                    <Icon
-                      name="person-circle-outline"
-                      size={50}
-                      style={styles.reviewImageUserNull}
-                    />
-                  )}
+            {(showAllReviews ? reviews : reviews.slice(0, 5)).map(
+              (review, index) => (
+                <View key={index} style={styles.reviewContainer}>
+                  <View style={styles.reviewHeader}>
+                    {review.image ? (
+                      <Image
+                        style={styles.reviewImageUser}
+                        source={{ uri: review.image }}
+                      />
+                    ) : (
+                      <Icon
+                        name="person-circle-outline"
+                        size={50}
+                        style={styles.reviewImageUserNull}
+                      />
+                    )}
 
-                  <Text style={[globalStyles.textBase, styles.reviewText]}>
-                    Review by{" "}
-                    <Text
-                      style={[globalStyles.textBase, styles.reviewTextUser]}
-                    >
-                      {review.username}
+                    <Text style={[globalStyles.textBase, styles.reviewText]}>
+                      Review by{" "}
+                      <Text
+                        style={[globalStyles.textBase, styles.reviewTextUser]}
+                      >
+                        {review.username}
+                      </Text>
                     </Text>
+                  </View>
+                  <Text style={[globalStyles.textBase, styles.reviewResult]}>
+                    {review.comment}
                   </Text>
                 </View>
-                <Text style={[globalStyles.textBase, styles.reviewResult]}>
-                  {review.comment}
-                </Text>
-              </View>
-            ))}
+              )
+            )}
 
             <View style={styles.addReview}>
               <TextInput
@@ -382,8 +419,8 @@ export default function Film() {
                 placeholderTextColor="#E9A6A6"
                 multiline={true}
                 maxLength={400}
-                value={comment}
-                onChangeText={setComment}
+                value={review}
+                onChangeText={setReview}
               />
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -438,7 +475,8 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     gap: 15,
-    height: 280,
+    height: 270,
+    transition: "height 0.3s",
   },
 
   bodyLeft: {
@@ -509,7 +547,6 @@ const styles = {
 
   description: {
     flex: 1,
-    height: 200,
   },
 
   descriptionText: {
