@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   Text,
@@ -30,11 +31,20 @@ export default function Film() {
   const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
   const [expanded, setExpanded] = useState(false);
+  const [modalWatchlist, setModalWatchlist] = useState(false);
   const [streaming, setStreaming] = useState([]);
   const [review, setReview] = useState("");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviews, setReviews] = useState([]);
   const { userInfo, loading, error } = useUserInfo();
+
+  const handleOpenModalWatchlist = () => {
+    setModalWatchlist(true);
+  };
+
+  const handleCloseModalWatchlist = () => {
+    setModalWatchlist(false);
+  };
 
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
@@ -49,7 +59,7 @@ export default function Film() {
     try {
       await axios.post(`${API_URL}/api/movies/${filmId}/comments`, {
         user_id: userInfo.id,
-        content: comment,
+        content: review,
       });
 
       Alert.alert("Success", "Your review has been added successfully");
@@ -57,7 +67,6 @@ export default function Film() {
       setReview("");
       fetchMovieComments();
     } catch (error) {
-      console.error("Error afegint el comentari: " + error);
       Alert.alert(
         "Error",
         "There was an error submitting your comment. Please try again."
@@ -164,15 +173,14 @@ export default function Film() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         vertical={true}
         showsVerticalScrollIndicator={false}
         style={{ backgroundColor: "#1F1D36" }}
         contentContainerStyle={{ paddingBottom: 10, flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
       >
         <ImageBackground
           source={{ uri: movieDetails.cover }}
@@ -200,7 +208,7 @@ export default function Film() {
               <View style={styles.buttons}>
                 <View style={styles.button}>
                   <Icon
-                    name="duplicate-outline"
+                    name="star-outline"
                     size={20}
                     style={styles.buttonImage}
                   />
@@ -215,19 +223,24 @@ export default function Film() {
                     style={styles.buttonImage}
                   />
                   <Text style={[globalStyles.textBase, styles.buttonText]}>
-                    Add to Lists
+                    Add to List
                   </Text>
                 </View>
-                <View style={styles.button}>
-                  <Icon
-                    name="document-outline"
-                    size={20}
-                    style={styles.buttonImage}
-                  />
-                  <Text style={[globalStyles.textBase, styles.buttonText]}>
-                    Add to Watchlist
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleOpenModalWatchlist}
+                >
+                  <View style={styles.button}>
+                    <Icon
+                      name="duplicate-outline"
+                      size={20}
+                      style={styles.buttonImage}
+                    />
+                    <Text style={[globalStyles.textBase, styles.buttonText]}>
+                      Add to Watchlist
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -243,7 +256,10 @@ export default function Film() {
                 </Text>
               </View>
               <View style={styles.description}>
-                <Text style={[globalStyles.textBase, styles.descriptionText]}>
+                <Text
+                  style={[globalStyles.textBase, styles.descriptionText]}
+                  numberOfLines={expanded ? 0 : 20}
+                >
                   {movieDetails.synopsis}
                 </Text>
                 <Text
@@ -435,6 +451,24 @@ export default function Film() {
           </View>
         </SafeAreaView>
       </ScrollView>
+
+      <Modal
+        visible={modalWatchlist}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={handleCloseModalWatchlist}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Choose an Option</Text>
+            <View style={styles.columnContainer}>
+              <Icon name="heart-outline" size={40} color="#E9A6A6" />
+              <Icon name="eye-outline" size={40} color="#E9A6A6" />
+              <Icon name="clock-outline" size={40} color="#E9A6A6" />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -553,6 +587,48 @@ const styles = {
     fontSize: 14,
     color: "#fff",
     textAlign: "justify",
+  },
+
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#323048",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 5, // Ombra en Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84, // Ombra en iOS
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "white",
+  },
+
+  columnContainer: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 40,
+    marginTop: 20,
+  },
+
+  optionText: {
+    fontSize: 16,
+    paddingVertical: 10,
+    color: "#007bff",
+    fontWeight: "bold",
   },
 
   castContainer: {

@@ -11,6 +11,7 @@ const getMoviesQuery = async (limit, offset, query) => {
     SELECT *
     FROM movies
     WHERE LOWER(title) LIKE LOWER($1)
+    AND poster IS NOT NULL
     LIMIT $2 OFFSET $3
   `;
   const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);

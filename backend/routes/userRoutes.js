@@ -31,6 +31,23 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/check-username/:username', async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const exists = await userModel.checkUserExists(username);
+
+    if (exists) {
+      return res.status(400).json({ message: "El nom d'usuari ja està en ús" });
+    }
+
+    res.status(200).json({ message: "El nom d'usuari està disponible" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error en la verificació del nom d'usuari" });
+  }
+});
+
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 

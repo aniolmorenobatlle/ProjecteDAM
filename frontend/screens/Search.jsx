@@ -4,7 +4,6 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -16,10 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
-
-const numColumns = 4;
-const screenWidth = Dimensions.get("window").width;
-const itemSize = screenWidth / numColumns - 10;
 
 export default function Search() {
   const navigation = useNavigation();
@@ -68,17 +63,13 @@ export default function Search() {
   };
 
   const searchMovies = async () => {
-    if (!searchQuery) {
-      getPopularFilms();
-      return;
-    }
-
     setLoading(true);
 
     try {
       const response = await axios.get(
         `${API_URL}/api/movies?query=${searchQuery}`
       );
+
       setMovies(response.data.movies);
     } catch (error) {
       console.error("Error searching movies: " + error);
@@ -95,6 +86,9 @@ export default function Search() {
 
   const handleSearch = (text) => {
     setSearchQuery(text);
+    if (text.trim() === "") {
+      getPopularFilms();
+    }
     searchMovies();
   };
 
@@ -137,13 +131,7 @@ export default function Search() {
         ) : (
           <View style={styles.movieGrid}>
             {movies.map((item, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.movieItem,
-                  { width: itemSize, height: itemSize * 1.5 },
-                ]}
-              >
+              <View key={index} style={styles.movieItem}>
                 <TouchableOpacity
                   activeOpacity={0.8}
                   onPress={() =>
@@ -210,10 +198,11 @@ const styles = {
   movieGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
   },
 
   movieItem: {
+    width: "25%",
+    height: 130,
     alignItems: "center",
   },
 

@@ -10,7 +10,7 @@ END$$;
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL,
-  username VARCHAR NOT NULL,
+  username VARCHAR NOT NULL UNIQUE,
   email VARCHAR NOT NULL UNIQUE,
   password VARCHAR NOT NULL,
   image VARCHAR,
@@ -52,14 +52,6 @@ CREATE TABLE comments (
   created_at TIMESTAMP
 );
 
-CREATE TABLE ratings (
-  id SERIAL PRIMARY KEY,
-  user_id int,
-  movie_id int,
-  rating DECIMAL(2,1) NOT NULL,
-  created_at TIMESTAMP
-);
-
 CREATE TABLE notifications (
   id SERIAL PRIMARY KEY,
   user_id int,
@@ -83,6 +75,8 @@ CREATE TABLE to_watch (
   movie_id int,
   likes boolean,
   watched boolean,
+  watchlist boolean,
+  rating DECIMAL(2,1),
   created_at TIMESTAMP
 );
 
@@ -163,9 +157,6 @@ CREATE TABLE messages (
 -- Afegir les claus foranes
 ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
-
-ALTER TABLE ratings ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE ratings ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
 
 ALTER TABLE notifications ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE notifications ADD FOREIGN KEY (friend_id) REFERENCES users (id);

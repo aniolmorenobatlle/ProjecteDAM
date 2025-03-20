@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -27,9 +28,15 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [incorrectUser, setIncorrectUser] = useState(false);
-  const [incorrectEmail, setIncorrectEmail] = useState(false);
-  const [incorrectPassword, setIncorrectPassword] = useState(false);
+
+  const checkUsernameAvailability = async (username) => {
+    try {
+      await axios.get(`${API_URL}/api/users/check-username/${username}`);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const validatePassword = (password) => {
     const regex =
@@ -37,27 +44,39 @@ export default function Register() {
     return regex.test(password);
   };
 
-  // Handle per registre
   const handleRegister = async () => {
     if (username.trim() === "") {
-      setIncorrectUser(true);
+      Alert.alert("Error", "Username is required!");
       return;
-    } else {
-      setIncorrectUser(false);
+    }
+
+    if (username.length < 4) {
+      Alert.alert("Error", "Username must be at least 4 characters long!");
+      return;
+    }
+
+    const isAvailable = await checkUsernameAvailability(username);
+    if (!isAvailable) {
+      Alert.alert("Error", "Username is already taken!");
+      return;
     }
 
     if (email.trim() === "") {
-      setIncorrectEmail(true);
+      Alert.alert("Error", "Email is required!");
       return;
-    } else {
-      setIncorrectEmail(false);
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+      Alert.alert("Error", "Email is not valid!");
+      return;
     }
 
     if (!validatePassword(password)) {
-      setIncorrectPassword(true);
+      Alert.alert(
+        "Error",
+        "Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character!"
+      );
       return;
-    } else {
-      setIncorrectPassword(false);
     }
 
     try {
@@ -70,30 +89,11 @@ export default function Register() {
 
       if (response.status === 200) {
         const { token } = response.data;
-
-        // Guardar token a AsyncStorage
         await AsyncStorage.setItem("authToken", token);
-
         navigation.navigate("Login");
-      } else {
-        if (error.response) {
-          const errorMessage = error.response.data.message;
-          console.error("Error al servidor:", errorMessage);
-
-          if (errorMessage.includes("username")) {
-            setIncorrectUser(true);
-            setIncorrectEmail(false);
-          } else if (errorMessage.includes("email")) {
-            setIncorrectEmail(true);
-            setIncorrectUser(false);
-          } else {
-            setIncorrectUser(true);
-            setIncorrectEmail(true);
-          }
-        }
       }
     } catch (error) {
-      console.error("Error en la petició de registre", error);
+      console.error(error);
     }
   };
 
@@ -136,34 +136,16 @@ export default function Register() {
                   value={username}
                   onChange={setUsername}
                 />
-                {incorrectUser && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    {username.trim() === ""
-                      ? "Username is required!"
-                      : "This username is already in use!"}
-                  </Text>
-                )}
 
                 <InputLogin
                   text="Email"
                   icon="mail-outline"
                   type="email-address"
+                  autoComplete="email"
                   value={email}
                   onChange={setEmail}
                 />
-                {incorrectEmail && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    {email.trim() === ""
-                      ? "Email is required!"
-                      : "This email is already in use!"}
-                  </Text>
-                )}
 
-                {incorrectEmail && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    This email is already in use!
-                  </Text>
-                )}
                 <InputLogin
                   text="Password"
                   icon="lock-closed-outline"
@@ -171,12 +153,7 @@ export default function Register() {
                   value={password}
                   onChange={setPassword}
                 />
-                {incorrectPassword && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    Password must be at least 8 characters long, with 1
-                    uppercase, 1 lowercase, 1 number, and 1 special character!
-                  </Text>
-                )}
+
                 <TouchableOpacity activeOpacity={0.8} onPress={handleRegister}>
                   <ButtonConfirm text="Register" />
                 </TouchableOpacity>

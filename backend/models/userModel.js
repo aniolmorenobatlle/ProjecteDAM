@@ -19,6 +19,14 @@ const findUserByUsername = async (username) => {
   return result.rows[0];
 };
 
+const checkUserExists = async (username) => {
+  const result = await pool.query(
+    `SELECT id FROM "users" WHERE "username" = $1`,
+    [username]
+  );
+  return result.rows.length > 0;
+}
+
 const findUserById = async (userId) => {
   const result = await pool.query(
     `SELECT id, name, username, email, image FROM "users" WHERE id = $1`,
@@ -34,6 +42,7 @@ const comparePasswords = async (password, hashedPassword) => {
 module.exports = {
   createUser,
   findUserByUsername,
+  checkUserExists,
   findUserById,
   comparePasswords,
 }; 
