@@ -24,6 +24,8 @@ import { useUserInfo } from "../hooks/useUserInfo";
 export default function Film() {
   const route = useRoute();
   const { filmId } = route.params;
+  const { userInfo, loading, error } = useUserInfo();
+
   const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("cast");
   const [movieDetails, setMovieDetails] = useState({});
@@ -36,13 +38,69 @@ export default function Film() {
   const [review, setReview] = useState("");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviews, setReviews] = useState([]);
-  const { userInfo, loading, error } = useUserInfo();
+  const [isWatched, setIsWatched] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
 
   const handleOpenModalWatchlist = () => {
     setModalWatchlist(true);
   };
 
-  const handleCloseModalWatchlist = () => {
+  const handleIsWatched = () => {
+    setIsWatched(!isWatched);
+  };
+
+  const handleIsLiked = () => {
+    setIsLiked(!isLiked);
+  };
+
+  const handleIsInWatchlist = () => {
+    setIsInWatchlist(!isInWatchlist);
+  };
+
+  const handleAddToWatchlist = async () => {
+    if (isWatched) {
+      try {
+        await axios.post(`${API_URL}/api/movies/${filmId}/watched`, {
+          user_id: userInfo.id,
+        });
+
+        Alert.alert("Success", "The movie has been added to your watched list");
+      } catch (error) {
+        console.error("Error adding movie to watched list: " + error);
+        Alert.alert("Error", "There was an error adding the movie to the list");
+      }
+    }
+
+    if (isLiked) {
+      try {
+        await axios.post(`${API_URL}/api/movies/${filmId}/like`, {
+          user_id: userInfo.id,
+        });
+
+        Alert.alert("Success", "The movie has been added to your liked list");
+      } catch (error) {
+        console.error("Error adding movie to liked list: " + error);
+        Alert.alert("Error", "There was an error adding the movie to the list");
+      }
+    }
+
+    if (isInWatchlist) {
+      try {
+        await axios.post(`${API_URL}/api/movies/${filmId}/watchlist`, {
+          user_id: userInfo.id,
+        });
+
+        Alert.alert(
+          "Success",
+          "The movie has been added to your watchlist list"
+        );
+      } catch (error) {
+        console.error("Error adding movie to watchlist: " + error);
+        Alert.alert("Error", "There was an error adding the movie to the list");
+      }
+    }
+
     setModalWatchlist(false);
   };
 
@@ -456,16 +514,54 @@ export default function Film() {
         visible={modalWatchlist}
         animationType="fade"
         transparent={true}
-        onRequestClose={handleCloseModalWatchlist}
+        onRequestClose={() => setModalWatchlist(false)}
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Choose an Option</Text>
             <View style={styles.columnContainer}>
-              <Icon name="heart-outline" size={40} color="#E9A6A6" />
-              <Icon name="eye-outline" size={40} color="#E9A6A6" />
-              <Icon name="clock-outline" size={40} color="#E9A6A6" />
+              <TouchableOpacity activeOpacity={0.8} onPress={handleIsWatched}>
+                <View style={styles.optionContainer}>
+                  <Icon
+                    name={isWatched ? "eye" : "eye-outline"}
+                    size={60}
+                    color={isWatched ? "#a9c9ff" : "#D3D3D3"}
+                  />
+                  <Text style={styles.optionText}>Watched</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity activeOpacity={0.8} onPress={handleIsLiked}>
+                <View style={styles.optionContainer}>
+                  <Icon
+                    name={isLiked ? "heart" : "heart-outline"}
+                    size={60}
+                    color={isLiked ? "red" : "#D3D3D3"}
+                  />
+                  <Text style={styles.optionText}>Like</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleIsInWatchlist}
+              >
+                <View style={styles.optionContainer}>
+                  <Icon
+                    name={isInWatchlist ? "time" : "time-outline"}
+                    size={60}
+                    color={isInWatchlist ? "#ff007f" : "#D3D3D3"}
+                  />
+                  <Text style={styles.optionText}>Watchlist</Text>
+                </View>
+              </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleAddToWatchlist}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -587,48 +683,6 @@ const styles = {
     fontSize: 14,
     color: "#fff",
     textAlign: "justify",
-  },
-
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#323048",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    elevation: 5, // Ombra en Android
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84, // Ombra en iOS
-  },
-
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "white",
-  },
-
-  columnContainer: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 40,
-    marginTop: 20,
-  },
-
-  optionText: {
-    fontSize: 16,
-    paddingVertical: 10,
-    color: "#007bff",
-    fontWeight: "bold",
   },
 
   castContainer: {
@@ -763,5 +817,67 @@ const styles = {
     padding: 10,
     marginTop: 10,
     alignSelf: "flex-start",
+  },
+
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
+  modalContainer: {
+    width: "90%",
+    backgroundColor: "#323048",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 5, // Ombra en Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84, // Ombra en iOS
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "white",
+  },
+
+  columnContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 40,
+    marginTop: 20,
+  },
+
+  optionContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+  },
+
+  optionText: {
+    fontSize: 12,
+    paddingVertical: 10,
+    color: "#D3D3D3",
+    fontWeight: "bold",
+  },
+
+  confirmButton: {
+    width: "100%",
+    padding: 15,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  confirmButtonText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
   },
 };

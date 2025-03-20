@@ -71,8 +71,8 @@ CREATE TABLE friends (
 
 CREATE TABLE to_watch (
   id SERIAL PRIMARY KEY,
-  user_id int,
-  movie_id int,
+  user_id int NOT NULL,
+  movie_id int NOT NULL,
   likes boolean,
   watched boolean,
   watchlist boolean,
@@ -166,7 +166,8 @@ ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id);
 
 ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
+CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 

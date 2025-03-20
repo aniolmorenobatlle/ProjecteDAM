@@ -130,23 +130,29 @@ export default function Search() {
           </View>
         ) : (
           <View style={styles.movieGrid}>
-            {movies.map((item, index) => (
-              <View key={index} style={styles.movieItem}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() =>
-                    navigation.navigate("Film", {
-                      filmId: item.id_api,
-                    })
-                  }
-                >
-                  <Image
-                    source={{ uri: item.poster }}
-                    style={styles.movieImage}
-                  />
-                </TouchableOpacity>
-              </View>
-            ))}
+            {movies.length === 0 ? (
+              <Text style={[globalStyles.textBase, styles.noResults]}>
+                No results
+              </Text>
+            ) : (
+              movies.map((item, index) => (
+                <View key={index} style={styles.movieItem}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() =>
+                      navigation.navigate("Film", {
+                        filmId: item.id_api,
+                      })
+                    }
+                  >
+                    <Image
+                      source={{ uri: item.poster }}
+                      style={styles.movieImage}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))
+            )}
           </View>
         )}
       </ScrollView>
@@ -210,5 +216,12 @@ const styles = {
     width: 80,
     height: 120,
     borderRadius: 10,
+  },
+
+  noResults: {
+    textAlign: "center",
+    color: "rgba(255, 255, 255, 0.5)",
+    fontSize: 18,
+    marginTop: 20,
   },
 };

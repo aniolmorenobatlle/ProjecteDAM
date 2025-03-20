@@ -117,23 +117,6 @@ exports.fetchMovieComments = async (req, res) => {
   }
 };
 
-exports.fetchAddMovieComment = async (req, res) => {
-  try {
-    const { id_api } = req.params;
-    const { user_id, content } = req.body;
-
-    if (!user_id || !content) {
-      return res.status(400).json({ message: 'Falten camps obligatoris' });
-    }
-
-    await movieModel.addMovieComment(id_api, user_id, content);
-    res.json({ message: 'Comentari afegit correctament' });
-  } catch (error) {
-    console.error('Error afegint el comentari a la pel·lícula:', error);
-    res.status(500).json({ message: 'Error del servidor' });
-  }
-};
-
 exports.fetchMovieStreaming = async (req, res) => {
   try {
     const { id_api } = req.params;
@@ -222,5 +205,88 @@ exports.fetchMovieDetails = async (req, res) => {
   } catch (error) {
     console.error('Error obtenint els detalls de la pel·lícula:', error);
     res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+exports.fetchAddMovieComment = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id, content } = req.body;
+
+    if (!user_id || !content) {
+      return res.status(400).json({ message: 'Falten camps obligatoris' });
+    }
+
+    await movieModel.addMovieComment(id_api, user_id, content);
+    res.json({ message: 'Comentari afegit correctament' });
+  } catch (error) {
+    console.error('Error afegint el comentari a la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+exports.fetchAddMovieToWatched = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id || !id_api) {
+      return res.status(400).json({ message: "Falten dades (user_id o id_api)" });
+    }
+
+    const movie = await movieModel.addMovieIsWatched(user_id, id_api);
+
+    res.json({
+      message: "Pel·lícula afegida a les vistes correctament",
+      movie
+    });
+
+  } catch (error) {
+    console.error("Error afegint la pel·lícula a les vistes:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+exports.fetchAddMovieToLike = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id || !id_api) {
+      return res.status(400).json({ message: "Falten dades (user_id o id_api)" });
+    }
+
+    const movie = await movieModel.addMovieIsLike(user_id, id_api);
+
+    res.json({
+      message: "Pel·lícula afegida a likes correctament",
+      movie
+    });
+
+  } catch (error) {
+    console.error("Error afegint la pel·lícula a les vistes:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+exports.fetchAddMovieToWatchlist = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id || !id_api) {
+      return res.status(400).json({ message: "Falten dades (user_id o id_api)" });
+    }
+
+    const movie = await movieModel.addMovieIsWatchlist(user_id, id_api);
+
+    res.json({
+      message: "Pel·lícula afegida a veure més tard correctament",
+      movie
+    });
+
+  } catch (error) {
+    console.error("Error afegint la pel·lícula a les vistes:", error);
+    res.status(500).json({ message: "Error del servidor" });
   }
 };

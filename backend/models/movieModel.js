@@ -1,12 +1,12 @@
 const pool = require('../config/db.js');
 
-const getMovies = async (limit, offset) => {
+exports.getMovies = async (limit, offset) => {
   const query = 'SELECT * FROM "movies" LIMIT $1 OFFSET $2';
   const result = await pool.query(query, [limit, offset]);
   return result.rows;
 };
 
-const getMoviesQuery = async (limit, offset, query) => {
+exports.getMoviesQuery = async (limit, offset, query) => {
   const movieQuery = `
     SELECT *
     FROM movies
@@ -18,20 +18,20 @@ const getMoviesQuery = async (limit, offset, query) => {
   return result.rows;
 };
 
-const getMoviesCount = async () => {
+exports.getMoviesCount = async () => {
   const query = 'SELECT COUNT(*) FROM "movies"';
   const result = await pool.query(query);
   return parseInt(result.rows[0].count);
 };
 
-const getMovieByTitle = async (title) => {
+exports.getMovieByTitle = async (title) => {
   const query = 'SELECT * FROM "movies" WHERE title = $1 LIMIT 1';
   const result = await pool.query(query, [title]);
 
   return result.rows[0];
 };
 
-const getLastMostPopularMovies = async () => {
+exports.getLastMostPopularMovies = async () => {
   const lastMonth = new Date();
   lastMonth.setMonth(lastMonth.getMonth() - 1);
   const lastMonthString = lastMonth.toISOString().split("T")[0];
@@ -47,7 +47,7 @@ const getLastMostPopularMovies = async () => {
   return result.rows;
 };
 
-const getMovieComments = async (id) => {
+exports.getMovieComments = async (id) => {
   const query = `
     SELECT c.*, u.username, u.image
     FROM comments c
@@ -59,17 +59,7 @@ const getMovieComments = async (id) => {
   return result.rows;
 };
 
-const addMovieComment = async (id_api, user_id, comment) => {
-  const query = `
-    INSERT INTO comments (movie_id, user_id, comment, created_at)
-    VALUES ($1, $2, $3, NOW())
-    RETURNING *;
-  `;
-  const result = await pool.query(query, [id_api, user_id, comment]);
-  return result.rows[0];
-};
-
-const getMovieStreaming = async (id_api) => {
+exports.getMovieStreaming = async (id_api) => {
   const query = `
     SELECT m.id_api, s.*, ms.display_priority
     FROM streaming s
@@ -83,7 +73,7 @@ const getMovieStreaming = async (id_api) => {
   return result.rows;
 };
 
-const getMovieCreditsCast = async (id) => {
+exports.getMovieCreditsCast = async (id) => {
   const query = `
     SELECT
       m.id_api,
@@ -101,7 +91,7 @@ const getMovieCreditsCast = async (id) => {
   return result.rows;
 };
 
-const getMovieCreditsDirector = async (id) => {
+exports.getMovieCreditsDirector = async (id) => {
   const query = `
     SELECT 
       m.id_api, 
@@ -117,11 +107,58 @@ const getMovieCreditsDirector = async (id) => {
   return result.rows;
 };
 
-const getMovieById = async (id) => {
+exports.getMovieById = async (id) => {
   const query = 'SELECT * FROM "movies" WHERE id_api = $1 LIMIT 1';
   const result = await pool.query(query, [id]);
 
   return result.rows[0];
 };
 
-module.exports = { getMovies, getMoviesQuery, getMoviesCount, getMovieByTitle, getLastMostPopularMovies, getMovieComments, addMovieComment, getMovieStreaming, getMovieCreditsCast, getMovieCreditsDirector, getMovieById };
+exports.addMovieComment = async (id_api, user_id, comment) => {
+  const query = `
+    INSERT INTO comments (movie_id, user_id, comment, created_at)
+    VALUES ($1, $2, $3, NOW())
+    RETURNING *;
+  `;
+  const result = await pool.query(query, [id_api, user_id, comment]);
+  return result.rows[0];
+};
+
+exports.addMovieIsWatched = async (user_id, id_api) => {
+  const query = `
+    INSERT INTO to_watch (user_id, movie_id, watched, created_at)
+    VALUES ($1, $2, true, NOW())
+    ON CONFLICT (user_id, movie_id) 
+    DO UPDATE SET watched = true
+    RETURNING *;
+  `;
+
+  const result = await pool.query(query, [user_id, id_api]);
+  return result.rows[0];
+}
+
+exports.addMovieIsLike = async (user_id, id_api) => {
+  const query = `
+    INSERT INTO to_watch (user_id, movie_id, likes, created_at)
+    VALUES ($1, $2, true, NOW())
+    ON CONFLICT (user_id, movie_id) 
+    DO UPDATE SET likes = true
+    RETURNING *;
+  `;
+
+  const result = await pool.query(query, [user_id, id_api]);
+  return result.rows[0];
+}
+
+exports.addMovieIsWatchlist = async (user_id, id_api) => {
+  const query = `
+    INSERT INTO to_watch (user_id, movie_id, watchlist, created_at)
+    VALUES ($1, $2, true, NOW())
+    ON CONFLICT (user_id, movie_id) 
+    DO UPDATE SET watchlist = true
+    RETURNING *;
+  `;
+
+  const result = await pool.query(query, [user_id, id_api]);
+  return result.rows[0];
+}
