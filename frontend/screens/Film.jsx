@@ -41,6 +41,9 @@ export default function Film() {
   const [isWatched, setIsWatched] = useState(false);
   const [isLikes, setIsLikes] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [modalRate, setModalRate] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [lastRatingClick, setLastRatingClick] = useState(0);
 
   const fetchMovieStatus = async () => {
     try {
@@ -56,20 +59,24 @@ export default function Film() {
           watched = false,
           likes = false,
           watchlist = false,
+          rating = 0,
         } = response.data;
         setIsWatched(watched);
         setIsLikes(likes);
         setIsInWatchlist(watchlist);
+        setRating(rating);
       } else {
         setIsWatched(false);
         setIsLikes(false);
         setIsInWatchlist(false);
+        setRating(0);
       }
     } catch (error) {
       console.error("Error obtenint l'estat de la pel·lícula: " + error);
       setIsWatched(false);
       setIsLikes(false);
       setIsInWatchlist(false);
+      setRating(0);
     }
   };
 
@@ -82,6 +89,10 @@ export default function Film() {
         watchlist: newStatus.watchlist,
       });
     } catch (error) {
+      Alert.alert(
+        "Error",
+        "There was an error updating the movie status. Please try again."
+      );
       console.error(
         "Error actualitzant l'estat de la pel·lícula:",
         error.response?.data || error
@@ -123,8 +134,65 @@ export default function Film() {
     updateMovieStatus(newStatus);
   };
 
-  const handleAddToWatchlist = () => {
+  const handleCloseModalWatchlist = () => {
     setModalWatchlist(false);
+  };
+
+  const handleOpenModalRate = () => {
+    setModalRate(true);
+  };
+
+  const handleCloseModalRate = async () => {
+    await updateMovieRate();
+    setModalRate(false);
+  };
+
+  const updateMovieRate = async () => {
+    try {
+      await axios.put(`${API_URL}/api/movies/${filmId}/status/rate`, {
+        user_id: userInfo.id,
+        rate: rating,
+      });
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "There was an error submitting your rating. Please try again."
+      );
+      console.error(
+        "Error actualitzant la valoració de la pel·lícula: " + error
+      );
+    }
+  };
+
+  const handleAddRating = (rating) => {
+    const currentTime = new Date().getTime();
+    // Si fa doble click restablir el rating
+    if (currentTime - lastRatingClick < 300) {
+      setRating(0);
+    } else {
+      setRating(rating);
+    }
+    setLastRatingClick(currentTime);
+  };
+
+  const renderStars = () => {
+    let stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <TouchableOpacity
+          activeOpacity={0.8}
+          key={i}
+          onPress={() => handleAddRating(i)}
+        >
+          <Icon
+            name={i <= rating ? "star" : "star-outline"}
+            color={i <= rating ? "gold" : "white"}
+            size={50}
+          />
+        </TouchableOpacity>
+      );
+    }
+    return stars;
   };
 
   const handleButtonPress = (buttonName) => {
@@ -291,16 +359,22 @@ export default function Film() {
                 source={{ uri: movieDetails.poster }}
               />
               <View style={styles.buttons}>
-                <View style={styles.button}>
-                  <Icon
-                    name="star-outline"
-                    size={20}
-                    style={styles.buttonImage}
-                  />
-                  <Text style={[globalStyles.textBase, styles.buttonText]}>
-                    Rate
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleOpenModalRate}
+                >
+                  <View style={styles.button}>
+                    <Icon
+                      name="star-outline"
+                      size={20}
+                      style={styles.buttonImage}
+                    />
+                    <Text style={[globalStyles.textBase, styles.buttonText]}>
+                      Rate
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
                 <View style={styles.button}>
                   <Icon
                     name="list-outline"
@@ -311,6 +385,7 @@ export default function Film() {
                     Add to List
                   </Text>
                 </View>
+
                 <TouchableOpacity
                   activeOpacity={0.8}
                   onPress={handleOpenModalWatchlist}
@@ -554,7 +629,9 @@ export default function Film() {
                     size={60}
                     color={isWatched ? "#a9c9ff" : "#D3D3D3"}
                   />
-                  <Text style={styles.optionText}>Watched</Text>
+                  <Text style={styles.optionText}>
+                    {isWatched ? "Watched" : "Watch"}
+                  </Text>
                 </View>
               </TouchableOpacity>
 
@@ -565,7 +642,9 @@ export default function Film() {
                     size={60}
                     color={isLikes ? "red" : "#D3D3D3"}
                   />
-                  <Text style={styles.optionText}>Like</Text>
+                  <Text style={styles.optionText}>
+                    {isLikes ? "Liked" : "Like"}
+                  </Text>
                 </View>
               </TouchableOpacity>
 
@@ -585,7 +664,28 @@ export default function Film() {
             </View>
             <TouchableOpacity
               style={styles.confirmButton}
-              onPress={handleAddToWatchlist}
+              onPress={handleCloseModalWatchlist}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={modalRate}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setModalRate(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Rate this movie</Text>
+            <View style={styles.columnContainerRate}>{renderStars()}</View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleCloseModalRate}
             >
               <Text style={styles.confirmButtonText}>Done</Text>
             </TouchableOpacity>
@@ -878,6 +978,13 @@ const styles = {
     flexWrap: "wrap",
     gap: 40,
     marginTop: 20,
+  },
+
+  columnContainerRate: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginVertical: 20,
   },
 
   optionContainer: {

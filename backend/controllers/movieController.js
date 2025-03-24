@@ -254,6 +254,31 @@ exports.updateMovieStatus = async (req, res) => {
   }
 };
 
+exports.updateMovieRate = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id, rate } = req.body;
+
+    if (user_id === undefined || rate === undefined) {
+      console.log("Falten camps obligatoris");
+      return res.status(400).json({ message: 'Falten camps obligatoris' });
+    }
+
+    if (rate === null || rate === undefined) {
+      console.log("Valoració no vàlida");
+      return res.status(400).json({ message: 'Valoració no vàlida' });
+    }
+
+    await movieModel.updateMovieRate(user_id, id_api, rate);
+    res.json({ message: 'Puntuació actualitzada correctament' });
+
+  } catch (error) {
+    console.error('Error actualitzant la puntuació de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+
 exports.fetchFavoriteUserMovies = async (req, res) => {
   try {
     const { user_id } = req.query;
@@ -277,7 +302,6 @@ exports.fetchFavoriteUserMovies = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
-
 
 exports.fetchAddMovieComment = async (req, res) => {
   try {

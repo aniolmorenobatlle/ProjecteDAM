@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { fetchMovies, fetchMostPopularMovies, fetchLastMostPopularMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies } = require('../controllers/movieController.js');
+const { fetchMovies, fetchMostPopularMovies, fetchLastMostPopularMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate } = require('../controllers/movieController.js');
 const router = Router();
 
 router.get('/', fetchMovies);
@@ -17,7 +17,9 @@ router.post('/:id_api/comments', fetchAddMovieComment);
 router.post('/:id_api/watched', fetchAddMovieToWatched);
 router.post('/:id_api/like', fetchAddMovieToLike);
 router.post('/:id_api/watchlist', fetchAddMovieToWatchlist);
+
 router.put('/:id_api/status', updateMovieStatus);
+router.put('/:id_api/status/rate', updateMovieRate);
 
 
 module.exports = router;
