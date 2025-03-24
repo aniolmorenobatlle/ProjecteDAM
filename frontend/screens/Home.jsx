@@ -35,9 +35,10 @@ const movies = [
 
 export default function Home() {
   const navigation = useNavigation();
+  const { userInfo, loading, error } = useUserInfo();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [films, setFilms] = useState([]);
-  const { userInfo, loading, error } = useUserInfo();
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
 
   const getPopularFilms = async () => {
     try {
@@ -73,9 +74,23 @@ export default function Home() {
     }
   };
 
+  const getFavoritesMovies = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/movies/favorites`, {
+        params: { user_id: userInfo.id },
+      });
+      setFavoriteMovies(response.data.movies);
+    } catch (error) {
+      console.error("Error en obtenir les pel·lícules favorites: " + error);
+    }
+  };
+
   useEffect(() => {
     getPopularFilms();
-  }, []);
+    if (userInfo && userInfo.id) {
+      getFavoritesMovies();
+    }
+  }, [userInfo]);
 
   if (loading)
     return (
@@ -133,6 +148,7 @@ export default function Home() {
           )}
         </TouchableOpacity>
       </View>
+
       <ScrollView
         style={globalStyles.container}
         showsVerticalScrollIndicator={false}
@@ -150,6 +166,7 @@ export default function Home() {
               See what's new today!
             </Text>
           </View>
+
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
               Popular this month
@@ -180,21 +197,24 @@ export default function Home() {
               </View>
             </ScrollView>
           </View>
+
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
               Favorites
             </Text>
             <View style={styles.favoriteFilms}>
-              {movies.map((film, index) => (
+              {favoriteMovies.slice(0, 5).map((film, index) => (
                 <TouchableOpacity
                   key={index}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate("Film", { film })}
+                  onPress={() =>
+                    navigation.navigate("Film", { filmId: film.movie_id })
+                  }
                 >
                   <View key={index} style={styles.favoriteCard}>
                     <Image
                       style={styles.favoriteCardImage}
-                      source={{ uri: film.image }}
+                      source={{ uri: film.poster }}
                     />
                     <View style={styles.favoriteCardInfo}>
                       <Text
@@ -203,30 +223,31 @@ export default function Home() {
                           styles.favoriteCardInfoTitle,
                         ]}
                       >
-                        {film.name}
+                        {film.title}
                       </Text>
                       <Text
                         style={[
                           globalStyles.textBase,
-                          styles.favoriteCardInfoYear,
+                          styles.favoriteCardInfoSynopsis,
                         ]}
+                        numberOfLines={2}
                       >
-                        {film.year}
+                        {film.synopsis}
                       </Text>
-                      <View style={styles.favoriteCardInfoDuration}>
+                      <View style={styles.favoriteCardInfoRelease}>
                         <Icon
-                          name="time-outline"
+                          name="calendar-outline"
                           color="white"
                           size={20}
-                          style={styles.favoriteCardInfoDurationClock}
+                          style={styles.favoriteCardInfoReleaseClock}
                         />
                         <Text
                           style={[
                             globalStyles.textBase,
-                            styles.favoriteCardInfoDurationText,
+                            styles.favoriteCardInfoReleaseText,
                           ]}
                         >
-                          {film.duration}
+                          {film.release_year.split("-")[0]}
                         </Text>
                       </View>
                     </View>
@@ -325,7 +346,7 @@ const styles = {
   },
 
   favoriteCardImage: {
-    height: 120,
+    height: 140,
     width: 90,
     borderRadius: 10,
   },
@@ -342,22 +363,22 @@ const styles = {
     fontWeight: "bold",
   },
 
-  favoriteCardInfoYear: {
+  favoriteCardInfoSynopsis: {
     fontSize: 14,
     fontWeight: "semibold",
     color: "#aba9b3",
   },
 
-  favoriteCardInfoDuration: {
+  favoriteCardInfoRelease: {
     flexDirection: "row",
     alignItems: "center",
   },
 
-  favoriteCardInfoDurationClock: {
+  favoriteCardInfoReleaseClock: {
     marginRight: 5,
   },
 
-  favoriteCardInfoDurationText: {
+  favoriteCardInfoReleaseText: {
     fontSize: 14,
     fontWeight: "semibold",
   },

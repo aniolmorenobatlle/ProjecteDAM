@@ -133,6 +133,16 @@ exports.updateMovieStatus = async (user_id, id_api, watched, liked, watchlist) =
   await pool.query(query, [user_id, id_api, liked, watched, watchlist]);
 };
 
+exports.getFavoritesUserMovies = async (user_id) => {
+  const query = `
+    SELECT * FROM to_watch
+    WHERE user_id = $1
+    AND likes = true
+  `;
+  const result = await pool.query(query, [user_id]);
+  return result.rows;
+};
+
 
 exports.addMovieComment = async (id_api, user_id, comment) => {
   const query = `

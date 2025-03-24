@@ -254,6 +254,30 @@ exports.updateMovieStatus = async (req, res) => {
   }
 };
 
+exports.fetchFavoriteUserMovies = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      console.log("Falta l'identificador de l'usuari");
+      return res.status(400).json({ message: "Falta l'identificador de l'usuari" });
+    }
+
+    const favorites = await movieModel.getFavoritesUserMovies(user_id);
+
+    const detailedMovies = await Promise.all(
+      favorites.map(async (movie) => {
+        const movieDetails = await movieModel.getMovieById(movie.movie_id);
+        return { ...movie, ...movieDetails };
+      })
+    );
+
+    res.json({ movies: detailedMovies });
+  } catch (error) {
+    console.error('Error obtenint les pel·lícules favorites de l\'usuari:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
 
 exports.fetchAddMovieComment = async (req, res) => {
   try {
