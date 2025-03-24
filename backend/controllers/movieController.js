@@ -208,6 +208,53 @@ exports.fetchMovieDetails = async (req, res) => {
   }
 };
 
+exports.fetchMovieStatus = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ message: "Falta l'identificador de l'usuari" });
+    }
+
+    const status = await movieModel.getMovieStatus(user_id, id_api);
+
+    if (!status) {
+      return res.json({ watched: false, likes: false, watchlist: false });
+    }
+
+    res.json(status);
+  } catch (error) {
+    console.error('Error obtenint l\'estat de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+exports.updateMovieStatus = async (req, res) => {
+  try {
+    const { id_api } = req.params;
+    const { user_id, likes, watched, watchlist } = req.body;
+
+    if (!user_id) {
+      console.log("Falta l'identificador de l'usuari");
+      return res.status(400).json({ message: "Falta l'identificador de l'usuari" });
+    }
+
+    if (likes === undefined || watched === undefined || watchlist === undefined) {
+      console.log("Falten valors necessaris", { likes, watched, watchlist });
+      return res.status(400).json({ message: "Falten valors necessaris" });
+    }
+
+    await movieModel.updateMovieStatus(user_id, id_api, watched, likes, watchlist);
+
+    res.json({ message: "Estat actualitzat correctament" });
+  } catch (error) {
+    console.error("Error actualitzant l'estat de la pel·lícula:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+
 exports.fetchAddMovieComment = async (req, res) => {
   try {
     const { id_api } = req.params;

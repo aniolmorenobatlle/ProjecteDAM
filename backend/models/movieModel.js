@@ -114,6 +114,26 @@ exports.getMovieById = async (id) => {
   return result.rows[0];
 };
 
+exports.getMovieStatus = async (user_id, id_api) => {
+  const query = `
+    SELECT * FROM to_watch
+    WHERE user_id = $1 AND movie_id = $2
+  `;
+  const result = await pool.query(query, [user_id, id_api]);
+  return result.rows[0];
+};
+
+exports.updateMovieStatus = async (user_id, id_api, watched, liked, watchlist) => {
+  const query = `
+    INSERT INTO to_watch (user_id, movie_id, likes, watched, watchlist, created_at)
+    VALUES ($1, $2, $3, $4, $5, NOW())
+    ON CONFLICT (user_id, movie_id)
+    DO UPDATE SET likes = $3, watched = $4, watchlist = $5;
+  `;
+  await pool.query(query, [user_id, id_api, liked, watched, watchlist]);
+};
+
+
 exports.addMovieComment = async (id_api, user_id, comment) => {
   const query = `
     INSERT INTO comments (movie_id, user_id, comment, created_at)

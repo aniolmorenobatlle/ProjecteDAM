@@ -33,74 +33,97 @@ export default function Film() {
   const [cast, setCast] = useState([]);
   const [director, setDirector] = useState({});
   const [expanded, setExpanded] = useState(false);
-  const [modalWatchlist, setModalWatchlist] = useState(false);
   const [streaming, setStreaming] = useState([]);
   const [review, setReview] = useState("");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [modalWatchlist, setModalWatchlist] = useState(false);
   const [isWatched, setIsWatched] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLikes, setIsLikes] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
+
+  const fetchMovieStatus = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/movies/${filmId}/status`,
+        {
+          params: { user_id: userInfo.id },
+        }
+      );
+
+      if (response.data) {
+        const {
+          watched = false,
+          likes = false,
+          watchlist = false,
+        } = response.data;
+        setIsWatched(watched);
+        setIsLikes(likes);
+        setIsInWatchlist(watchlist);
+      } else {
+        setIsWatched(false);
+        setIsLikes(false);
+        setIsInWatchlist(false);
+      }
+    } catch (error) {
+      console.error("Error obtenint l'estat de la pel·lícula: " + error);
+      setIsWatched(false);
+      setIsLikes(false);
+      setIsInWatchlist(false);
+    }
+  };
+
+  const updateMovieStatus = async (newStatus) => {
+    try {
+      await axios.put(`${API_URL}/api/movies/${filmId}/status`, {
+        user_id: userInfo.id,
+        likes: newStatus.likes,
+        watched: newStatus.watched,
+        watchlist: newStatus.watchlist,
+      });
+    } catch (error) {
+      console.error(
+        "Error actualitzant l'estat de la pel·lícula:",
+        error.response?.data || error
+      );
+    }
+  };
 
   const handleOpenModalWatchlist = () => {
     setModalWatchlist(true);
   };
 
   const handleIsWatched = () => {
+    const newStatus = {
+      watched: !isWatched,
+      likes: isLikes,
+      watchlist: isInWatchlist,
+    };
     setIsWatched(!isWatched);
+    updateMovieStatus(newStatus);
   };
 
-  const handleIsLiked = () => {
-    setIsLiked(!isLiked);
+  const handleisLikes = () => {
+    const newStatus = {
+      watched: isWatched,
+      likes: !isLikes,
+      watchlist: isInWatchlist,
+    };
+    setIsLikes(!isLikes);
+    updateMovieStatus(newStatus);
   };
 
   const handleIsInWatchlist = () => {
+    const newStatus = {
+      watched: isWatched,
+      likes: isLikes,
+      watchlist: !isInWatchlist,
+    };
     setIsInWatchlist(!isInWatchlist);
+    updateMovieStatus(newStatus);
   };
 
-  const handleAddToWatchlist = async () => {
-    if (isWatched) {
-      try {
-        await axios.post(`${API_URL}/api/movies/${filmId}/watched`, {
-          user_id: userInfo.id,
-        });
-
-        Alert.alert("Success", "The movie has been added to your watched list");
-      } catch (error) {
-        console.error("Error adding movie to watched list: " + error);
-        Alert.alert("Error", "There was an error adding the movie to the list");
-      }
-    }
-
-    if (isLiked) {
-      try {
-        await axios.post(`${API_URL}/api/movies/${filmId}/like`, {
-          user_id: userInfo.id,
-        });
-
-        Alert.alert("Success", "The movie has been added to your liked list");
-      } catch (error) {
-        console.error("Error adding movie to liked list: " + error);
-        Alert.alert("Error", "There was an error adding the movie to the list");
-      }
-    }
-
-    if (isInWatchlist) {
-      try {
-        await axios.post(`${API_URL}/api/movies/${filmId}/watchlist`, {
-          user_id: userInfo.id,
-        });
-
-        Alert.alert(
-          "Success",
-          "The movie has been added to your watchlist list"
-        );
-      } catch (error) {
-        console.error("Error adding movie to watchlist: " + error);
-        Alert.alert("Error", "There was an error adding the movie to the list");
-      }
-    }
-
+  const handleAddToWatchlist = () => {
     setModalWatchlist(false);
   };
 
@@ -194,12 +217,16 @@ export default function Film() {
   };
 
   useEffect(() => {
+    if (userInfo && userInfo.id) {
+      fetchMovieStatus();
+    }
+
     fetchMovieDetails();
     fetchMovieDetailsCast();
     fetchMovieDetailsDirector();
     fetchMovieStreaming();
     fetchMovieComments();
-  }, [filmId]);
+  }, [filmId, userInfo]);
 
   if (loading)
     return (
@@ -531,12 +558,12 @@ export default function Film() {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity activeOpacity={0.8} onPress={handleIsLiked}>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleisLikes}>
                 <View style={styles.optionContainer}>
                   <Icon
-                    name={isLiked ? "heart" : "heart-outline"}
+                    name={isLikes ? "heart" : "heart-outline"}
                     size={60}
-                    color={isLiked ? "red" : "#D3D3D3"}
+                    color={isLikes ? "red" : "#D3D3D3"}
                   />
                   <Text style={styles.optionText}>Like</Text>
                 </View>
