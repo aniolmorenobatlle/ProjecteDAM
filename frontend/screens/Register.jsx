@@ -28,6 +28,7 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState("");
 
   const checkUsernameAvailability = async (username) => {
     try {
@@ -44,6 +45,24 @@ export default function Register() {
     return regex.test(password);
   };
 
+  const getRandomLightColor = () => {
+    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    return `${randomColor.padStart(6, "0")}`;
+  };
+
+  const getAvatarUrl = (name) => {
+    if (!name) return "";
+
+    const onlyNamePart = name.split(" ")[0];
+    const backgroundColor = getRandomLightColor();
+    return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}`;
+  };
+
+  const handleNameChange = (name) => {
+    setName(name);
+    setAvatar(getAvatarUrl(name));
+  };
+
   const handleRegister = async () => {
     if (username.trim() === "") {
       Alert.alert("Error", "Username is required!");
@@ -56,6 +75,7 @@ export default function Register() {
     }
 
     const isAvailable = await checkUsernameAvailability(username);
+
     if (!isAvailable) {
       Alert.alert("Error", "Username is already taken!");
       return;
@@ -85,6 +105,7 @@ export default function Register() {
         username,
         email,
         password,
+        avatar,
       });
 
       if (response.status === 200) {
@@ -126,7 +147,7 @@ export default function Register() {
                   icon="person-circle-outline"
                   type="default"
                   value={name}
-                  onChange={setName}
+                  onChange={handleNameChange}
                 />
 
                 <InputLogin

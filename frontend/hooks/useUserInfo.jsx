@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-const API_URL = "http://172.20.10.2:3000";
+import { API_URL } from "../config";
 
 export const useUserInfo = () => {
   const [userInfo, setUserInfo] = useState(null);

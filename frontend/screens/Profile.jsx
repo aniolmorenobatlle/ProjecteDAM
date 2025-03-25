@@ -67,8 +67,8 @@ export default function Profile() {
       />
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
-          {userInfo.image ? (
-            <Image style={styles.avatar} source={{ uri: userInfo.image }} />
+          {userInfo.avatar ? (
+            <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
           ) : (
             <Icon
               name="person-circle-outline"

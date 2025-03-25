@@ -17,22 +17,6 @@ import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
-const theGorge =
-  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
-const theBatman =
-  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
-const babyDriver =
-  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
-const avatar =
-  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
-
-const movies = [
-  { name: "The Batman", image: theBatman, year: 2022, duration: "175 min" },
-  { name: "The Gorge", image: theGorge, year: 2025, duration: "127 min" },
-  { name: "Avatar", image: avatar, year: 2009, duration: "162 min" },
-  { name: "Baby Driver", image: babyDriver, year: 2017, duration: "113 min" },
-];
-
 export default function Home() {
   const navigation = useNavigation();
   const { userInfo, loading, error } = useUserInfo();
@@ -116,7 +100,9 @@ export default function Home() {
           backgroundColor: "#1F1D36",
         }}
       >
-        <Text style={{ color: "white" }}>Error: {error}</Text>
+        <Text style={{ color: "white" }}>
+          Error: {error?.message || "Error desconegut"}
+        </Text>
       </View>
     );
 
@@ -203,57 +189,63 @@ export default function Home() {
               Favorites
             </Text>
             <View style={styles.favoriteFilms}>
-              {favoriteMovies.slice(0, 5).map((film, index) => (
-                <TouchableOpacity
-                  key={index}
-                  activeOpacity={0.8}
-                  onPress={() =>
-                    navigation.navigate("Film", { filmId: film.movie_id })
-                  }
-                >
-                  <View key={index} style={styles.favoriteCard}>
-                    <Image
-                      style={styles.favoriteCardImage}
-                      source={{ uri: film.poster }}
-                    />
-                    <View style={styles.favoriteCardInfo}>
-                      <Text
-                        style={[
-                          globalStyles.textBase,
-                          styles.favoriteCardInfoTitle,
-                        ]}
-                      >
-                        {film.title}
-                      </Text>
-                      <Text
-                        style={[
-                          globalStyles.textBase,
-                          styles.favoriteCardInfoSynopsis,
-                        ]}
-                        numberOfLines={2}
-                      >
-                        {film.synopsis}
-                      </Text>
-                      <View style={styles.favoriteCardInfoRelease}>
-                        <Icon
-                          name="calendar-outline"
-                          color="white"
-                          size={20}
-                          style={styles.favoriteCardInfoReleaseClock}
-                        />
+              {favoriteMovies.length === 0 ? (
+                <Text style={styles.noFavoritesText}>
+                  You don't have any favorite movies yet
+                </Text>
+              ) : (
+                favoriteMovies.slice(0, 5).map((film, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    activeOpacity={0.8}
+                    onPress={() =>
+                      navigation.navigate("Film", { filmId: film.movie_id })
+                    }
+                  >
+                    <View key={index} style={styles.favoriteCard}>
+                      <Image
+                        style={styles.favoriteCardImage}
+                        source={{ uri: film.poster }}
+                      />
+                      <View style={styles.favoriteCardInfo}>
                         <Text
                           style={[
                             globalStyles.textBase,
-                            styles.favoriteCardInfoReleaseText,
+                            styles.favoriteCardInfoTitle,
                           ]}
                         >
-                          {film.release_year.split("-")[0]}
+                          {film.title}
                         </Text>
+                        <Text
+                          style={[
+                            globalStyles.textBase,
+                            styles.favoriteCardInfoSynopsis,
+                          ]}
+                          numberOfLines={2}
+                        >
+                          {film.synopsis}
+                        </Text>
+                        <View style={styles.favoriteCardInfoRelease}>
+                          <Icon
+                            name="calendar-outline"
+                            color="white"
+                            size={20}
+                            style={styles.favoriteCardInfoReleaseClock}
+                          />
+                          <Text
+                            style={[
+                              globalStyles.textBase,
+                              styles.favoriteCardInfoReleaseText,
+                            ]}
+                          >
+                            {film.release_year.split("-")[0]}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))
+              )}
             </View>
           </View>
         </View>
@@ -381,5 +373,12 @@ const styles = {
   favoriteCardInfoReleaseText: {
     fontSize: 14,
     fontWeight: "semibold",
+  },
+
+  noFavoritesText: {
+    color: "rgba(255, 255, 255, 0.5)",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 10,
   },
 };

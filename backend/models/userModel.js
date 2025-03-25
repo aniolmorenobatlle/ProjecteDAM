@@ -1,12 +1,12 @@
 const { hash, compare } = require('bcrypt');
 const pool = require('../config/db.js');
 
-const createUser = async (name, username, email, password) => {
+const createUser = async (name, username, email, password, avatar) => {
   const hashedPassword = await hash(password, 10);
   const result = await pool.query(
-    `INSERT INTO "users" ("name", "username", "email", "password", "created_at")
-     VALUES ($1, $2, $3, $4, NOW()) RETURNING id`,
-    [name, username, email, hashedPassword]
+    `INSERT INTO "users" ("name", "username", "email", "password", "avatar", "created_at")
+     VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
+    [name, username, email, hashedPassword, avatar]
   )
   return result.rows[0].id;
 }
@@ -29,7 +29,7 @@ const checkUserExists = async (username) => {
 
 const findUserById = async (userId) => {
   const result = await pool.query(
-    `SELECT id, name, username, email, image FROM "users" WHERE id = $1`,
+    `SELECT id, name, username, email, avatar FROM "users" WHERE id = $1`,
     [userId]
   );
   return result.rows[0];
