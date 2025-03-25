@@ -120,10 +120,10 @@ export default function Home() {
           <Icon name="menu" size={50} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          {userInfo.image ? (
+          {userInfo.avatar ? (
             <Image
               style={styles.menuIconAvatar}
-              source={{ uri: userInfo.image }}
+              source={{ uri: userInfo.avatar }}
             />
           ) : (
             <Icon

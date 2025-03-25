@@ -94,19 +94,19 @@ CREATE TABLE directors (
   created_at TIMESTAMP
 );
 
-CREATE TABLE movie_list (
-  id SERIAL PRIMARY KEY,
-  list_id int,
-  movie_id int,
-  created_at TIMESTAMP
-);
-
 CREATE TABLE streaming (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL UNIQUE,
   logo VARCHAR,
   id_api INT UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE movie_list (
+  id SERIAL PRIMARY KEY,
+  list_id int,
+  movie_id int,
+  created_at TIMESTAMP
 );
 
 CREATE TABLE movies_streaming (
@@ -174,7 +174,7 @@ ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
 
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
-ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 
 ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);

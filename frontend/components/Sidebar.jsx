@@ -110,10 +110,10 @@ export default function Sidebar({ isOpen, closeMenu }) {
             </TouchableOpacity>
 
             <View style={styles.avatar}>
-              {userInfo.image ? (
+              {userInfo.avatar ? (
                 <Image
                   style={styles.menuIconAvatar}
-                  source={{ uri: userInfo.image }}
+                  source={{ uri: userInfo.avatar }}
                 />
               ) : (
                 <Icon
@@ -147,7 +147,10 @@ export default function Sidebar({ isOpen, closeMenu }) {
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.menuItem}
-                onPress={closeMenu}
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate("Search");
+                }}
               >
                 <Icon
                   name="film-outline"
@@ -160,15 +163,18 @@ export default function Sidebar({ isOpen, closeMenu }) {
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.menuItem}
-                onPress={closeMenu}
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate("Lists");
+                }}
               >
                 <Icon
-                  name="heart-outline"
+                  name="list-outline"
                   size={24}
                   color="white"
                   style={styles.icon}
                 />
-                <Text style={styles.menuText}>Likes</Text>
+                <Text style={styles.menuText}>Lists</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                 <Icon

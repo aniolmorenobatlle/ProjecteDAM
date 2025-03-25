@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import Navbar from "./components/Navbar";
 import Film from "./screens/Film";
 import Home from "./screens/Home";
+import ListInfo from './screens/ListInfo';
+import Lists from "./screens/Lists";
 import Login from "./screens/Login";
 import Notifications from "./screens/Notifications";
 import Profile from "./screens/Profile";
@@ -96,8 +98,18 @@ export default function App() {
             component={Profile}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="Lists"
+            component={Lists}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ListInfo"
+            component={ListInfo}
+            options={{ headerShown: false }}
+          />
         </Stack.Navigator>
-        {routeName !== 'Recommend' && routeName !== 'Film' && routeName !== "Login" && routeName !== "Register" && <Navbar currentPage={routeName} />}
+        {routeName !== 'Recommend' && routeName !== 'Film' && routeName !== "Login" && routeName !== "Register" && routeName !== "Lists" && routeName !== "ListInfo" && <Navbar currentPage={routeName} />}
       </NavigationContainer>
     </>
   );
