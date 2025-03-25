@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -44,7 +45,6 @@ export default function Login() {
       );
 
       if (response.status === 200) {
-        // Recuperar token
         const { token } = response.data;
 
         // Guardar token a AsyncStorage
@@ -58,6 +58,7 @@ export default function Login() {
         console.error("Error en el login", response.data);
       }
     } catch (error) {
+      Alert.alert("Error", "Incorrect username or password");
       if (error.response.status === 401) {
         const errorMesage = error.response.data.message;
 
@@ -110,11 +111,6 @@ export default function Login() {
                   value={username}
                   onChange={setUsername}
                 />
-                {incorrectUser && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    Incorrect username
-                  </Text>
-                )}
                 <InputLogin
                   text="Password"
                   icon="lock-closed-outline"
@@ -122,11 +118,6 @@ export default function Login() {
                   value={password}
                   onChange={setPassword}
                 />
-                {incorrectPassword && (
-                  <Text style={[globalStyles.textBase, styles.incorrectInfo]}>
-                    Incorrect password
-                  </Text>
-                )}
                 <TouchableOpacity activeOpacity={0.8} onPress={handleLogin}>
                   <ButtonConfirm text="Log In" />
                 </TouchableOpacity>
