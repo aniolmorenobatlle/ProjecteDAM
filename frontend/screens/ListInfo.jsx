@@ -39,18 +39,6 @@ export default function ListInfo() {
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
-  const handleDeleteList = async () => {
-    try {
-      await axios.post(`${API_URL}/api/lists/deleteList`, {
-        list_id: listId,
-      });
-
-      navigation.goBack();
-    } catch (error) {
-      console.error("Error deleting the list", error);
-    }
-  };
-
   useEffect(() => {
     fetchListInfo();
   }, [listId]);
@@ -123,18 +111,19 @@ export default function ListInfo() {
                 onPress={() => navigation.navigate("Search")}
                 title="Add film"
               />
-              <Menu.Item onPress={handleDeleteList} title="Delete list" />
+              <Menu.Item title="Delete film" />
             </Menu>
           </View>
 
-          <View style={styles.listGrid}>
-            {listFilms.length === 0 ? (
-              <Text style={styles.emptyMessage}>
-                There are no films on this list yet
-              </Text>
-            ) : (
-              listFilms.map((list, index) => (
+          {listFilms.length === 0 ? (
+            <Text style={styles.emptyMessage}>
+              There are no films on this list yet
+            </Text>
+          ) : (
+            <View style={styles.listGrid} key={listId}>
+              {listFilms.map((list, index) => (
                 <TouchableOpacity
+                  key={list.id_api}
                   activeOpacity={0.8}
                   onPress={() =>
                     navigation.navigate("Film", { filmId: list.id_api })
@@ -148,9 +137,9 @@ export default function ListInfo() {
                     <Text style={styles.listTitle}>{list.title}</Text>
                   </View>
                 </TouchableOpacity>
-              ))
-            )}
-          </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </Provider>
@@ -167,7 +156,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    marginBottom: 15,
+    marginBottom: 20,
   },
 
   addList: {
@@ -177,27 +166,27 @@ const styles = {
   listGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    gap: 15,
   },
 
   listItem: {
-    width: "30%",
-    marginBottom: 20,
+    width: 110,
   },
 
   listImage: {
     width: "100%",
-    height: 180,
+    height: 170,
     borderRadius: 10,
   },
 
   listTitle: {
-    color: "white",
+    color: "rgba(255, 255, 255, 0.8)",
     fontSize: 16,
     marginTop: 10,
   },
 
   emptyMessage: {
+    textAlign: "center",
     color: "rgba(255, 255, 255, 0.5)",
     fontSize: 16,
     marginTop: 10,

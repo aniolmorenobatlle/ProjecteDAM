@@ -49,7 +49,7 @@ exports.getLastMostPopularMovies = async () => {
 
 exports.getMovieComments = async (id) => {
   const query = `
-    SELECT c.*, u.username, u.image
+    SELECT c.*, u.username, u.avatar
     FROM comments c
     JOIN users u ON c.user_id = u.id
     WHERE c.movie_id = $1

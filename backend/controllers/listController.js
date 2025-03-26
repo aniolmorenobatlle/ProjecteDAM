@@ -64,10 +64,36 @@ exports.fetchListInfo = async (req, res) => {
     }
 
     const listInfo = await listModel.getListInfo(list_id);
-    res.json({ listInfo });
+
+    if (listInfo.length === 0) {
+      return res.status(404).json({ message: 'No information found for this list' });
+    }
+
+    res.json({
+      listInfo,
+      movie_count: listInfo[0].movie_count
+    });
 
   } catch (error) {
     console.error("Error getting list info", error);
     res.status(500).json({ message: 'Error getting list information' });
+  }
+};
+
+
+exports.fetchAddFilmToList = async (req, res) => {
+  try {
+    const { list_id, movie_id } = req.body;
+
+    if (!list_id || !movie_id) {
+      return res.status(400).json({ message: 'List ID and Movie ID are required' });
+    }
+
+    await listModel.addFilmToList(list_id, movie_id);
+    res.json({ message: 'Film added to list successfully' });
+
+  } catch (error) {
+    console.error("Error adding film to list", error);
+    res.status(500).json({ message: 'Error adding film to list' });
   }
 };

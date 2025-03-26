@@ -31,11 +31,21 @@ exports.deleteList = async (list_id) => {
 
 exports.getListInfo = async (list_id) => {
   const query = `
-    SELECT m.id_api, m.title, m.poster, m.cover
+    SELECT m.id_api, m.title, m.poster, m.cover,
+           (SELECT COUNT(*) FROM movie_list WHERE list_id = $1) AS movie_count
     FROM movies m
-    JOIN movie_list ml ON ml.movie_id = m.id
+    JOIN movie_list ml ON ml.movie_id = m.id_api
     WHERE ml.list_id = $1;
   `;
   const result = await pool.query(query, [list_id]);
   return result.rows;
 };
+
+
+exports.addFilmToList = async (list_id, movie_id) => {
+  const query = `
+    INSERT INTO movie_list (list_id, movie_id, created_at)
+    VALUES ($1, $2, NOW());
+  `;
+  await pool.query(query, [list_id, movie_id]);
+}

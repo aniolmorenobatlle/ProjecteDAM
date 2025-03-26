@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -15,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../config";
@@ -25,6 +27,9 @@ export default function Film() {
   const route = useRoute();
   const { filmId } = route.params;
   const { userInfo, loading, error } = useUserInfo();
+
+  const [dropdownList, setDropdownList] = useState([]);
+  const [selectedListId, setSelectedListId] = useState(null);
 
   const navigation = useNavigation();
   const [activeButton, setActiveButton] = useState("cast");
@@ -44,6 +49,32 @@ export default function Film() {
   const [modalRate, setModalRate] = useState(false);
   const [rating, setRating] = useState(0);
   const [lastRatingClick, setLastRatingClick] = useState(0);
+  const [modalList, setModalList] = useState(false);
+
+  const fetchLists = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    const userId = userInfo.id;
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/lists?user_id=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const formattedData = response.data.lists.map((list) => ({
+        label: list.name,
+        value: list.id,
+      }));
+
+      setDropdownList(formattedData);
+    } catch (error) {
+      console.error("Error fetching the lists", error);
+    }
+  };
 
   const fetchMovieStatus = async () => {
     try {
@@ -195,6 +226,31 @@ export default function Film() {
     return stars;
   };
 
+  const handleOpenModalList = () => {
+    setModalList(true);
+  };
+
+  const handleCloseModalList = () => {
+    setModalList(false);
+  };
+
+  const handleAddToList = async () => {
+    try {
+      await axios.post(`${API_URL}/api/lists/addFilmToList`, {
+        list_id: selectedListId,
+        movie_id: filmId,
+      });
+
+      setModalList(false);
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "There was an error adding the movie to the list. Please try again."
+      );
+      console.error("Error afegint la pel·lícula a la llista: " + error);
+    }
+  };
+
   const handleButtonPress = (buttonName) => {
     setActiveButton(buttonName);
   };
@@ -287,6 +343,7 @@ export default function Film() {
   useEffect(() => {
     if (userInfo && userInfo.id) {
       fetchMovieStatus();
+      fetchLists();
     }
 
     fetchMovieDetails();
@@ -375,16 +432,21 @@ export default function Film() {
                   </View>
                 </TouchableOpacity>
 
-                <View style={styles.button}>
-                  <Icon
-                    name="list-outline"
-                    size={20}
-                    style={styles.buttonImage}
-                  />
-                  <Text style={[globalStyles.textBase, styles.buttonText]}>
-                    Add to List
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleOpenModalList}
+                >
+                  <View style={styles.button}>
+                    <Icon
+                      name="list-outline"
+                      size={20}
+                      style={styles.buttonImage}
+                    />
+                    <Text style={[globalStyles.textBase, styles.buttonText]}>
+                      Add to List
+                    </Text>
+                  </View>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                   activeOpacity={0.8}
@@ -668,6 +730,52 @@ export default function Film() {
             >
               <Text style={styles.confirmButtonText}>Done</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={modalList}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setModalList(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Delete a list</Text>
+
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={dropdownList}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select item"
+              value={selectedListId}
+              onChange={(item) => {
+                setSelectedListId(item.value);
+              }}
+            />
+
+            <View style={styles.buttonsContainerList}>
+              <TouchableOpacity
+                style={styles.confirmButtonList}
+                onPress={handleAddToList}
+              >
+                <Text style={styles.confirmButtonText}>Done</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelButtonList}
+                onPress={handleCloseModalList}
+              >
+                <Text style={styles.confirmButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -1002,7 +1110,7 @@ const styles = {
 
   confirmButton: {
     width: "100%",
-    padding: 15,
+    padding: 10,
     backgroundColor: "#E9A6A6",
     borderRadius: 10,
     alignItems: "center",
@@ -1013,5 +1121,61 @@ const styles = {
     fontSize: 16,
     color: "#000",
     fontWeight: "bold",
+  },
+
+  dropdown: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "white",
+    padding: 10,
+  },
+
+  icon: {
+    marginRight: 5,
+  },
+
+  placeholderStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  selectedTextStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  iconStyle: {
+    width: 25,
+    height: 25,
+  },
+
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+
+  buttonsContainerList: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+  },
+
+  confirmButtonList: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  cancelButtonList: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#9C4A8B",
+    borderRadius: 10,
+    alignItems: "center",
   },
 };
