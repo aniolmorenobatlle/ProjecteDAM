@@ -8,7 +8,6 @@ import {
   Image,
   ImageBackground,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   Text,
@@ -19,6 +18,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import CustomModal from "../components/CustomModal";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
@@ -674,132 +674,98 @@ export default function Film() {
         </SafeAreaView>
       </ScrollView>
 
-      <Modal
-        visible={modalWatchlist}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalWatchlist(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Choose an Option</Text>
-            <View style={styles.columnContainer}>
-              <TouchableOpacity activeOpacity={0.8} onPress={handleIsWatched}>
-                <View style={styles.optionContainer}>
-                  <Icon
-                    name={isWatched ? "eye" : "eye-outline"}
-                    size={60}
-                    color={isWatched ? "#a9c9ff" : "#D3D3D3"}
-                  />
-                  <Text style={styles.optionText}>
-                    {isWatched ? "Watched" : "Watch"}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity activeOpacity={0.8} onPress={handleisLikes}>
-                <View style={styles.optionContainer}>
-                  <Icon
-                    name={isLikes ? "heart" : "heart-outline"}
-                    size={60}
-                    color={isLikes ? "red" : "#D3D3D3"}
-                  />
-                  <Text style={styles.optionText}>
-                    {isLikes ? "Liked" : "Like"}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleIsInWatchlist}
-              >
-                <View style={styles.optionContainer}>
-                  <Icon
-                    name={isInWatchlist ? "time" : "time-outline"}
-                    size={60}
-                    color={isInWatchlist ? "#ff007f" : "#D3D3D3"}
-                  />
-                  <Text style={styles.optionText}>Watchlist</Text>
-                </View>
-              </TouchableOpacity>
+      <CustomModal visible={modalWatchlist} onClose={handleCloseModalWatchlist}>
+        <Text style={styles.modalTitle}>Choose an Option</Text>
+        <View style={styles.columnContainer}>
+          <TouchableOpacity activeOpacity={0.8} onPress={handleIsWatched}>
+            <View style={styles.optionContainer}>
+              <Icon
+                name={isWatched ? "eye" : "eye-outline"}
+                size={60}
+                color={isWatched ? "#a9c9ff" : "#D3D3D3"}
+              />
+              <Text style={styles.optionText}>
+                {isWatched ? "Watched" : "Watch"}
+              </Text>
             </View>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleCloseModalWatchlist}
-            >
-              <Text style={styles.confirmButtonText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          </TouchableOpacity>
 
-      <Modal
-        visible={modalList}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalList(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Delete a list</Text>
-
-            <Dropdown
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={dropdownList}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="Select item"
-              value={selectedListId}
-              onChange={(item) => {
-                setSelectedListId(item.value);
-              }}
-            />
-
-            <View style={styles.buttonsContainerList}>
-              <TouchableOpacity
-                style={styles.confirmButtonList}
-                onPress={handleAddToList}
-              >
-                <Text style={styles.confirmButtonText}>Done</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.cancelButtonList}
-                onPress={handleCloseModalList}
-              >
-                <Text style={styles.confirmButtonText}>Cancel</Text>
-              </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.8} onPress={handleisLikes}>
+            <View style={styles.optionContainer}>
+              <Icon
+                name={isLikes ? "heart" : "heart-outline"}
+                size={60}
+                color={isLikes ? "red" : "#D3D3D3"}
+              />
+              <Text style={styles.optionText}>
+                {isLikes ? "Liked" : "Like"}
+              </Text>
             </View>
-          </View>
-        </View>
-      </Modal>
+          </TouchableOpacity>
 
-      <Modal
-        visible={modalRate}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalRate(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Rate this movie</Text>
-            <View style={styles.columnContainerRate}>{renderStars()}</View>
-
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleCloseModalRate}
-            >
-              <Text style={styles.confirmButtonText}>Done</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity activeOpacity={0.8} onPress={handleIsInWatchlist}>
+            <View style={styles.optionContainer}>
+              <Icon
+                name={isInWatchlist ? "time" : "time-outline"}
+                size={60}
+                color={isInWatchlist ? "#ff007f" : "#D3D3D3"}
+              />
+              <Text style={styles.optionText}>Watchlist</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-      </Modal>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={handleCloseModalWatchlist}
+        >
+          <Text style={styles.confirmButtonText}>Done</Text>
+        </TouchableOpacity>
+      </CustomModal>
+
+      <CustomModal visible={modalList} onClose={handleCloseModalList}>
+        <Text style={styles.modalTitle}>Delete a list</Text>
+
+        <Dropdown
+          style={styles.dropdown}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          data={dropdownList}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder="Select item"
+          value={selectedListId}
+          onChange={(item) => setSelectedListId(item.value)}
+        />
+
+        <View style={styles.buttonsContainerList}>
+          <TouchableOpacity
+            style={styles.confirmButtonList}
+            onPress={handleAddToList}
+          >
+            <Text style={styles.confirmButtonText}>Done</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cancelButtonList}
+            onPress={handleCloseModalList}
+          >
+            <Text style={styles.confirmButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </CustomModal>
+
+      <CustomModal visible={modalRate} onClose={handleCloseModalRate}>
+        <Text style={styles.modalTitle}>Rate this movie</Text>
+        <View style={styles.columnContainerRate}>{renderStars()}</View>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={handleCloseModalRate}
+        >
+          <Text style={styles.confirmButtonText}>Done</Text>
+        </TouchableOpacity>
+      </CustomModal>
     </KeyboardAvoidingView>
   );
 }
@@ -1052,26 +1018,6 @@ const styles = {
     padding: 10,
     marginTop: 10,
     alignSelf: "flex-start",
-  },
-
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#323048",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    elevation: 5, // Ombra en Android
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84, // Ombra en iOS
   },
 
   modalTitle: {

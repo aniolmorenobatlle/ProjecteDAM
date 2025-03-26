@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Modal,
   ScrollView,
   Text,
   TextInput,
@@ -16,6 +15,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Menu, Provider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import CustomModal from "../components/CustomModal";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
@@ -85,8 +85,8 @@ export default function Lists() {
     }
   };
 
-  const handleListClick = (listId) => {
-    navigation.navigate("ListInfo", { listId });
+  const handleListClick = (listId, listName) => {
+    navigation.navigate("ListInfo", { listId, listName });
   };
 
   const handleOpenModalDeleteList = () => {
@@ -203,7 +203,7 @@ export default function Lists() {
                   <View key={index} style={{ width: "100%", marginTop: 10 }}>
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      onPress={() => handleListClick(list.id)}
+                      onPress={() => handleListClick(list.id, list.name)}
                     >
                       <View
                         style={{
@@ -240,81 +240,67 @@ export default function Lists() {
           </View>
         </ScrollView>
 
-        <Modal
+        <CustomModal
           visible={modalAddList}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setModalAddList(false)}
+          onClose={() => setModalAddList(false)}
         >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Add a new list</Text>
-
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Name of the list"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                  value={name}
-                  onChangeText={setName}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={handleAddList}
-              >
-                <Text style={styles.confirmButtonText}>Done</Text>
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.modalTitle}>Add a new list</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Name of the list"
+              placeholderTextColor="rgba(255, 255, 255, 0.5)"
+              value={name}
+              onChangeText={setName}
+            />
           </View>
-        </Modal>
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={handleAddList}
+          >
+            <Text style={styles.confirmButtonText}>Done</Text>
+          </TouchableOpacity>
+        </CustomModal>
 
-        <Modal
+        <CustomModal
           visible={modalDeleteList}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setModalDeleteList(false)}
+          onClose={() => setModalDeleteList(false)}
         >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Delete a list</Text>
+          <Text style={styles.modalTitle}>Delete a list</Text>
 
-              <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                iconStyle={styles.iconStyle}
-                data={dropdownList}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder="Select item"
-                value={selectedListId}
-                onChange={(item) => {
-                  setSelectedListId(item.value);
-                }}
-              />
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={dropdownList}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder="Select item"
+            value={selectedListId}
+            onChange={(item) => {
+              setSelectedListId(item.value);
+            }}
+          />
 
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={styles.confirmButton}
-                  onPress={handleDeleteList}
-                >
-                  <Text style={styles.confirmButtonText}>Done</Text>
-                </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleDeleteList}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={handleCloseModalDeleteList}
-                >
-                  <Text style={styles.confirmButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCloseModalDeleteList}
+            >
+              <Text style={styles.confirmButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
+        </CustomModal>
       </SafeAreaView>
     </Provider>
   );
@@ -356,26 +342,6 @@ const styles = {
 
   listInfoNumber: {
     color: "#9C4A8B",
-  },
-
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#323048",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    elevation: 5, // Ombra en Android
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84, // Ombra en iOS
   },
 
   modalTitle: {

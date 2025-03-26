@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -14,13 +13,14 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Menu, Provider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import CustomModal from "../components/CustomModal";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
 export default function ListInfo() {
   const route = useRoute();
-  const { listId } = route.params;
+  const { listId, listName } = route.params;
   const navigation = useNavigation();
   const { loading, error } = useUserInfo();
   const [visible, setVisible] = useState(false);
@@ -128,6 +128,8 @@ export default function ListInfo() {
               />
             </TouchableOpacity>
 
+            <Text style={styles.listName}>{listName}</Text>
+
             <Menu
               visible={visible}
               onDismiss={closeMenu}
@@ -179,51 +181,47 @@ export default function ListInfo() {
           )}
         </ScrollView>
 
-        <Modal
+        <CustomModal
           visible={modalDeleteList}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setModalDeleteList(false)}
+          onClose={() => setModalDeleteList(false)}
         >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Delete a list</Text>
+          <Text style={styles.modalTitle}>Delete a list</Text>
 
-              <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                iconStyle={styles.iconStyle}
-                data={dropdownList}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder="Select item"
-                value={selectedFilmId}
-                onChange={(item) => {
-                  setSelectedFilmId(item.value);
-                }}
-              />
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={dropdownList}
+            maxHeight={300}
+            search
+            searchPlaceholder="Search"
+            labelField="label"
+            valueField="value"
+            placeholder="Select item"
+            value={selectedFilmId}
+            onChange={(item) => {
+              setSelectedFilmId(item.value);
+            }}
+          />
 
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={styles.confirmButton}
-                  onPress={handleDeleteFilmFromList}
-                >
-                  <Text style={styles.confirmButtonText}>Done</Text>
-                </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleDeleteFilmFromList}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={handleCloseModalDeleteList}
-                >
-                  <Text style={styles.confirmButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCloseModalDeleteList}
+            >
+              <Text style={styles.confirmButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
+        </CustomModal>
       </SafeAreaView>
     </Provider>
   );
@@ -240,6 +238,12 @@ const styles = {
     alignItems: "center",
     width: "100%",
     marginBottom: 20,
+  },
+
+  listName: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 
   addList: {
@@ -273,26 +277,6 @@ const styles = {
     color: "rgba(255, 255, 255, 0.5)",
     fontSize: 16,
     marginTop: 10,
-  },
-
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#323048",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    elevation: 5, // Ombra en Android
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84, // Ombra en iOS
   },
 
   modalTitle: {
