@@ -53,6 +53,8 @@ export default function Lists() {
         value: list.id,
       }));
 
+      console.log(response.data.lists);
+
       setDropdownList(formattedData);
       setLists(response.data.lists);
     } catch (error) {
@@ -221,7 +223,7 @@ export default function Lists() {
                         <Text
                           style={[globalStyles.textBase, styles.listInfoNumber]}
                         >
-                          10
+                          {list.movie_count}
                         </Text>
                       </View>
                     </TouchableOpacity>

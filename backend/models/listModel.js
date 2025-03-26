@@ -2,14 +2,16 @@ const pool = require('../config/db');
 
 exports.getLists = async (user_id) => {
   const query = `
-    SELECT * FROM lists
-    WHERE user_id = $1
-    ORDER BY created_at DESC;
+    SELECT 
+      l.*, 
+      (SELECT COUNT(*) FROM movie_list WHERE list_id = l.id) AS movie_count
+    FROM lists l
+    WHERE l.user_id = $1
+    ORDER BY l.created_at DESC;
   `;
   const result = await pool.query(query, [user_id]);
   return result.rows;
 };
-
 
 exports.addList = async (name, user_id) => {
   const query = `
@@ -31,8 +33,7 @@ exports.deleteList = async (list_id) => {
 
 exports.getListInfo = async (list_id) => {
   const query = `
-    SELECT m.id_api, m.title, m.poster, m.cover,
-           (SELECT COUNT(*) FROM movie_list WHERE list_id = $1) AS movie_count
+    SELECT m.id_api, m.title, m.poster, m.cover
     FROM movies m
     JOIN movie_list ml ON ml.movie_id = m.id_api
     WHERE ml.list_id = $1;
@@ -40,7 +41,6 @@ exports.getListInfo = async (list_id) => {
   const result = await pool.query(query, [list_id]);
   return result.rows;
 };
-
 
 exports.addFilmToList = async (list_id, movie_id) => {
   const query = `

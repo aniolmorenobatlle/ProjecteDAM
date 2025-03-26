@@ -80,7 +80,6 @@ exports.fetchListInfo = async (req, res) => {
   }
 };
 
-
 exports.fetchAddFilmToList = async (req, res) => {
   try {
     const { list_id, movie_id } = req.body;
