@@ -53,8 +53,6 @@ export default function Lists() {
         value: list.id,
       }));
 
-      console.log(response.data.lists);
-
       setDropdownList(formattedData);
       setLists(response.data.lists);
     } catch (error) {
@@ -96,12 +94,11 @@ export default function Lists() {
     setModalDeleteList(true);
   };
 
-  const handleCloseModalDeleteList = async () => {
+  const handleCloseModalDeleteList = () => {
     setModalDeleteList(false);
   };
 
   const handleDeleteList = async () => {
-    console.log(selectedListId);
     try {
       await axios.post(`${API_URL}/api/lists/deleteList`, {
         list_id: selectedListId,

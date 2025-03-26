@@ -4,11 +4,13 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { Menu, Provider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -20,9 +22,15 @@ export default function ListInfo() {
   const route = useRoute();
   const { listId } = route.params;
   const navigation = useNavigation();
-  const { userInfo, loading, error } = useUserInfo();
+  const { loading, error } = useUserInfo();
   const [visible, setVisible] = useState(false);
   const [listFilms, setListFilms] = useState([]);
+  const [modalDeleteList, setModalDeleteList] = useState(false);
+  const [dropdownList, setDropdownList] = useState([]);
+  const [selectedFilmId, setSelectedFilmId] = useState(null);
+
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const fetchListInfo = async () => {
     try {
@@ -30,14 +38,40 @@ export default function ListInfo() {
         `${API_URL}/api/lists/listInfo/${listId}`
       );
 
+      const dropdownList = response.data.listInfo.map((list) => ({
+        label: list.title,
+        value: list.id_api,
+      }));
+
+      setDropdownList(dropdownList);
       setListFilms(response.data.listInfo);
     } catch (error) {
       console.error("Error fetching list info", error);
     }
   };
 
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
+  const handleOpenModalDeleteList = () => {
+    closeMenu();
+    setModalDeleteList(true);
+  };
+
+  const handleCloseModalDeleteList = () => {
+    setModalDeleteList(false);
+  };
+
+  const handleDeleteFilmFromList = async () => {
+    try {
+      await axios.post(`${API_URL}/api/lists/deleteFilmFromList`, {
+        movie_id: selectedFilmId,
+        list_id: listId,
+      });
+
+      handleCloseModalDeleteList();
+      fetchListInfo();
+    } catch (error) {
+      console.error("Error deleting film from list", error);
+    }
+  };
 
   useEffect(() => {
     fetchListInfo();
@@ -111,7 +145,10 @@ export default function ListInfo() {
                 onPress={() => navigation.navigate("Search")}
                 title="Add film"
               />
-              <Menu.Item title="Delete film" />
+              <Menu.Item
+                onPress={handleOpenModalDeleteList}
+                title="Delete film"
+              />
             </Menu>
           </View>
 
@@ -141,6 +178,52 @@ export default function ListInfo() {
             </View>
           )}
         </ScrollView>
+
+        <Modal
+          visible={modalDeleteList}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalDeleteList(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Delete a list</Text>
+
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={dropdownList}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder="Select item"
+                value={selectedFilmId}
+                onChange={(item) => {
+                  setSelectedFilmId(item.value);
+                }}
+              />
+
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={handleDeleteFilmFromList}
+                >
+                  <Text style={styles.confirmButtonText}>Done</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={handleCloseModalDeleteList}
+                >
+                  <Text style={styles.confirmButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </Provider>
   );
@@ -190,5 +273,138 @@ const styles = {
     color: "rgba(255, 255, 255, 0.5)",
     fontSize: 16,
     marginTop: 10,
+  },
+
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
+  modalContainer: {
+    width: "90%",
+    backgroundColor: "#323048",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 5, // Ombra en Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84, // Ombra en iOS
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "white",
+  },
+
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginVertical: 10,
+    marginBottom: 20,
+  },
+
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "white",
+  },
+
+  columnContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 40,
+    marginTop: 20,
+  },
+
+  columnContainerRate: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginVertical: 20,
+  },
+
+  optionContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+  },
+
+  optionText: {
+    fontSize: 12,
+    paddingVertical: 10,
+    color: "#D3D3D3",
+    fontWeight: "bold",
+  },
+
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+  },
+
+  confirmButton: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  cancelButton: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#9C4A8B",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  confirmButtonText: {
+    fontSize: 14,
+    color: "#000",
+    fontWeight: "bold",
+  },
+
+  dropdown: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "white",
+    padding: 10,
+  },
+
+  icon: {
+    marginRight: 5,
+  },
+
+  placeholderStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  selectedTextStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  iconStyle: {
+    width: 25,
+    height: 25,
+  },
+
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 };

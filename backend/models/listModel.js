@@ -48,4 +48,12 @@ exports.addFilmToList = async (list_id, movie_id) => {
     VALUES ($1, $2, NOW());
   `;
   await pool.query(query, [list_id, movie_id]);
-}
+};
+
+exports.deleteFilmFromList = async (list_id, movie_id) => {
+  const query = `
+    DELETE FROM movie_list
+    WHERE list_id = $1 AND movie_id = $2;
+  `;
+  await pool.query(query, [list_id, movie_id]);
+};

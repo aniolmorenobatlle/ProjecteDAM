@@ -96,3 +96,20 @@ exports.fetchAddFilmToList = async (req, res) => {
     res.status(500).json({ message: 'Error adding film to list' });
   }
 };
+
+exports.fetchDeleteFilmFromList = async (req, res) => {
+  try {
+    const { list_id, movie_id } = req.body;
+
+    if (!list_id || !movie_id) {
+      return res.status(400).json({ message: 'List ID and Movie ID are required' });
+    }
+
+    await listModel.deleteFilmFromList(list_id, movie_id);
+    res.json({ message: 'Film deleted from list successfully' });
+
+  } catch (error) {
+    console.error("Error deleting film from list", error);
+    res.status(500).json({ message: 'Error deleting film from list' });
+  }
+};
