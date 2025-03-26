@@ -1,5 +1,13 @@
-import React from "react";
-import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Modalize } from "react-native-modalize";
 import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
@@ -25,10 +33,41 @@ const lists = [
   { title: "Friends", number: 5 },
 ];
 
-export default function Profile() {
+export default function Profile({ setIsModalizeOpen }) {
   const { userInfo, loading, error } = useUserInfo();
+  const [showLoading, setShowLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalizeRef = useRef(null);
 
-  if (loading)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowLoading(false);
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const userInfoModalize = userInfo
+    ? [
+        { title: "Full Name", result: userInfo.name, editable: "true" },
+        { title: "Username", result: userInfo.username, editable: "true" },
+        { title: "Email", result: userInfo.email, editable: "false" },
+        {
+          title: "Avatar",
+          result: userInfo.avatar,
+          editable: "true",
+          image: "true",
+        },
+      ]
+    : [];
+
+  const openModalize = () => {
+    modalizeRef.current?.open();
+    setIsModalOpen(true);
+    setIsModalizeOpen(true);
+  };
+
+  if (loading || showLoading)
     return (
       <View
         style={{
@@ -60,11 +99,141 @@ export default function Profile() {
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={[globalStyles.container, styles.mainContainer]}
+      scrollEnabled={!isModalOpen}
     >
       <Image
         source={{ uri: theBatmanBackground }}
         style={styles.backgroundImage}
       />
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={openModalize}
+        style={styles.editProfile}
+      >
+        <Icon name="cog-outline" size={40} />
+      </TouchableOpacity>
+
+      <Modalize
+        modalStyle={styles.modalize}
+        ref={modalizeRef}
+        onOpened={() => {
+          setIsModalizeOpen(true);
+          setIsModalOpen(true);
+        }}
+        onClosed={() => {
+          setIsModalizeOpen(false);
+          setIsModalOpen(false);
+        }}
+      >
+        <View style={styles.panelContent}>
+          <View>
+            <Text style={styles.profileTitle}>Profile</Text>
+
+            <View style={styles.longLine}></View>
+
+            <View
+              style={styles.listInfoContainer}
+              contentContainerStyle={{ alignItems: "center" }}
+            >
+              {userInfoModalize.map((info, index) => (
+                <View key={index} style={{ width: "100%" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
+                      {info.title}
+                    </Text>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                    >
+                      {info.image === "true" ? (
+                        <Image
+                          source={{ uri: info.result }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderRadius: 50,
+                          }}
+                        />
+                      ) : (
+                        <Text
+                          style={[globalStyles.textBase, styles.listInfoResult]}
+                        >
+                          {info.result}
+                        </Text>
+                      )}
+
+                      {info.editable === "true" && (
+                        <Icon
+                          name="chevron-forward-outline"
+                          size={15}
+                          color="rgba(255, 255, 255, 0.7)"
+                        />
+                      )}
+                    </View>
+                  </View>
+
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 1,
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      marginVertical: 10,
+                    }}
+                  ></View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.posterTitle}>Poster</Text>
+
+            <View style={styles.longLine}></View>
+
+            <Image
+              source={{ uri: theBatmanBackground }}
+              style={styles.posterImage}
+            />
+          </View>
+
+          <View>
+            <Text style={styles.favoriteTitle}>Top Favorite Films</Text>
+
+            <View style={styles.longLine}></View>
+
+            <View style={styles.favoritesContainer}>
+              <View style={styles.favorites}>
+                <Image
+                  style={styles.favoritesImage}
+                  source={{ uri: theBatman }}
+                />
+                <Image style={styles.favoritesImage} source={{ uri: avatar }} />
+                <Image
+                  style={styles.favoritesImage}
+                  source={{ uri: theGorge }}
+                />
+                <Image
+                  style={styles.favoritesImage}
+                  source={{ uri: babyDriver }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modalize>
+
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
           {userInfo.avatar ? (
@@ -72,7 +241,7 @@ export default function Profile() {
           ) : (
             <Icon
               name="person-circle-outline"
-              size={120}
+              size={100}
               style={styles.menuIconAvatarNone}
             />
           )}
@@ -118,7 +287,7 @@ export default function Profile() {
 
         <View style={styles.favoritesContainer}>
           <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
-            Robert's Favorite Films
+            {userInfo.name.split(" ")[0]}'s Top Favorite Films
           </Text>
 
           <View style={styles.favorites}>
@@ -131,39 +300,34 @@ export default function Profile() {
 
         <View style={styles.line}></View>
 
-        <View style={styles.listInfo}>
-          <View
-            style={styles.listInfoContainer}
-            contentContainerStyle={{ alignItems: "center" }}
-          >
-            {lists.map((list, index) => (
-              <View key={index} style={{ width: "100%" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                    {list.title}
-                  </Text>
-                  <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
-                    {list.number}
-                  </Text>
-                </View>
-
-                <View
-                  style={{
-                    width: "100%",
-                    height: 1,
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    marginVertical: 10,
-                  }}
-                ></View>
+        <View contentContainerStyle={{ alignItems: "center" }}>
+          {lists.map((list, index) => (
+            <View key={index} style={{ width: "100%" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
+                  {list.title}
+                </Text>
+                <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
+                  {list.number}
+                </Text>
               </View>
-            ))}
-          </View>
+
+              <View
+                style={{
+                  width: "100%",
+                  height: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  marginVertical: 10,
+                }}
+              ></View>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -182,6 +346,67 @@ const styles = {
     width: "100%",
   },
 
+  editProfile: {
+    position: "absolute",
+    top: 50,
+    right: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 50,
+  },
+
+  modalize: {
+    backgroundColor: "#1F1D36",
+  },
+
+  profileTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+
+  posterTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+
+  favoriteTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    paddingHorizontal: 20,
+    paddingTop: 30,
+  },
+
+  longLine: {
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    marginTop: 5,
+  },
+
+  listInfoContainer: {
+    padding: 20,
+    paddingBottom: 0,
+  },
+
+  listInfoResult: {
+    color: "rgba(255, 255, 255, 0.7)",
+    fontSize: 16,
+  },
+
+  posterImage: {
+    flex: 1,
+    justifyContent: "center",
+    height: 150,
+    width: "100%",
+    marginTop: 10,
+    objectFit: "contain",
+  },
+
   contentContainer: {
     paddingHorizontal: 15,
     marginTop: 60,
@@ -194,27 +419,25 @@ const styles = {
   },
 
   avatar: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: "50%",
     borderWidth: 2,
     borderColor: "white",
     position: "absolute",
-    top: -120,
+    top: -110,
   },
 
   menuIconAvatarNone: {
     color: "white",
-    width: 120,
-    height: 120,
     position: "absolute",
-    top: -120,
+    top: -110,
   },
 
   name: {
     fontSize: 25,
     fontWeight: "bold",
-    marginVertical: 5,
+    marginBottom: 5,
     color: "#E9A6A6",
   },
 

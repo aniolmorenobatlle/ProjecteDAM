@@ -22,6 +22,8 @@ export default function App() {
   const [routeName, setRouteName] = useState("Login");
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isModalizeOpen, setIsModalizeOpen] = useState(false);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -95,9 +97,10 @@ export default function App() {
           />
           <Stack.Screen
             name="Profile"
-            component={Profile}
             options={{ headerShown: false }}
-          />
+          >
+            {(props) => <Profile {...props} setIsModalizeOpen={setIsModalizeOpen} />}
+          </Stack.Screen>
           <Stack.Screen
             name="Lists"
             component={Lists}
@@ -109,7 +112,15 @@ export default function App() {
             options={{ headerShown: false }}
           />
         </Stack.Navigator>
-        {routeName !== 'Recommend' && routeName !== 'Film' && routeName !== "Login" && routeName !== "Register" && routeName !== "Lists" && routeName !== "ListInfo" && <Navbar currentPage={routeName} />}
+        {!isModalizeOpen &&
+          routeName !== 'Recommend' &&
+          routeName !== 'Film' &&
+          routeName !== "Login" &&
+          routeName !== "Register" &&
+          routeName !== "Lists" &&
+          routeName !== "ListInfo" && (
+            <Navbar currentPage={routeName} />
+          )}
       </NavigationContainer>
     </>
   );
