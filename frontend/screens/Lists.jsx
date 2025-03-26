@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -11,30 +12,48 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { Menu, Provider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
-// const lists = [
-//   { title: "Best films", number: 10 },
-//   { title: "Favorites of all time", number: 30 },
-//   { title: "Romance", number: 30 },
-//   { title: "Terror", number: 30 },
-// ];
-
 export default function Lists() {
   const navigation = useNavigation();
   const { userInfo, loading, error } = useUserInfo();
   const [modalAddList, setModalAddList] = useState(false);
+  const [modalDeleteList, setModalDeleteList] = useState(false);
   const [name, setName] = useState("");
   const [lists, setLists] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [dropdownList, setDropdownList] = useState([]);
+  const [selectedListId, setSelectedListId] = useState(null);
+
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const fetchLists = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/lists/${userInfo.id}`);
+    const token = await AsyncStorage.getItem("authToken");
+    const userId = userInfo.id;
 
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/lists?user_id=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const formattedData = response.data.lists.map((list) => ({
+        label: list.name,
+        value: list.id,
+      }));
+
+      setDropdownList(formattedData);
       setLists(response.data.lists);
     } catch (error) {
       console.error("Error fetching the lists", error);
@@ -42,6 +61,7 @@ export default function Lists() {
   };
 
   const handleOpenModalAddList = () => {
+    closeMenu();
     setModalAddList(true);
   };
 
@@ -62,6 +82,33 @@ export default function Lists() {
       }
     } else {
       setModalAddList(false);
+    }
+  };
+
+  const handleListClick = (listId) => {
+    navigation.navigate("ListInfo", { listId });
+  };
+
+  const handleOpenModalDeleteList = () => {
+    closeMenu();
+    setModalDeleteList(true);
+  };
+
+  const handleCloseModalDeleteList = async () => {
+    setModalDeleteList(false);
+  };
+
+  const handleDeleteList = async () => {
+    console.log(selectedListId);
+    try {
+      await axios.post(`${API_URL}/api/lists/deleteList`, {
+        list_id: selectedListId,
+      });
+
+      setModalDeleteList(false);
+      fetchLists();
+    } catch (error) {
+      console.error("Error deleting the list", error);
     }
   };
 
@@ -102,102 +149,175 @@ export default function Lists() {
     );
 
   return (
-    <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-      <ScrollView
-        style={globalStyles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          >
-            <Icon name="arrow-back-outline" size={30} style={styles.addList} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleOpenModalAddList}
-          >
-            <Icon name="add-circle-outline" size={45} style={styles.addList} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.listInfo}>
-          <View
-            style={styles.listInfoContainer}
-            contentContainerStyle={{ alignItems: "center" }}
-          >
-            {lists.length === 0 ? (
-              <Text style={[globalStyles.textBase, styles.noList]}>
-                No lists yet
-              </Text>
-            ) : (
-              lists.map((list, index) => (
-                <View key={index} style={{ width: "100%" }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                      {list.name}
-                    </Text>
-                    <Text
-                      style={[globalStyles.textBase, styles.listInfoNumber]}
-                    >
-                      10
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      width: "100%",
-                      height: 1,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      marginVertical: 10,
-                    }}
-                  ></View>
-                </View>
-              ))
-            )}
-          </View>
-        </View>
-      </ScrollView>
-
-      <Modal
-        visible={modalAddList}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setModalAddList(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Add a new list</Text>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Name of the list"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-
+    <Provider>
+      <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
+        <ScrollView
+          style={globalStyles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
             <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleAddList}
+              activeOpacity={0.8}
+              onPress={() => {
+                navigation.goBack();
+              }}
             >
-              <Text style={styles.confirmButtonText}>Done</Text>
+              <Icon
+                name="arrow-back-outline"
+                size={30}
+                style={styles.addList}
+              />
             </TouchableOpacity>
+
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <TouchableOpacity onPress={openMenu}>
+                  <Icon
+                    name="ellipsis-vertical"
+                    size={30}
+                    style={styles.addList}
+                  />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item onPress={handleOpenModalAddList} title="Add list" />
+              <Menu.Item
+                onPress={handleOpenModalDeleteList}
+                title="Delete list"
+              />
+            </Menu>
           </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+
+          <View style={styles.listInfo}>
+            <View
+              style={styles.listInfoContainer}
+              contentContainerStyle={{ alignItems: "center" }}
+            >
+              {lists.length === 0 ? (
+                <Text style={[globalStyles.textBase, styles.noList]}>
+                  No lists yet
+                </Text>
+              ) : (
+                lists.map((list, index) => (
+                  <View key={index} style={{ width: "100%", marginTop: 10 }}>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      onPress={() => handleListClick(list.id)}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <Text
+                          style={[globalStyles.textBase, styles.listInfoTitle]}
+                        >
+                          {list.name}
+                        </Text>
+                        <Text
+                          style={[globalStyles.textBase, styles.listInfoNumber]}
+                        >
+                          10
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    <View
+                      style={{
+                        width: "100%",
+                        height: 1,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        marginVertical: 10,
+                      }}
+                    />
+                  </View>
+                ))
+              )}
+            </View>
+          </View>
+        </ScrollView>
+
+        <Modal
+          visible={modalAddList}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalAddList(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Add a new list</Text>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Name of the list"
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={handleAddList}
+              >
+                <Text style={styles.confirmButtonText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={modalDeleteList}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalDeleteList(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Delete a list</Text>
+
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={dropdownList}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder="Select item"
+                value={selectedListId}
+                onChange={(item) => {
+                  setSelectedListId(item.value);
+                }}
+              />
+
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={handleDeleteList}
+                >
+                  <Text style={styles.confirmButtonText}>Done</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={handleCloseModalDeleteList}
+                >
+                  <Text style={styles.confirmButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </Provider>
   );
 }
 
@@ -273,7 +393,8 @@ const styles = {
     borderBottomColor: "#ccc",
     paddingHorizontal: 10,
     paddingVertical: 8,
-    marginVertical: 5,
+    marginVertical: 10,
+    marginBottom: 20,
   },
 
   input: {
@@ -309,18 +430,65 @@ const styles = {
     fontWeight: "bold",
   },
 
-  confirmButton: {
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     width: "100%",
+    marginTop: 20,
+  },
+
+  confirmButton: {
+    width: "48%",
     padding: 10,
     backgroundColor: "#E9A6A6",
     borderRadius: 10,
     alignItems: "center",
-    marginTop: 20,
+  },
+
+  cancelButton: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#9C4A8B",
+    borderRadius: 10,
+    alignItems: "center",
   },
 
   confirmButtonText: {
     fontSize: 14,
     color: "#000",
     fontWeight: "bold",
+  },
+
+  dropdown: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "white",
+    padding: 10,
+  },
+
+  icon: {
+    marginRight: 5,
+  },
+
+  placeholderStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  selectedTextStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  iconStyle: {
+    width: 25,
+    height: 25,
+  },
+
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 };

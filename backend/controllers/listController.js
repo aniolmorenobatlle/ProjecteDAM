@@ -2,20 +2,24 @@ const listModel = require('../models/listModel.js');
 
 exports.fetchLists = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.query.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ message: 'User ID is required' });
+      return res.status(400).json({ message: 'User ID no proporcionat' });
     }
 
     const lists = await listModel.getLists(user_id);
-    res.json({ lists });
 
+    if (!lists || lists.length === 0) {
+      return res.status(404).json({ message: 'No hi ha llistes disponibles' });
+    }
+
+    res.json({ lists });
   } catch (error) {
     console.error("Error en obtenir les llistes", error);
-    res.status(500).json({ message: 'Error getting the lists' });
+    res.status(500).json({ message: "Error obtenint les llistes" });
   }
-}
+};
 
 exports.fetchAddList = async (req, res) => {
   try {
@@ -32,4 +36,38 @@ exports.fetchAddList = async (req, res) => {
     console.error("Error en afegir la llista", error);
     res.status(500).json({ message: 'Error creating the list' });
   }
-}
+};
+
+exports.fetchDeleteList = async (req, res) => {
+  try {
+    const { list_id } = req.body;
+
+    if (!list_id) {
+      return res.status(400).json({ message: 'List ID is required' });
+    }
+
+    await listModel.deleteList(list_id);
+    res.json({ message: 'Llista eliminada correctament' });
+
+  } catch (error) {
+    console.error("Error en eliminar la llista", error);
+    res.status(500).json({ message: 'Error deleting the list' });
+  }
+};
+
+exports.fetchListInfo = async (req, res) => {
+  try {
+    const { list_id } = req.params;
+
+    if (!list_id) {
+      return res.status(400).json({ message: 'List ID is required' });
+    }
+
+    const listInfo = await listModel.getListInfo(list_id);
+    res.json({ listInfo });
+
+  } catch (error) {
+    console.error("Error getting list info", error);
+    res.status(500).json({ message: 'Error getting list information' });
+  }
+};

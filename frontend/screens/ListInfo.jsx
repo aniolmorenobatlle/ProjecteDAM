@@ -1,5 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -8,30 +9,51 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Menu, Provider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
-const theGorge =
-  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
-const theBatman =
-  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
-const babyDriver =
-  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
-const avatar =
-  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
-
-const lists = [
-  { title: "The Gorge", image: theGorge },
-  { title: "The Batman", image: theBatman },
-  { title: "Baby Driver", image: babyDriver },
-  { title: "Avatar", image: avatar },
-];
-
 export default function ListInfo() {
+  const route = useRoute();
+  const { listId } = route.params;
   const navigation = useNavigation();
   const { userInfo, loading, error } = useUserInfo();
+  const [visible, setVisible] = useState(false);
+  const [listFilms, setListFilms] = useState([]);
+
+  const fetchListInfo = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/lists/listInfo/${listId}`
+      );
+
+      setListFilms(response.data.listInfo);
+    } catch (error) {
+      console.error("Error fetching list info", error);
+    }
+  };
+
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
+  const handleDeleteList = async () => {
+    try {
+      await axios.post(`${API_URL}/api/lists/deleteList`, {
+        list_id: listId,
+      });
+
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error deleting the list", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchListInfo();
+  }, [listId]);
 
   if (loading)
     return (
@@ -64,31 +86,74 @@ export default function ListInfo() {
     );
 
   return (
-    <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-      <ScrollView
-        style={globalStyles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          >
-            <Icon name="arrow-back-outline" size={30} style={styles.addList} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.listGrid}>
-          {lists.map((list, index) => (
-            <View style={styles.listItem} key={index}>
-              <Image source={{ uri: list.image }} style={styles.listImage} />
-              <Text style={styles.listTitle}>{list.title}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <Provider>
+      <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
+        <ScrollView
+          style={globalStyles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Icon
+                name="arrow-back-outline"
+                size={30}
+                style={styles.addList}
+              />
+            </TouchableOpacity>
+
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <TouchableOpacity onPress={openMenu}>
+                  <Icon
+                    name="ellipsis-vertical"
+                    size={30}
+                    style={styles.addList}
+                  />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item
+                onPress={() => navigation.navigate("Search")}
+                title="Add film"
+              />
+              <Menu.Item onPress={handleDeleteList} title="Delete list" />
+            </Menu>
+          </View>
+
+          <View style={styles.listGrid}>
+            {listFilms.length === 0 ? (
+              <Text style={styles.emptyMessage}>
+                There are no films on this list yet
+              </Text>
+            ) : (
+              listFilms.map((list, index) => (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigation.navigate("Film", { filmId: list.id_api })
+                  }
+                >
+                  <View style={styles.listItem} key={index}>
+                    <Image
+                      source={{ uri: list.poster }}
+                      style={styles.listImage}
+                    />
+                    <Text style={styles.listTitle}>{list.title}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </Provider>
   );
 }
 
@@ -128,6 +193,12 @@ const styles = {
 
   listTitle: {
     color: "white",
+    fontSize: 16,
+    marginTop: 10,
+  },
+
+  emptyMessage: {
+    color: "rgba(255, 255, 255, 0.5)",
     fontSize: 16,
     marginTop: 10,
   },
