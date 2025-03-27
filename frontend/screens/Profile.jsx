@@ -256,42 +256,6 @@ export default function Profile({ setIsModalizeOpen }) {
               </View>
             </View>
           </View>
-
-          <View>
-            <Text style={styles.favoriteTitle}>Favorite Films Of All Time</Text>
-
-            <View style={styles.longLine}></View>
-
-            <View style={styles.favoritesContainer}>
-              <View style={styles.favorites}>
-                {filledFavorites.map((favorite, index) => (
-                  <View key={index} style={styles.favoriteFilmContainer}>
-                    {favorite ? (
-                      <View>
-                        <Icon
-                          name="close-outline"
-                          size={20}
-                          style={styles.favoriteFilmDelete}
-                        />
-                        <Image
-                          style={styles.favoritesImage}
-                          source={{ uri: favorite.image }}
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.noFavorite}>
-                        <Icon
-                          name="add-outline"
-                          size={35}
-                          style={styles.noFavoriteIcon}
-                        />
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
-            </View>
-          </View>
         </View>
       </Modalize>
 
