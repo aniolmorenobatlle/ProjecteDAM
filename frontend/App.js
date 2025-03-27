@@ -3,6 +3,7 @@ import { NavigationContainer, useNavigationContainerRef } from "@react-navigatio
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import Navbar from "./components/Navbar";
 import Film from "./screens/Film";
 import Home from "./screens/Home";
@@ -40,6 +41,12 @@ export default function App() {
     };
 
     checkAuth();
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      return true; // Bloqueja el botó de tornada
+    });
+
+    return () => backHandler.remove();
   }, []);
 
   useEffect(() => {
@@ -63,53 +70,53 @@ export default function App() {
           <Stack.Screen
             name="Login"
             component={Login}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Register"
             component={Register}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Home"
             component={Home}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Search"
             component={Search}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Recommend"
             component={Recommend}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Film"
             component={Film}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Notifications"
             component={Notifications}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="Profile"
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           >
             {(props) => <Profile {...props} setIsModalizeOpen={setIsModalizeOpen} />}
           </Stack.Screen>
           <Stack.Screen
             name="Lists"
             component={Lists}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
           <Stack.Screen
             name="ListInfo"
             component={ListInfo}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, gestureEnabled: false, }}
           />
         </Stack.Navigator>
         {!isModalizeOpen &&

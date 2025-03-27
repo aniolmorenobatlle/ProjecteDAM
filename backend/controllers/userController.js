@@ -8,10 +8,10 @@ const { sign } = pkg;
 const SECRET_KEY = process.env.SECRET_KEY;
 
 exports.register = async (req, res) => {
-  const { name, username, email, password, avatar } = req.body;
+  const { name, username, email, password, avatar, poster } = req.body;
 
   try {
-    const userId = await userModel.createUser(name, username, email, password, avatar);
+    const userId = await userModel.createUser(name, username, email, password, avatar, poster);
 
     // Crear token JWS
     const token = sign({ userId }, SECRET_KEY, { expiresIn: '7d' });

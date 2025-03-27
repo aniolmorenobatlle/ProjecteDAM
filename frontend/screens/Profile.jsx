@@ -12,9 +12,6 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 
-const theBatmanBackground =
-  "https://image.tmdb.org/t/p/w500/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg";
-
 const theGorge =
   "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
 const theBatman =
@@ -31,6 +28,18 @@ const lists = [
   { title: "Reviews", number: 30 },
   { title: "Likes", number: 302 },
   { title: "Friends", number: 5 },
+];
+
+const favorites = [
+  { image: theBatman },
+  { image: avatar },
+  { image: babyDriver },
+];
+
+const maxFavorites = 4;
+const filledFavorites = [
+  ...favorites,
+  ...Array(maxFavorites - favorites.length).fill(null),
 ];
 
 export default function Profile({ setIsModalizeOpen }) {
@@ -101,10 +110,7 @@ export default function Profile({ setIsModalizeOpen }) {
       style={[globalStyles.container, styles.mainContainer]}
       scrollEnabled={!isModalOpen}
     >
-      <Image
-        source={{ uri: theBatmanBackground }}
-        style={styles.backgroundImage}
-      />
+      <Image source={{ uri: userInfo.poster }} style={styles.backgroundImage} />
 
       <TouchableOpacity
         activeOpacity={0.8}
@@ -202,32 +208,87 @@ export default function Profile({ setIsModalizeOpen }) {
 
             <View style={styles.longLine}></View>
 
-            <Image
-              source={{ uri: theBatmanBackground }}
-              style={styles.posterImage}
-            />
+            <View style={styles.posterContainer}>
+              <Image
+                source={{ uri: userInfo.poster }}
+                style={styles.posterImage}
+              />
+              <Icon
+                name="swap-horizontal-outline"
+                size={30}
+                style={styles.posterImageSwitch}
+              />
+            </View>
           </View>
 
           <View>
-            <Text style={styles.favoriteTitle}>Top Favorite Films</Text>
+            <Text style={styles.favoriteTitle}>Favorite Films Of All Time</Text>
 
             <View style={styles.longLine}></View>
 
             <View style={styles.favoritesContainer}>
               <View style={styles.favorites}>
-                <Image
-                  style={styles.favoritesImage}
-                  source={{ uri: theBatman }}
-                />
-                <Image style={styles.favoritesImage} source={{ uri: avatar }} />
-                <Image
-                  style={styles.favoritesImage}
-                  source={{ uri: theGorge }}
-                />
-                <Image
-                  style={styles.favoritesImage}
-                  source={{ uri: babyDriver }}
-                />
+                {filledFavorites.map((favorite, index) => (
+                  <View key={index} style={styles.favoriteFilmContainer}>
+                    {favorite ? (
+                      <View>
+                        <Icon
+                          name="close-outline"
+                          size={20}
+                          style={styles.favoriteFilmDelete}
+                        />
+                        <Image
+                          style={styles.favoritesImage}
+                          source={{ uri: favorite.image }}
+                        />
+                      </View>
+                    ) : (
+                      <View style={styles.noFavorite}>
+                        <Icon
+                          name="add-outline"
+                          size={35}
+                          style={styles.noFavoriteIcon}
+                        />
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.favoriteTitle}>Favorite Films Of All Time</Text>
+
+            <View style={styles.longLine}></View>
+
+            <View style={styles.favoritesContainer}>
+              <View style={styles.favorites}>
+                {filledFavorites.map((favorite, index) => (
+                  <View key={index} style={styles.favoriteFilmContainer}>
+                    {favorite ? (
+                      <View>
+                        <Icon
+                          name="close-outline"
+                          size={20}
+                          style={styles.favoriteFilmDelete}
+                        />
+                        <Image
+                          style={styles.favoritesImage}
+                          source={{ uri: favorite.image }}
+                        />
+                      </View>
+                    ) : (
+                      <View style={styles.noFavorite}>
+                        <Icon
+                          name="add-outline"
+                          size={35}
+                          style={styles.noFavoriteIcon}
+                        />
+                      </View>
+                    )}
+                  </View>
+                ))}
               </View>
             </View>
           </View>
@@ -398,13 +459,58 @@ const styles = {
     fontSize: 16,
   },
 
-  posterImage: {
-    flex: 1,
+  posterContainer: {
+    position: "relative",
+    alignItems: "center",
     justifyContent: "center",
-    height: 150,
+  },
+
+  posterImage: {
+    height: 170,
     width: "100%",
+    paddingHorizontal: 20,
     marginTop: 10,
-    objectFit: "contain",
+    borderRadius: 10,
+    objectFit: "cover",
+    opacity: 0.8,
+  },
+
+  posterImageSwitch: {
+    position: "absolute",
+    top: "42%",
+    left: "45%",
+    width: 40,
+    height: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: 50,
+    textAlign: "center",
+    lineHeight: 40,
+  },
+
+  favoriteFilmDelete: {
+    position: "absolute",
+    top: 2,
+    right: 2,
+    width: 25,
+    height: 25,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    borderRadius: 50,
+    textAlign: "center",
+    lineHeight: 25,
+    zIndex: 1,
+  },
+
+  noFavorite: {
+    width: 82,
+    height: 130,
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+  },
+
+  noFavoriteIcon: {
+    color: "rgba(255, 255, 255, 0.7)",
+    textAlign: "center",
+    lineHeight: 130,
   },
 
   contentContainer: {

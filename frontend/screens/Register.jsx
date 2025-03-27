@@ -21,6 +21,25 @@ import { globalStyles } from "../globalStyles";
 
 import lalaland from "../assets/films/lalaland.jpg";
 
+const CLOUNDINARY_URL =
+  "https://res.cloudinary.com/dwe0on2fw/image/upload/recommendme-cover";
+
+const posters = [
+  "toyStory",
+  "interstellar",
+  "whiplash",
+  "spiderman",
+  "lotr",
+  "walle",
+  "topGun",
+  "theBatman",
+  "lionKing",
+  "oceans",
+  "pp",
+  "noah",
+  "hp",
+];
+
 export default function Register() {
   const navigation = useNavigation();
 
@@ -56,6 +75,11 @@ export default function Register() {
     const onlyNamePart = name.split(" ")[0];
     const backgroundColor = getRandomLightColor();
     return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}`;
+  };
+
+  const getRandomPoster = () => {
+    const randomIndex = Math.floor(Math.random() * posters.length);
+    return `${CLOUNDINARY_URL}/${posters[randomIndex]}.jpg`;
   };
 
   const handleNameChange = (name) => {
@@ -99,6 +123,8 @@ export default function Register() {
       return;
     }
 
+    const randomPoster = getRandomPoster();
+
     try {
       const response = await axios.post(`${API_URL}/api/users/register`, {
         name,
@@ -106,6 +132,7 @@ export default function Register() {
         email,
         password,
         avatar,
+        poster: randomPoster,
       });
 
       if (response.status === 200) {

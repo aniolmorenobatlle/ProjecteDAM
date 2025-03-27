@@ -14,6 +14,7 @@ CREATE TABLE users (
   email VARCHAR NOT NULL UNIQUE,
   password VARCHAR NOT NULL,
   avatar VARCHAR,
+  poster TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -102,6 +103,13 @@ CREATE TABLE streaming (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE user_movies (
+  id SERIAL PRIMARY KEY,
+  user_id int,
+  movie_id int,
+  created_at TIMESTAMP
+);
+
 CREATE TABLE movie_list (
   id SERIAL PRIMARY KEY,
   list_id int,
@@ -172,6 +180,9 @@ CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
+
+ALTER TABLE user_movies ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE user_movies ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
 ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
