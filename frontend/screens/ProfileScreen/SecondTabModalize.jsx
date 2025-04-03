@@ -31,7 +31,7 @@ const posters = [
   "hp",
 ];
 
-export default function AvatarTabModalize({
+export default function SecondTabModalize({
   userInfo,
   selectedPoster,
   setSelectedPoster,
