@@ -1,12 +1,18 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
-const { register, checkUsername, login, me } = require('../controllers/userController.js');
+const { register, checkUsername, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, deleteFavorite } = require('../controllers/userController.js');
 
 const router = Router();
 
-router.post('/register', register);
 router.get('/check-username/:username', checkUsername);
-router.post('/login', login);
 router.get("/me", authMiddleware, me);
+router.get('/favorites', authMiddleware, fetchFavorites);
+
+router.post('/register', register);
+router.post('/login', login);
+router.post('/editProfile', authMiddleware, editProfile);
+router.post('/editProfilePoster', authMiddleware, editProfilePoster);
+router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
+router.post('/deleteFavorite', authMiddleware, deleteFavorite);
 
 module.exports = router;

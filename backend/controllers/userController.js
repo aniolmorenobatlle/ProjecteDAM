@@ -89,3 +89,132 @@ exports.me = async (req, res) => {
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
+
+exports.editProfile = async (req, res) => {
+  const { name, username } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const currentUsername = await userModel.getCurrentUsername(userId);
+
+    if (username && username !== currentUsername) {
+      const exists = await userModel.checkUserExists(username);
+      if (exists) {
+        return res.status(400).json({ message: "El nom d'usuari ja està en ús" });
+      }
+    }
+
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (username !== undefined) updates.username = username;
+
+    // Actualitzar només si hi ha canvis
+    const user = await userModel.editProfile(userId, updates);
+
+    if (user.rowCount === 0) {
+      return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Perfil modificat correctament",
+      name: user.rows[0].name,
+      username: user.rows[0].username
+    });
+
+  } catch (error) {
+    console.error("Error en editar el perfil:", error);
+    res.status(500).json({ message: "Error al modificar el perfil" });
+  }
+};
+
+exports.editProfilePoster = async (req, res) => {
+  const { poster } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const user = await userModel.editProfilePoster(userId, poster);
+
+    if (!user) {
+      return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Poster modificat correctament",
+      poster: user.poster
+    });
+
+  } catch (error) {
+    console.error("Error en editar el poster:", error);
+    res.status(500).json({ message: "Error al modificar el poster" });
+  }
+};
+
+exports.editProfileAvatar = async (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const user = await userModel.editProfileAvatar(userId, avatar);
+
+    if (!user) {
+      return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Avatar modificat correctament",
+      avatar: user.avatar
+    });
+
+  } catch (error) {
+    console.error("Error en editar l'avatar:", error);
+    res.status(500).json({ message: "Error al modificar l'avatar" });
+  }
+}
+
+exports.fetchFavorites = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const favorites = await userModel.getFavorites(userId);
+
+    if (!favorites) {
+      return res.status(404).json({ message: "No s'han trobat pel·lícules favorites" });
+    }
+
+    const movies = favorites.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules favorites obtingudes correctament",
+      favorites: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir les pel·lícules favorites:", error);
+    res.status(500).json({ message: "Error al obtenir les pel·lícules favorites" });
+  }
+};
+
+exports.deleteFavorite = async (req, res) => {
+  const { movieId } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const result = await userModel.deleteFavorite(userId, movieId);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "No s'ha trobat cap pel·lícula amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Pel·lícula eliminada de les favorites correctament",
+      movieId: result.movie_id
+    });
+
+  } catch (error) {
+    console.error("Error en eliminar la pel·lícula favorita:", error);
+    res.status(500).json({ message: "Error al eliminar la pel·lícula favorita" });
+  }
+}

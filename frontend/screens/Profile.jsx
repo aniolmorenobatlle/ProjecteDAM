@@ -1,6 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -9,17 +13,11 @@ import {
 } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
-
-const theGorge =
-  "https://image.tmdb.org/t/p/w500/7iMBZzVZtG0oBug4TfqDb9ZxAOa.jpg";
-const theBatman =
-  "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg";
-const babyDriver =
-  "https://image.tmdb.org/t/p/w500/dN9LbVNNZFITwfaRjl4tmwGWkRg.jpg";
-const avatar =
-  "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg";
+import AvatarTabModalize from "./profile/AvatarTabModalize";
+import MainTabModalize from "./profile/MainTabModalize";
 
 const lists = [
   { title: "Watchlist", number: 10 },
@@ -30,51 +28,68 @@ const lists = [
   { title: "Friends", number: 5 },
 ];
 
-const favorites = [
-  { image: theBatman },
-  { image: avatar },
-  { image: babyDriver },
-];
-
-const maxFavorites = 4;
-const filledFavorites = [
-  ...favorites,
-  ...Array(maxFavorites - favorites.length).fill(null),
-];
+const screenHeight = Dimensions.get("window").height;
 
 export default function Profile({ setIsModalizeOpen }) {
   const { userInfo, loading, error } = useUserInfo();
   const [showLoading, setShowLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalizeRef = useRef(null);
+  const [index, setIndex] = useState(0);
+  const [newName, setNewName] = useState("");
+  const [newUsername, setNewUsername] = useState("");
+  const [selectedPoster, setSelectedPoster] = useState(null);
+  const [poster, setPoster] = useState(userInfo?.poster);
+  const [favoritesLoading, setFavoritesLoading] = useState(true);
+  const [favorites, setFavorites] = useState([]);
+  const [filledFavorites, setFilledFavorites] = useState([]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    if (userInfo) {
+      setNewName(userInfo.name);
+      setNewUsername(userInfo.username);
+      setPoster(userInfo.poster);
       setShowLoading(false);
-    }, 200);
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const userInfoModalize = userInfo
-    ? [
-        { title: "Full Name", result: userInfo.name, editable: "true" },
-        { title: "Username", result: userInfo.username, editable: "true" },
-        { title: "Email", result: userInfo.email, editable: "false" },
-        {
-          title: "Avatar",
-          result: userInfo.avatar,
-          editable: "true",
-          image: "true",
-        },
-      ]
-    : [];
+    }
+  }, [userInfo]);
 
   const openModalize = () => {
     modalizeRef.current?.open();
     setIsModalOpen(true);
     setIsModalizeOpen(true);
   };
+
+  const fetchFavorites = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(`${API_URL}/api/users/favorites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 200) {
+        setFavorites(response.data.favorites);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error fetching favorites, please try again later");
+      console.error("Error fetching favorites:", error);
+    } finally {
+      setFavoritesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      fetchFavorites();
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (!favoritesLoading) {
+      const filled = [...favorites, ...Array(4 - favorites.length).fill(null)];
+      setFilledFavorites(filled.slice(0, 4));
+    }
+  }, [favorites, favoritesLoading]);
 
   if (loading || showLoading)
     return (
@@ -105,24 +120,142 @@ export default function Profile({ setIsModalizeOpen }) {
     );
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      style={[globalStyles.container, styles.mainContainer]}
-      scrollEnabled={!isModalOpen}
-    >
-      <Image source={{ uri: userInfo.poster }} style={styles.backgroundImage} />
-
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={openModalize}
-        style={styles.editProfile}
+    <View style={[globalStyles.container, styles.mainContainer]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={!isModalOpen}
       >
-        <Icon name="cog-outline" size={40} />
-      </TouchableOpacity>
+        <Image source={{ uri: poster }} style={styles.backgroundImage} />
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={openModalize}
+          style={styles.editProfile}
+        >
+          <Icon name="cog-outline" size={40} />
+        </TouchableOpacity>
+
+        <View style={styles.contentContainer}>
+          <View style={styles.avatarContainer}>
+            {userInfo.avatar ? (
+              <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
+            ) : (
+              <Icon
+                name="person-circle-outline"
+                size={100}
+                style={styles.menuIconAvatarNone}
+              />
+            )}
+            <Text style={[globalStyles.textBase, styles.name]}>
+              {" "}
+              {newName ? newName : userInfo.name}
+            </Text>
+            <Text style={[globalStyles.textBase, styles.username]}>
+              @{newUsername ? newUsername : userInfo.username}
+            </Text>
+          </View>
+
+          <View style={styles.stats}>
+            <View style={styles.statsContainer}>
+              <Text
+                style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}
+              >
+                445
+              </Text>
+              <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                Total Films
+              </Text>
+            </View>
+            <View style={styles.statsContainer}>
+              <Text
+                style={[
+                  globalStyles.textBase,
+                  styles.statsTotalFilmsYearNumber,
+                ]}
+              >
+                33
+              </Text>
+              <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                Films This Year
+              </Text>
+            </View>
+            <View style={styles.statsContainer}>
+              <Text
+                style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
+              >
+                30
+              </Text>
+              <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                Review
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.favoritesContainer}>
+            <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
+              {userInfo.name.split(" ")[0]}'s Top Favorite Films
+            </Text>
+
+            <View style={styles.favorites}>
+              {filledFavorites.filter((favorite) => favorite !== null).length >
+              0 ? (
+                filledFavorites.map(
+                  (favorite) =>
+                    favorite && (
+                      <Image
+                        style={styles.favoritesImage}
+                        source={{ uri: favorite.poster }}
+                        key={favorite.id_api}
+                      />
+                    )
+                )
+              ) : (
+                <Text style={[globalStyles.textBase, styles.noFavoritesText]}>
+                  User didn't put any as favorite
+                </Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.line}></View>
+
+          <View contentContainerStyle={{ alignItems: "center" }}>
+            {lists.map((list, index) => (
+              <View key={index} style={{ width: "100%" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
+                    {list.title}
+                  </Text>
+                  <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
+                    {list.number}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    width: "100%",
+                    height: 1,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    marginVertical: 10,
+                  }}
+                ></View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
 
       <Modalize
         modalStyle={styles.modalize}
         ref={modalizeRef}
+        modalHeight={screenHeight * 0.85}
+        panGestureEnabled={false}
         onOpened={() => {
           setIsModalizeOpen(true);
           setIsModalOpen(true);
@@ -130,232 +263,71 @@ export default function Profile({ setIsModalizeOpen }) {
         onClosed={() => {
           setIsModalizeOpen(false);
           setIsModalOpen(false);
+          setIndex(0);
         }}
+        // HeaderComponent={
+        //   <>
+        //     <View style={styles.headerModal}>
+        //       <TouchableOpacity
+        //         style={styles.btnCloseContainer}
+        //         activeOpacity={0.8}
+        //         onPress={() => {
+        //           modalizeRef.current?.close();
+        //         }}
+        //       >
+        //         <Text style={styles.cancel}>Cancel</Text>
+        //       </TouchableOpacity>
+        //       <Text style={styles.searchFilm}>Edit your Profile</Text>
+        //       <Image
+        //         source={{ uri: userInfo.avatar }}
+        //         style={styles.searchAvatar}
+        //       />
+        //     </View>
+        //   </>
+        // }
+        withHandle={false}
       >
-        <View style={styles.panelContent}>
-          <View>
-            <Text style={styles.profileTitle}>Profile</Text>
-
-            <View style={styles.longLine}></View>
-
-            <View
-              style={styles.listInfoContainer}
-              contentContainerStyle={{ alignItems: "center" }}
+        <View>
+          <View style={styles.headerModal}>
+            <TouchableOpacity
+              style={styles.btnCloseContainer}
+              activeOpacity={0.8}
+              onPress={() => {
+                modalizeRef.current?.close();
+              }}
             >
-              {userInfoModalize.map((info, index) => (
-                <View key={index} style={{ width: "100%" }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                      {info.title}
-                    </Text>
-
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 5,
-                      }}
-                    >
-                      {info.image === "true" ? (
-                        <Image
-                          source={{ uri: info.result }}
-                          style={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: 50,
-                          }}
-                        />
-                      ) : (
-                        <Text
-                          style={[globalStyles.textBase, styles.listInfoResult]}
-                        >
-                          {info.result}
-                        </Text>
-                      )}
-
-                      {info.editable === "true" && (
-                        <Icon
-                          name="chevron-forward-outline"
-                          size={15}
-                          color="rgba(255, 255, 255, 0.7)"
-                        />
-                      )}
-                    </View>
-                  </View>
-
-                  <View
-                    style={{
-                      width: "100%",
-                      height: 1,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      marginVertical: 10,
-                    }}
-                  ></View>
-                </View>
-              ))}
-            </View>
+              <Text style={styles.cancel}>Cancel</Text>
+            </TouchableOpacity>
+            <Text style={styles.searchFilm}>Edit your Profile</Text>
+            <Image
+              source={{ uri: userInfo.avatar }}
+              style={styles.searchAvatar}
+            />
           </View>
-
-          <View>
-            <Text style={styles.posterTitle}>Poster</Text>
-
-            <View style={styles.longLine}></View>
-
-            <View style={styles.posterContainer}>
-              <Image
-                source={{ uri: userInfo.poster }}
-                style={styles.posterImage}
-              />
-              <Icon
-                name="swap-horizontal-outline"
-                size={30}
-                style={styles.posterImageSwitch}
-              />
-            </View>
-          </View>
-
-          <View>
-            <Text style={styles.favoriteTitle}>Favorite Films Of All Time</Text>
-
-            <View style={styles.longLine}></View>
-
-            <View style={styles.favoritesContainer}>
-              <View style={styles.favorites}>
-                {filledFavorites.map((favorite, index) => (
-                  <View key={index} style={styles.favoriteFilmContainer}>
-                    {favorite ? (
-                      <View>
-                        <Icon
-                          name="close-outline"
-                          size={20}
-                          style={styles.favoriteFilmDelete}
-                        />
-                        <Image
-                          style={styles.favoritesImage}
-                          source={{ uri: favorite.image }}
-                        />
-                      </View>
-                    ) : (
-                      <View style={styles.noFavorite}>
-                        <Icon
-                          name="add-outline"
-                          size={35}
-                          style={styles.noFavoriteIcon}
-                        />
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modalize>
-
-      <View style={styles.contentContainer}>
-        <View style={styles.avatarContainer}>
-          {userInfo.avatar ? (
-            <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
+          {index === 0 ? (
+            <MainTabModalize
+              userInfo={userInfo}
+              newName={newName}
+              setNewName={setNewName}
+              newUsername={newUsername}
+              setNewUsername={setNewUsername}
+              poster={poster}
+              filledFavorites={filledFavorites}
+              setFavorites={setFavorites}
+              setIndex={setIndex}
+            />
           ) : (
-            <Icon
-              name="person-circle-outline"
-              size={100}
-              style={styles.menuIconAvatarNone}
+            <AvatarTabModalize
+              userInfo={userInfo}
+              selectedPoster={selectedPoster}
+              setSelectedPoster={setSelectedPoster}
+              setPoster={setPoster}
+              setIndex={setIndex}
             />
           )}
-          <Text style={[globalStyles.textBase, styles.name]}>
-            {" "}
-            {userInfo.name}
-          </Text>
-          <Text style={[globalStyles.textBase, styles.username]}>
-            @{userInfo.username}
-          </Text>
         </View>
-
-        <View style={styles.stats}>
-          <View style={styles.statsContainer}>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}>
-              445
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Total Films
-            </Text>
-          </View>
-          <View style={styles.statsContainer}>
-            <Text
-              style={[globalStyles.textBase, styles.statsTotalFilmsYearNumber]}
-            >
-              33
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Films This Year
-            </Text>
-          </View>
-          <View style={styles.statsContainer}>
-            <Text
-              style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
-            >
-              30
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Review
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.favoritesContainer}>
-          <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
-            {userInfo.name.split(" ")[0]}'s Top Favorite Films
-          </Text>
-
-          <View style={styles.favorites}>
-            <Image style={styles.favoritesImage} source={{ uri: theBatman }} />
-            <Image style={styles.favoritesImage} source={{ uri: avatar }} />
-            <Image style={styles.favoritesImage} source={{ uri: theGorge }} />
-            <Image style={styles.favoritesImage} source={{ uri: babyDriver }} />
-          </View>
-        </View>
-
-        <View style={styles.line}></View>
-
-        <View contentContainerStyle={{ alignItems: "center" }}>
-          {lists.map((list, index) => (
-            <View key={index} style={{ width: "100%" }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                  {list.title}
-                </Text>
-                <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
-                  {list.number}
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  width: "100%",
-                  height: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  marginVertical: 10,
-                }}
-              ></View>
-            </View>
-          ))}
-        </View>
-      </View>
-    </ScrollView>
+      </Modalize>
+    </View>
   );
 }
 
@@ -383,98 +355,31 @@ const styles = {
     backgroundColor: "#1F1D36",
   },
 
-  profileTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    paddingHorizontal: 20,
-    paddingTop: 20,
+  headerModal: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
   },
 
-  posterTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-
-  favoriteTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    paddingHorizontal: 20,
-    paddingTop: 30,
-  },
-
-  longLine: {
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
-    marginTop: 5,
-  },
-
-  listInfoContainer: {
-    padding: 20,
-    paddingBottom: 0,
-  },
-
-  listInfoResult: {
+  cancel: {
     color: "rgba(255, 255, 255, 0.7)",
     fontSize: 16,
   },
 
-  posterContainer: {
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
+  searchFilm: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 
-  posterImage: {
-    height: 170,
-    width: "100%",
-    paddingHorizontal: 20,
-    marginTop: 10,
-    borderRadius: 10,
-    objectFit: "cover",
-    opacity: 0.8,
-  },
-
-  posterImageSwitch: {
-    position: "absolute",
-    top: "42%",
-    left: "45%",
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  searchAvatar: {
+    width: 35,
+    height: 35,
     borderRadius: 50,
-    textAlign: "center",
-    lineHeight: 40,
-  },
-
-  favoriteFilmDelete: {
-    position: "absolute",
-    top: 2,
-    right: 2,
-    width: 25,
-    height: 25,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    borderRadius: 50,
-    textAlign: "center",
-    lineHeight: 25,
-    zIndex: 1,
-  },
-
-  noFavorite: {
-    width: 82,
-    height: 130,
-    borderRadius: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
-
-  noFavoriteIcon: {
-    color: "rgba(255, 255, 255, 0.7)",
-    textAlign: "center",
-    lineHeight: 130,
   },
 
   contentContainer: {
@@ -491,7 +396,7 @@ const styles = {
   avatar: {
     width: 100,
     height: 100,
-    borderRadius: "50%",
+    borderRadius: 50,
     borderWidth: 2,
     borderColor: "white",
     position: "absolute",
@@ -570,6 +475,12 @@ const styles = {
     width: 82,
     height: 130,
     borderRadius: 10,
+  },
+
+  noFavoritesText: {
+    color: "gray",
+    fontSize: 16,
+    marginTop: 20,
   },
 
   line: {

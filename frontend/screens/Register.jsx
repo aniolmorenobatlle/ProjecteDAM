@@ -34,7 +34,6 @@ const posters = [
   "topGun",
   "theBatman",
   "lionKing",
-  "oceans",
   "pp",
   "noah",
   "hp",

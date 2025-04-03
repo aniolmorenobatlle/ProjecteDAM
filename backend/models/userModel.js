@@ -1,48 +1,122 @@
 const { hash, compare } = require('bcrypt');
 const pool = require('../config/db.js');
 
-const createUser = async (name, username, email, password, avatar, poster) => {
+exports.createUser = async (name, username, email, password, avatar, poster) => {
   const hashedPassword = await hash(password, 10);
-  const result = await pool.query(
+  const query = await pool.query(
     `INSERT INTO "users" ("name", "username", "email", "password", "avatar", "poster", "created_at")
      VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id`,
     [name, username, email, hashedPassword, avatar, poster]
   )
-  return result.rows[0].id;
+  return query.rows[0].id;
 }
 
-const findUserByUsername = async (username) => {
-  const result = await pool.query(
+exports.findUserByUsername = async (username) => {
+  const query = await pool.query(
     `SELECT * FROM "users" WHERE "username" = $1`,
     [username]
   );
-  return result.rows[0];
+  return query.rows[0];
 };
 
-const checkUserExists = async (username) => {
-  const result = await pool.query(
+exports.checkUserExists = async (username) => {
+  const query = await pool.query(
     `SELECT id FROM "users" WHERE "username" = $1`,
     [username]
   );
-  return result.rows.length > 0;
+  return query.rows.length > 0;
 }
 
-const findUserById = async (userId) => {
-  const result = await pool.query(
+exports.findUserById = async (userId) => {
+  const query = await pool.query(
     `SELECT id, name, username, email, avatar, poster FROM "users" WHERE id = $1`,
     [userId]
   );
-  return result.rows[0];
+  return query.rows[0];
 };
 
-const comparePasswords = async (password, hashedPassword) => {
+exports.comparePasswords = async (password, hashedPassword) => {
   return await compare(password, hashedPassword);
 };
 
-module.exports = {
-  createUser,
-  findUserByUsername,
-  checkUserExists,
-  findUserById,
-  comparePasswords,
-}; 
+exports.getCurrentUsername = async (userId) => {
+  const query = await pool.query(
+    `SELECT username FROM "users" WHERE id = $1`,
+    [userId]
+  );
+  return query.rows[0]?.username;
+};
+
+exports.editProfile = async (userId, updates) => {
+  const setClauses = [];
+  const values = [];
+  let paramIndex = 1;
+
+  if (updates.name !== undefined) {
+    setClauses.push(`name = $${paramIndex}`);
+    values.push(updates.name);
+    paramIndex++;
+  }
+
+  if (updates.username !== undefined) {
+    setClauses.push(`username = $${paramIndex}`);
+    values.push(updates.username);
+    paramIndex++;
+  }
+
+  values.push(userId);
+
+  const query = `
+    UPDATE "users"
+    SET ${setClauses.join(', ')}
+    WHERE id = $${paramIndex}
+    RETURNING id, name, username;
+  `;
+
+  return await pool.query(query, values);
+};
+
+exports.editProfilePoster = async (userId, poster) => {
+  const query = await pool.query(
+    `UPDATE "users" SET poster = $1 WHERE id = $2 RETURNING id, name, username, avatar, poster`,
+    [poster, userId]
+  );
+  return query.rows[0];
+};
+
+exports.editProfileAvatar = async (userId, avatar) => {
+  const query = await pool.query(
+    `UPDATE "users" 
+    SET avatar = $1 
+    WHERE id = $2 
+    RETURNING id, name, username, avatar, poster`,
+    [avatar, userId]
+  );
+  return query.rows[0];
+};
+
+exports.getFavorites = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster 
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.favorite = true
+    `, [userId]
+  );
+  return query.rows;
+};
+
+exports.deleteFavorite = async (userId, movieId) => {
+  const query = await pool.query(
+    `
+      UPDATE to_watch
+      SET favorite = FALSE
+      WHERE user_id = $1 
+      AND movie_id = $2
+      RETURNING movie_id
+    `, [userId, movieId]
+  );
+  return query.rows[0];
+}

@@ -77,6 +77,7 @@ CREATE TABLE to_watch (
   likes boolean,
   watched boolean,
   watchlist boolean,
+  favorite boolean DEFAULT false,
   rating DECIMAL(2,1),
   created_at TIMESTAMP
 );
@@ -101,13 +102,6 @@ CREATE TABLE streaming (
   logo VARCHAR,
   id_api INT UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE user_movies (
-  id SERIAL PRIMARY KEY,
-  user_id int,
-  movie_id int,
-  created_at TIMESTAMP
 );
 
 CREATE TABLE movie_list (
@@ -180,9 +174,6 @@ CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
-
-ALTER TABLE user_movies ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE user_movies ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
 ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);

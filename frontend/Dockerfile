@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Instal·lem les dependències del projecte
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Copiem els fitxers del projecte
 COPY . .

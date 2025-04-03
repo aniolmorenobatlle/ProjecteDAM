@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
+import 'react-native-gesture-handler';
 import Navbar from "./components/Navbar";
 import Film from "./screens/Film";
 import Home from "./screens/Home";
