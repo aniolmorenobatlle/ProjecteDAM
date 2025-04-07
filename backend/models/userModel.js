@@ -163,3 +163,89 @@ exports.checkFavoriteExists = async (userId, movieId) => {
   );
   return query.rows.length > 0;
 };
+
+exports.fetchCounts = async (userId) => {
+  const queryComments = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM comments
+      WHERE user_id = $1
+    `, [userId]
+  )
+  const totalReviews = parseInt(queryComments.rows[0].count, 10);
+
+  const queryTotal = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM to_watch
+      WHERE user_id = $1
+      AND watched = TRUE
+    `, [userId]
+  )
+  const totalFilms = parseInt(queryTotal.rows[0].count, 10);
+
+  const queryThisYear = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM to_watch
+      WHERE user_id = $1
+      AND watched = TRUE
+      AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM NOW())
+    `, [userId]
+  )
+  const totalFilmsYear = parseInt(queryThisYear.rows[0].count, 10);
+
+  const queryWatchlist = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM movie_list ml
+      JOIN to_watch tw ON ml.movie_id = tw.movie_id
+      WHERE tw.user_id = $1;
+    `, [userId]
+  )
+  const totalWatchlist = parseInt(queryWatchlist.rows[0].count, 10);
+
+  const queryFavorites = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM to_watch
+      WHERE user_id = $1
+      AND favorite = TRUE
+    `, [userId]
+  )
+  const totalFavorites = parseInt(queryFavorites.rows[0].count, 10);
+
+  const queryRates = await pool.query(
+    `
+      SELECT COUNT(*)
+      FROM to_watch
+      WHERE rating IS NOT NULL
+      AND user_id = $1
+    `, [userId]
+  )
+  const totalRates = parseInt(queryRates.rows[0].count, 10);
+
+  const queryFriend = await pool.query(
+    `
+      SELECT COUNT(*) AS total_friends
+      FROM friends
+      WHERE (
+          (user_id = $1 OR friend_id = $1) 
+          AND status = 'accepted'
+      )
+      AND user_id != friend_id;
+    `, [userId]
+  );
+  const totalFriends = parseInt(queryFriend.rows[0].total_friends, 10);
+
+
+  return {
+    totalReviews,
+    totalFilms,
+    totalFilmsYear,
+    totalWatchlist,
+    totalFavorites,
+    totalRates,
+    totalFriends
+  }
+}

@@ -60,8 +60,6 @@ export default function Profile({ setIsModalizeOpen }) {
     if (!favoritesLoading) {
       const filled = [...favorites, ...Array(4 - favorites.length).fill(null)];
       setFilledFavorites(filled.slice(0, 4));
-
-      console.log("Filled favorites:", filled);
     }
   }, [favorites, favoritesLoading]);
 

@@ -242,3 +242,24 @@ exports.deleteFavorite = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar la pel·lícula favorita" });
   }
 }
+
+exports.fetchCounts = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const counts = await userModel.fetchCounts(userId);
+
+    if (!counts) {
+      return res.status(404).json({ message: "No s'han trobat comptes" });
+    }
+
+    res.status(200).json({
+      message: "Comptes obtinguts correctament",
+      counts: counts
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir els comptes:", error);
+    res.status(500).json({ message: "Error al obtenir els comptes" });
+  }
+}

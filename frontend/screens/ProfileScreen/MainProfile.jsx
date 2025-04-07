@@ -1,16 +1,10 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
-
-const lists = [
-  { title: "Watchlist", number: 10 },
-  { title: "Watched", number: 30 },
-  { title: "Films", number: 330 },
-  { title: "Reviews", number: 30 },
-  { title: "Likes", number: 302 },
-  { title: "Friends", number: 5 },
-];
 
 export default function MainProfile({
   userInfo,
@@ -20,8 +14,53 @@ export default function MainProfile({
   newName,
   newUsername,
   filledFavorites,
-  fetchFavorites,
 }) {
+  const [totalFilms, setTotalFilms] = useState(0);
+  const [totalFilmsYear, setTotalFilmsYear] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [totalWatchlist, setTotalWatchlist] = useState(0);
+  const [totalFavorites, setTotalFavorites] = useState(0);
+  const [totalRates, setTotalRates] = useState(0);
+  const [totalFriends, setTotalFriends] = useState(0);
+
+  const lists = [
+    { title: "Watchlist", number: totalWatchlist },
+    { title: "Watched", number: totalFilms },
+    { title: "Watched This Year", number: totalFilmsYear },
+    { title: "Reviews", number: totalReviews },
+    { title: "Likes", number: totalFavorites },
+    { title: "Ratings", number: totalRates },
+    { title: "Friends", number: totalFriends },
+  ];
+
+  const fetchCounts = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(`${API_URL}/api/users/userCounts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 200) {
+        setTotalFilms(response.data.counts.totalFilms);
+        setTotalFilmsYear(response.data.counts.totalFilmsYear);
+        setTotalReviews(response.data.counts.totalReviews);
+        setTotalWatchlist(response.data.counts.totalWatchlist);
+        setTotalFavorites(response.data.counts.totalFavorites);
+        setTotalRates(response.data.counts.totalRates);
+        setTotalFriends(response.data.counts.totalFriends);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      fetchCounts();
+    }
+  }, [userInfo]);
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -60,7 +99,7 @@ export default function MainProfile({
         <View style={styles.stats}>
           <View style={styles.statsContainer}>
             <Text style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}>
-              445
+              {totalFilms}
             </Text>
             <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
               Total Films
@@ -70,7 +109,7 @@ export default function MainProfile({
             <Text
               style={[globalStyles.textBase, styles.statsTotalFilmsYearNumber]}
             >
-              33
+              {totalFilmsYear}
             </Text>
             <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
               Films This Year
@@ -80,7 +119,7 @@ export default function MainProfile({
             <Text
               style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
             >
-              30
+              {totalReviews}
             </Text>
             <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
               Review
