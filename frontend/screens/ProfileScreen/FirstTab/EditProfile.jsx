@@ -1,5 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import React from "react";
 import {
+  Alert,
   Image,
   ScrollView,
   Text,
@@ -8,6 +11,7 @@ import {
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../../../config";
 import { globalStyles } from "../../../globalStyles";
 
 export default function EditProfile({
@@ -19,10 +23,73 @@ export default function EditProfile({
   poster,
   filledFavorites,
   setIndex,
-  handleSaveChangesProfile,
   onOpen,
-  handleDeleteFavorite,
+  fetchFavorites,
 }) {
+  const handleSaveChangesProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/editProfile`,
+        {
+          name: newName,
+          username: newUsername,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setNewName(response.data.name);
+        setNewUsername(response.data.username);
+
+        Alert.alert("Success", "Profile updated successfully");
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 400) {
+          Alert.alert(
+            "Error",
+            "Username already in use, please choose another one"
+          );
+        } else {
+          Alert.alert(
+            "Error",
+            "Error updating profile, please try again later"
+          );
+        }
+      } else {
+        console.error("Network error:", error);
+        Alert.alert("Error", "Network error, please try again");
+      }
+    }
+  };
+
+  const handleDeleteFavorite = async (favoriteId) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/deleteFavorite`,
+        {
+          movieId: favoriteId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        fetchFavorites();
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error deleting favorite, please try again later");
+      console.error("Error deleting favorite:", error);
+    }
+  };
+
   return (
     <ScrollView
       style={{ flex: 1, paddingBottom: 20 }}

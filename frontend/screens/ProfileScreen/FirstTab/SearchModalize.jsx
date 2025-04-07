@@ -68,11 +68,16 @@ export default function SearchModalize({
       fetchFavorites();
 
       modalizeRef.current?.close();
+
+      setSearchQuery("");
+      setMovies([]);
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        Alert.alert("Error", "Movie already in favorites");
-      } else {
-        Alert.alert("Error", "Error adding movie to favorites");
+      if (error.response) {
+        if (error.response.status === 400) {
+          Alert.alert("Info", "Movie already in favorites");
+        } else {
+          Alert.alert("Error", "Error adding movie to favorites");
+        }
       }
     }
   };

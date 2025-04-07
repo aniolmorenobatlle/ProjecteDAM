@@ -15,9 +15,14 @@ export default function FirstTabModalize({
   poster,
   setIndex,
 }) {
+  const modalizeRef = useRef(null);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [filledFavorites, setFilledFavorites] = useState([]);
+
+  const onOpen = () => {
+    modalizeRef.current?.open();
+  };
 
   const fetchFavorites = async () => {
     try {
@@ -51,78 +56,6 @@ export default function FirstTabModalize({
     }
   }, [favorites, favoritesLoading]);
 
-  const modalizeRef = useRef(null);
-
-  const onOpen = () => {
-    modalizeRef.current?.open();
-  };
-
-  const handleSaveChangesProfile = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const response = await axios.post(
-        `${API_URL}/api/users/editProfile`,
-        {
-          name: newName,
-          username: newUsername,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.status === 200) {
-        setNewName(response.data.name);
-        setNewUsername(response.data.username);
-        setIsModalOpen(false);
-        setIsModalizeOpen(false);
-        modalizeRef.current?.close();
-      }
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 400) {
-          Alert.alert(
-            "Error",
-            "Username already in use, please choose another one"
-          );
-        } else {
-          Alert.alert(
-            "Error",
-            "Error updating profile, please try again later"
-          );
-        }
-      } else {
-        Alert.alert("Error", "Network error, please try again");
-      }
-    }
-  };
-
-  const handleDeleteFavorite = async (favoriteId) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const response = await axios.post(
-        `${API_URL}/api/users/deleteFavorite`,
-        {
-          movieId: favoriteId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.status === 200) {
-        setFavorites((prevFavorites) =>
-          prevFavorites.filter((fav) => fav.id_api != favoriteId)
-        );
-      }
-    } catch (error) {
-      Alert.alert("Error", "Error deleting favorite, please try again later");
-      console.error("Error deleting favorite:", error);
-    }
-  };
-
   return (
     <>
       <EditProfile
@@ -134,9 +67,8 @@ export default function FirstTabModalize({
         poster={poster}
         filledFavorites={filledFavorites}
         setIndex={setIndex}
-        handleSaveChangesProfile={handleSaveChangesProfile}
         onOpen={onOpen}
-        handleDeleteFavorite={handleDeleteFavorite}
+        fetchFavorites={fetchFavorites}
       />
 
       <SearchModalize
