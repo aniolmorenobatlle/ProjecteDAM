@@ -1,16 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React from "react";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
 
 const lists = [
@@ -27,52 +17,11 @@ export default function MainProfile({
   openModalize,
   isModalOpen,
   poster,
+  newName,
+  newUsername,
+  filledFavorites,
+  fetchFavorites,
 }) {
-  const [newName, setNewName] = useState("");
-  const [newUsername, setNewUsername] = useState("");
-  const [favoritesLoading, setFavoritesLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]);
-  const [filledFavorites, setFilledFavorites] = useState([]);
-
-  useEffect(() => {
-    if (userInfo) {
-      setNewName(userInfo.name);
-      setNewUsername(userInfo.username);
-    }
-  }, [userInfo]);
-
-  const fetchFavorites = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const response = await axios.get(`${API_URL}/api/users/favorites`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 200) {
-        setFavorites(response.data.favorites);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Error fetching favorites, please try again later");
-      console.error("Error fetching favorites:", error);
-    } finally {
-      setFavoritesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (userInfo) {
-      fetchFavorites();
-    }
-  }, [userInfo]);
-
-  useEffect(() => {
-    if (!favoritesLoading) {
-      const filled = [...favorites, ...Array(4 - favorites.length).fill(null)];
-      setFilledFavorites(filled.slice(0, 4));
-    }
-  }, [favorites, favoritesLoading]);
-
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}

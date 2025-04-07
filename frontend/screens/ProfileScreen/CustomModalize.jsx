@@ -4,14 +4,13 @@ import { Modalize } from "react-native-modalize";
 import { screenHeight } from "../../config";
 
 export default function CustomModalize({
+  userInfo,
   modalizeRef,
   setIsModalOpen,
   setIsModalizeOpen,
-  userInfo,
   setIndex,
   children,
   title = "Edit your Profile",
-  cancelAction,
 }) {
   const handleClose = () => {
     modalizeRef.current?.close();
@@ -42,7 +41,7 @@ export default function CustomModalize({
           <TouchableOpacity
             style={styles.btnCloseContainer}
             activeOpacity={0.8}
-            onPress={cancelAction || handleClose}
+            onPress={handleClose}
           >
             <Text style={styles.cancel}>Close</Text>
           </TouchableOpacity>

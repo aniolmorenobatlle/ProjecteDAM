@@ -25,6 +25,7 @@ export default function EditProfile({
   setIndex,
   onOpen,
   fetchFavorites,
+  handleClose,
 }) {
   const handleSaveChangesProfile = async () => {
     try {
@@ -45,7 +46,7 @@ export default function EditProfile({
         setNewName(response.data.name);
         setNewUsername(response.data.username);
 
-        Alert.alert("Success", "Profile updated successfully");
+        handleClose();
       }
     } catch (error) {
       if (error.response) {

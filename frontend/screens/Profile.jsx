@@ -1,5 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
 import CustomModalize from "./ProfileScreen/CustomModalize";
@@ -16,22 +19,51 @@ export default function Profile({ setIsModalizeOpen }) {
   const [newUsername, setNewUsername] = useState("");
   const [selectedPoster, setSelectedPoster] = useState(null);
   const [poster, setPoster] = useState(userInfo?.poster);
+  const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [filledFavorites, setFilledFavorites] = useState([]);
 
-  useEffect(() => {
-    if (userInfo) {
-      setNewName(userInfo.name);
-      setNewUsername(userInfo.username);
-      setPoster(userInfo.poster);
+  const fetchFavorites = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(`${API_URL}/api/users/favorites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 200) {
+        setFavorites(response.data.favorites);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error fetching favorites, please try again later");
+    } finally {
+      setFavoritesLoading(false);
     }
-  }, [userInfo]);
+  };
 
   const openModalize = () => {
     modalizeRef.current?.open();
     setIsModalOpen(true);
     setIsModalizeOpen(true);
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      setNewName(userInfo.name);
+      setNewUsername(userInfo.username);
+      setPoster(userInfo.poster);
+      fetchFavorites();
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (!favoritesLoading) {
+      const filled = [...favorites, ...Array(4 - favorites.length).fill(null)];
+      setFilledFavorites(filled.slice(0, 4));
+
+      console.log("Filled favorites:", filled);
+    }
+  }, [favorites, favoritesLoading]);
 
   if (loading)
     return (
@@ -64,19 +96,21 @@ export default function Profile({ setIsModalizeOpen }) {
   return (
     <View style={[globalStyles.container, { flex: 1 }]}>
       <MainProfile
-        setIsModalizeOpen={setIsModalizeOpen}
         userInfo={userInfo}
         openModalize={openModalize}
-        poster={poster}
         isModalOpen={isModalOpen}
+        poster={poster}
+        newName={newName}
+        newUsername={newUsername}
+        filledFavorites={filledFavorites}
+        fetchFavorites={fetchFavorites}
       />
 
       <CustomModalize
+        userInfo={userInfo}
         modalizeRef={modalizeRef}
-        isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         setIsModalizeOpen={setIsModalizeOpen}
-        userInfo={userInfo}
         setIndex={setIndex}
         title="Edit your Profile"
       >
@@ -88,9 +122,12 @@ export default function Profile({ setIsModalizeOpen }) {
             newUsername={newUsername}
             setNewUsername={setNewUsername}
             poster={poster}
-            filledFavorites={filledFavorites}
-            setFavorites={setFavorites}
+            setIsModalOpen={setIsModalOpen}
+            setIsModalizeOpen={setIsModalizeOpen}
+            modalizeRef={modalizeRef}
             setIndex={setIndex}
+            filledFavorites={filledFavorites}
+            fetchFavorites={fetchFavorites}
           />
         ) : (
           <SecondTabModalize

@@ -1,8 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
-import { API_URL } from "../../config";
+import React, { useRef } from "react";
 import EditProfile from "./FirstTab/EditProfile";
 import SearchModalize from "./FirstTab/SearchModalize";
 
@@ -14,47 +10,24 @@ export default function FirstTabModalize({
   setNewUsername,
   poster,
   setIndex,
+  setIsModalOpen,
+  setIsModalizeOpen,
+  modalizeRef,
+  filledFavorites,
+  fetchFavorites,
 }) {
-  const modalizeRef = useRef(null);
-  const [favoritesLoading, setFavoritesLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]);
-  const [filledFavorites, setFilledFavorites] = useState([]);
+  const modalizeRef2 = useRef(null);
 
   const onOpen = () => {
-    modalizeRef.current?.open();
+    modalizeRef2.current?.open();
   };
 
-  const fetchFavorites = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const response = await axios.get(`${API_URL}/api/users/favorites`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 200) {
-        setFavorites(response.data.favorites);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Error fetching favorites, please try again later");
-      console.error("Error fetching favorites:", error);
-    } finally {
-      setFavoritesLoading(false);
-    }
+  const handleClose = () => {
+    modalizeRef.current?.close();
+    setIsModalizeOpen(false);
+    setIsModalOpen(false);
+    setIndex(0);
   };
-
-  useEffect(() => {
-    if (userInfo) {
-      fetchFavorites();
-    }
-  }, [userInfo]);
-
-  useEffect(() => {
-    if (!favoritesLoading) {
-      const filled = [...favorites, ...Array(4 - favorites.length).fill(null)];
-      setFilledFavorites(filled.slice(0, 4));
-    }
-  }, [favorites, favoritesLoading]);
 
   return (
     <>
@@ -69,12 +42,13 @@ export default function FirstTabModalize({
         setIndex={setIndex}
         onOpen={onOpen}
         fetchFavorites={fetchFavorites}
+        handleClose={handleClose}
       />
 
       <SearchModalize
-        modalizeRef={modalizeRef}
-        fetchFavorites={fetchFavorites}
         userInfo={userInfo}
+        modalizeRef={modalizeRef2}
+        fetchFavorites={fetchFavorites}
       />
     </>
   );

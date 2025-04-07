@@ -17,8 +17,8 @@ import { API_URL } from "../../../config";
 import { globalStyles } from "../../../globalStyles";
 
 export default function SearchModalize({
-  modalizeRef,
   userInfo,
+  modalizeRef,
   fetchFavorites,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
