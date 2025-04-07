@@ -18,6 +18,20 @@ exports.getMoviesQuery = async (limit, offset, query) => {
   return result.rows;
 };
 
+exports.getMoviesMin = async (limit, offset, query) => {
+  const movieQuery = `
+    SELECT m.id_api, m.title, m.poster, m.release_year, d.name AS director_name
+    FROM movies m
+    LEFT JOIN directors d ON m.director_id = d.id
+    WHERE LOWER(m.title) LIKE LOWER($1)
+    AND m.poster IS NOT NULL
+    LIMIT $2 OFFSET $3
+  `;
+
+  const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
+  return result.rows;
+}
+
 exports.getMoviesCount = async () => {
   const query = 'SELECT COUNT(*) FROM "movies"';
   const result = await pool.query(query);

@@ -79,7 +79,6 @@ export default function Profile({ setIsModalizeOpen }) {
         userInfo={userInfo}
         setIndex={setIndex}
         title="Edit your Profile"
-        avatarUrl={userInfo.avatar}
       >
         {index === 0 ? (
           <FirstTabModalize

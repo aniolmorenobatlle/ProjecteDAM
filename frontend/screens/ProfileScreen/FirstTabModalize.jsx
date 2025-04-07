@@ -57,14 +57,6 @@ export default function FirstTabModalize({
     modalizeRef.current?.open();
   };
 
-  const onClose = () => {
-    modalizeRef.current?.close();
-  };
-
-  const onSearch = (query) => {
-    // setSearchQuery(query);
-  };
-
   const handleSaveChangesProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -149,8 +141,7 @@ export default function FirstTabModalize({
 
       <SearchModalize
         modalizeRef={modalizeRef}
-        onClose={onClose}
-        onSearch={onSearch}
+        fetchFavorites={fetchFavorites}
         userInfo={userInfo}
       />
     </>

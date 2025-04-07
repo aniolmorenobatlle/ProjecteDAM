@@ -5,7 +5,6 @@ import { screenHeight } from "../../config";
 
 export default function CustomModalize({
   modalizeRef,
-  isModalOpen,
   setIsModalOpen,
   setIsModalizeOpen,
   userInfo,
@@ -13,8 +12,6 @@ export default function CustomModalize({
   children,
   title = "Edit your Profile",
   cancelAction,
-  avatarUrl,
-  index = 0,
 }) {
   const handleClose = () => {
     modalizeRef.current?.close();
@@ -47,11 +44,14 @@ export default function CustomModalize({
             activeOpacity={0.8}
             onPress={cancelAction || handleClose}
           >
-            <Text style={styles.cancel}>Cancel</Text>
+            <Text style={styles.cancel}>Close</Text>
           </TouchableOpacity>
           <Text style={styles.searchFilm}>{title}</Text>
-          {avatarUrl && (
-            <Image source={{ uri: avatarUrl }} style={styles.searchAvatar} />
+          {userInfo.avatar && (
+            <Image
+              source={{ uri: userInfo.avatar }}
+              style={styles.searchAvatar}
+            />
           )}
         </View>
 

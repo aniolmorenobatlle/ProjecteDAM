@@ -1,7 +1,11 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import React, { useState } from "react";
 import {
-  FlatList,
+  ActivityIndicator,
+  Alert,
   Image,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -9,166 +13,169 @@ import {
 } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Icon from "react-native-vector-icons/Ionicons";
+import { API_URL } from "../../../config";
 import { globalStyles } from "../../../globalStyles";
-
-const list = [
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-  {
-    poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
-    title: "Mufasa: The Lion King",
-    director: "Berry Jenkins",
-    year: 2024,
-  },
-];
 
 export default function SearchModalize({
   modalizeRef,
-  onClose,
-  onSearch,
   userInfo,
+  fetchFavorites,
 }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const searchMovies = async () => {
+    if (!searchQuery) return;
+
+    setLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/movies/search?query=${searchQuery}`
+      );
+
+      const updatedMovies = response.data.movies.map((movie) => {
+        const releaseYear = movie.release_year.split("-")[0];
+        return {
+          ...movie,
+          release_year: releaseYear,
+        };
+      });
+
+      setMovies(updatedMovies);
+    } catch (error) {
+      console.error("Error searching movies: " + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddFavorite = async (movieId) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      await axios.post(
+        `${API_URL}/api/users/addFavorite`,
+        { movieId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchFavorites();
+
+      modalizeRef.current?.close();
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        Alert.alert("Error", "Movie already in favorites");
+      } else {
+        Alert.alert("Error", "Error adding movie to favorites");
+      }
+    }
+  };
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    searchMovies();
+  };
+
   return (
     <Modalize
       ref={modalizeRef}
-      modalStyle={styles.modalize}
       panGestureEnabled={false}
-      HeaderComponent={
-        <>
-          <View style={styles.headerModal}>
-            <TouchableOpacity
-              style={styles.btnCloseContainer}
-              activeOpacity={0.8}
-              onPress={() => {
-                modalizeRef.current?.close();
-              }}
-            >
-              <Text style={styles.cancel}>Cancel</Text>
-            </TouchableOpacity>
-            <Text style={styles.searchFilm}>Search a Film</Text>
-            <Image
-              source={{ uri: userInfo.avatar }}
-              style={styles.searchAvatar}
-            />
-          </View>
-          <View style={styles.shortLine}></View>
-        </>
-      }
       withHandle={false}
+      modalStyle={styles.modalize}
     >
-      <View style={styles.searchContainer}>
-        <View style={styles.inputContainer}>
-          <Icon
-            name="search-outline"
-            size={20}
-            color="rgba(255, 255, 255, 0.7)"
-            style={styles.inputSearchIcon}
-          />
-          <TextInput
-            style={[globalStyles.textBase, styles.input]}
-            placeholder="Search a film"
-            placeholderTextColor="rgba(255, 255, 255, 0.7)"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoFocus={true}
-          />
-          <Icon
-            name="close-circle-outline"
-            size={20}
-            color="rgba(255, 255, 255, 0.7)"
-            style={styles.inputDeleteIcon}
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+        <View style={styles.headerModal}>
+          <TouchableOpacity
+            style={styles.btnCloseContainer}
+            activeOpacity={0.8}
+            onPress={() => modalizeRef.current?.close()}
+          >
+            <Text style={styles.cancel}>Cancel</Text>
+          </TouchableOpacity>
+          <Text style={styles.searchFilm}>Search a Film</Text>
+          <Image
+            source={{ uri: userInfo.avatar }}
+            style={styles.searchAvatar}
           />
         </View>
-        <View style={styles.separator} />
-      </View>
 
-      <FlatList
-        style={{ paddingBottom: 120 }}
-        data={list}
-        nestedScrollEnabled={true}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.listItem}>
-            <View style={styles.listSearchContainer}>
-              <Image source={{ uri: item.poster }} style={styles.listPoster} />
-              <View style={styles.listSearcTextsContainer}>
-                <Text style={styles.listSearchListTitle}>{item.title}</Text>
-                <Text style={styles.listSearchListYear}>
-                  {item.year}, directed by{" "}
-                </Text>
-                <Text style={styles.listSearchListDirector}>
-                  {item.director}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.separator} />
+        <View style={styles.shortLine} />
+
+        <View style={styles.searchContainer}>
+          <View style={styles.inputContainer}>
+            <Icon
+              name="search-outline"
+              size={20}
+              color="rgba(255, 255, 255, 0.7)"
+              style={styles.inputSearchIcon}
+            />
+            <TextInput
+              style={[globalStyles.textBase, styles.input]}
+              placeholder="Search a film"
+              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoFocus={true}
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+            <Icon
+              name="close-circle-outline"
+              size={20}
+              color="rgba(255, 255, 255, 0.7)"
+              style={styles.inputDeleteIcon}
+              onPress={() => {
+                setSearchQuery("");
+                setMovies([]);
+              }}
+            />
           </View>
+          <View style={styles.separator} />
+        </View>
+
+        {loading ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color="white" />
+          </View>
+        ) : (
+          movies.slice(0, 10).map((item, index) => (
+            <View key={index} style={styles.listItem}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleAddFavorite.bind(this, item.id_api)}
+                style={styles.listSearchContainer}
+              >
+                <Image
+                  source={{ uri: item.poster }}
+                  style={styles.listPoster}
+                />
+                <View style={styles.listSearcTextsContainer}>
+                  <Text style={styles.listSearchListTitle}>{item.title} </Text>
+                  <Text style={styles.listSearchListYear}>
+                    {item.release_year}, directed by{" "}
+                  </Text>
+                  <Text style={styles.listSearchListDirector}>
+                    {item.director_name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </View>
+          ))
         )}
-      />
+      </ScrollView>
     </Modalize>
   );
 }

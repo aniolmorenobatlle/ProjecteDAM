@@ -108,6 +108,17 @@ exports.getFavorites = async (userId) => {
   return query.rows;
 };
 
+exports.addFavorite = async (userId, movieId) => {
+  const query = await pool.query(
+    `
+      INSERT INTO to_watch (user_id, movie_id, favorite)
+      VALUES ($1, $2, TRUE)
+      RETURNING movie_id
+    `, [userId, movieId]
+  );
+  return query.rows[0];
+};
+
 exports.deleteFavorite = async (userId, movieId) => {
   const query = await pool.query(
     `
@@ -119,4 +130,17 @@ exports.deleteFavorite = async (userId, movieId) => {
     `, [userId, movieId]
   );
   return query.rows[0];
-}
+};
+
+exports.checkFavoriteExists = async (userId, movieId) => {
+  const query = await pool.query(
+    `
+      SELECT * 
+      FROM to_watch 
+      WHERE user_id = $1 
+      AND movie_id = $2
+      AND favorite = TRUE
+    `, [userId, movieId]
+  );
+  return query.rows.length > 0;
+};

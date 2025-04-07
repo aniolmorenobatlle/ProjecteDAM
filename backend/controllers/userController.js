@@ -197,6 +197,30 @@ exports.fetchFavorites = async (req, res) => {
   }
 };
 
+exports.addFavorite = async (req, res) => {
+  const { movieId } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const exists = await userModel.checkFavoriteExists(userId, movieId);
+
+    if (exists) {
+      return res.status(400).json({ message: "La pel·lícula ja és una de les favorites" });
+    }
+
+    const result = await userModel.addFavorite(userId, movieId);
+
+    res.status(200).json({
+      message: "Pel·lícula afegida a les favorites correctament",
+      movieId: result.movie_id
+    });
+
+  } catch (error) {
+    console.error("Error en afegir la pel·lícula a les favorites:", error);
+    res.status(500).json({ message: "Error al afegir la pel·lícula a les favorites" });
+  }
+}
+
 exports.deleteFavorite = async (req, res) => {
   const { movieId } = req.body;
   const userId = req.user.userId;

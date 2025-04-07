@@ -71,6 +71,42 @@ exports.fetchMovies = async (req, res) => {
   }
 };
 
+exports.fetchMoviesMin = async (req, res) => {
+  try {
+    // Parametres de la paginacio
+    const page = parseInt(req.query.page) || 1; // Per defecte comença per la 1
+    const limit = parseInt(req.query.limit) || 20; // Limit de 20 pelis per pagina
+    const offset = (page - 1) * limit; // Calcula l'offset
+
+    // Cerca pelis
+    const query = req.query.query || '';
+
+    let movies;
+    let totalMovies;
+
+    if (query) {
+      movies = await movieModel.getMoviesMin(limit, offset, query);
+      totalMovies = await movieModel.getMoviesCount(query);
+    } else {
+      movies = await movieModel.getMoviesMin(limit, offset);
+      totalMovies = await movieModel.getMoviesCount();
+    }
+
+    // Retornar pelis
+    res.json({
+      movies,
+      page,
+      limit,
+      total: totalMovies,
+      totalPages: Math.ceil(totalMovies / limit),
+    });
+
+  } catch (error) {
+    console.error('Error obtenint les pel·lícules:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}
+
 exports.fetchMostPopularMovies = async (_, res) => {
   try {
     const movies = await Promise.all(
