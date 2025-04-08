@@ -57,6 +57,15 @@ export default function Register() {
     }
   };
 
+  const checkEmailAvailability = async (email) => {
+    try {
+      await axios.get(`${API_URL}/api/users/check-email/${email}`);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const validatePassword = (password) => {
     const regex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
@@ -97,10 +106,15 @@ export default function Register() {
       return;
     }
 
-    const isAvailable = await checkUsernameAvailability(username);
-
-    if (!isAvailable) {
+    const isUsernameAvailable = await checkUsernameAvailability(username);
+    if (!isUsernameAvailable) {
       Alert.alert("Error", "Username is already taken!");
+      return;
+    }
+
+    const isEmailAvailable = await checkEmailAvailability(email);
+    if (!isEmailAvailable) {
+      Alert.alert("Error", "Email is already taken!");
       return;
     }
 

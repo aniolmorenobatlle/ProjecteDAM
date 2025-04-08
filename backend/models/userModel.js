@@ -27,6 +27,14 @@ exports.checkUserExists = async (username) => {
   return query.rows.length > 0;
 }
 
+exports.checkEmailExists = async (email) => {
+  const query = await pool.query(
+    `SELECT id FROM "users" WHERE "email" = $1`,
+    [email]
+  );
+  return query.rows.length > 0;
+}
+
 exports.findUserById = async (userId) => {
   const query = await pool.query(
     `SELECT id, name, username, email, avatar, poster FROM "users" WHERE id = $1`,

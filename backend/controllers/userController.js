@@ -45,6 +45,23 @@ exports.checkUsername = async (req, res) => {
   }
 };
 
+exports.checkEmail = async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const exists = await userModel.checkEmailExists(email);
+
+    if (exists) {
+      return res.status(400).json({ message: "L'email ja està en ús" });
+    }
+
+    res.status(200).json({ message: "L'email està disponible" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error en la verificació de l'email" });
+  }
+}
+
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 

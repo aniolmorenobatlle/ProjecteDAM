@@ -267,8 +267,6 @@ export default function Film() {
         content: review,
       });
 
-      Alert.alert("Success", "Your review has been added successfully");
-
       setReview("");
       fetchMovieComments();
     } catch (error) {
