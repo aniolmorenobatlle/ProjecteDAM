@@ -111,6 +111,7 @@ exports.getFavorites = async (userId) => {
       JOIN movies AS m ON tw.movie_id = m.id_api
       WHERE tw.user_id = $1
       AND tw.favorite = true
+      ORDER BY tw.created_at ASC
     `, [userId]
   );
   return query.rows;
