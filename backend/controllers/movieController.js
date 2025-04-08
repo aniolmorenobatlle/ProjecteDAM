@@ -314,7 +314,6 @@ exports.updateMovieRate = async (req, res) => {
   }
 };
 
-
 exports.fetchFavoriteUserMovies = async (req, res) => {
   try {
     const { user_id } = req.query;

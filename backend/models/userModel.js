@@ -238,7 +238,6 @@ exports.fetchCounts = async (userId) => {
   );
   const totalFriends = parseInt(queryFriend.rows[0].total_friends, 10);
 
-
   return {
     totalReviews,
     totalFilms,

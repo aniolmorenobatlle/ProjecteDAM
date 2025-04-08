@@ -1,7 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Servei per a la base de dades
+  # Base de dades
   postgres:
     image: postgres:latest
     container_name: postgres_container
@@ -16,7 +16,7 @@ services:
     networks:
       - backend_network
 
-  # Servei per al backend (Node.js)
+  # Backend
   backend:
     build:
       context: .
@@ -31,7 +31,7 @@ services:
     networks:
       - backend_network
 
-  # Servei per al frontend (React Native)
+  # Frontend
   frontend:
     build:
       context: ./frontend

@@ -1,25 +1,25 @@
 FROM node:18
 
-# Instal·lem Expo CLI globalment
+# Instalar expo
 RUN npm install -g expo-cli
 
-# Instal·lem @expo/ngrok globalment per evitar el mode no interactiu
+# Expo Go
 RUN npm install -g @expo/ngrok
 
-# Treballem dins del directori /app
+# Directori
 WORKDIR /app
 
-# Copiem els fitxers de dependències
+# Fitxers dependecies
 COPY package.json package-lock.json ./
 
-# Instal·lem les dependències del projecte
+# Installar dependecies
 RUN npm install
 
-# Copiem els fitxers del projecte
+# Copiar fitxers
 COPY . .
 
-# Exposem el port per a l'Expo
+# Ports
 EXPOSE 19000 19001
 
-# Executem el servidor d'Expo
+# Executar app
 CMD ["npm", "start", "--lan"]

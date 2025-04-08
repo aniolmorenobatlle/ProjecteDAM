@@ -46,7 +46,7 @@ export default function ListInfo() {
       setDropdownList(dropdownList);
       setListFilms(response.data.listInfo);
     } catch (error) {
-      console.error("Error fetching list info", error);
+      console.log("Error fetching list info", error);
     }
   };
 

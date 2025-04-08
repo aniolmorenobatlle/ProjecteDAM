@@ -56,7 +56,7 @@ export default function Lists() {
       setDropdownList(formattedData);
       setLists(response.data.lists);
     } catch (error) {
-      console.error("Error fetching the lists", error);
+      console.log("Error fetching the lists", error);
     }
   };
 

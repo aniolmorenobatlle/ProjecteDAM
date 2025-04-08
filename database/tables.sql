@@ -1,4 +1,4 @@
--- Creació del tipus ENUM per a "status"
+-- ENUM per a status de friends
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_enum') THEN
@@ -6,7 +6,7 @@ BEGIN
     END IF;
 END$$;
 
--- Creació de les taules
+-- Taules
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE messages (
   created_at TIMESTAMP
 );
 
--- Afegir les claus foranes
+-- Relacions i claus foranees
 ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 
