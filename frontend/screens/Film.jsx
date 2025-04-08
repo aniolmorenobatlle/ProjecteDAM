@@ -139,9 +139,10 @@ export default function Film() {
     const newStatus = {
       watched: !isWatched,
       likes: isLikes,
-      watchlist: isInWatchlist,
+      watchlist: !isInWatchlist,
     };
     setIsWatched(!isWatched);
+    setIsInWatchlist(false);
     updateMovieStatus(newStatus);
   };
 
@@ -157,11 +158,12 @@ export default function Film() {
 
   const handleIsInWatchlist = () => {
     const newStatus = {
-      watched: isWatched,
+      watched: !isWatched,
       likes: isLikes,
       watchlist: !isInWatchlist,
     };
     setIsInWatchlist(!isInWatchlist);
+    setIsWatched(false);
     updateMovieStatus(newStatus);
   };
 
@@ -457,7 +459,7 @@ export default function Film() {
                       style={styles.buttonImage}
                     />
                     <Text style={[globalStyles.textBase, styles.buttonText]}>
-                      Add to Watchlist
+                      More options
                     </Text>
                   </View>
                 </TouchableOpacity>
