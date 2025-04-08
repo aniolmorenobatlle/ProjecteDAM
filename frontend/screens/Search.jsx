@@ -22,16 +22,6 @@ export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // const clearStoredMovies = async () => {
-  //   try {
-  //     await AsyncStorage.removeItem("mostPopularMovies");
-  //     await AsyncStorage.removeItem("moviesTimestamp");
-  //     console.log("Dades esborrades. Es tornaran a carregar.");
-  //   } catch (error) {
-  //     console.error("Error en esborrar les dades: ", error);
-  //   }
-  // };
-
   const getPopularFilms = async () => {
     try {
       const storedMovies = await AsyncStorage.getItem("mostPopularMovies");
@@ -62,13 +52,11 @@ export default function Search() {
     }
   };
 
-  const searchMovies = async () => {
+  const searchMovies = async (query) => {
     setLoading(true);
 
     try {
-      const response = await axios.get(
-        `${API_URL}/api/movies?query=${searchQuery}`
-      );
+      const response = await axios.get(`${API_URL}/api/movies?query=${query}`);
 
       setMovies(response.data.movies);
     } catch (error) {
@@ -78,19 +66,21 @@ export default function Search() {
     }
   };
 
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+
+    if (text.trim() === "") {
+      getPopularFilms();
+    } else {
+      searchMovies(text);
+    }
+  };
+
   useEffect(() => {
     if (!searchQuery) {
       getPopularFilms();
     }
   }, []);
-
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    if (text.trim() === "") {
-      getPopularFilms();
-    }
-    searchMovies();
-  };
 
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
