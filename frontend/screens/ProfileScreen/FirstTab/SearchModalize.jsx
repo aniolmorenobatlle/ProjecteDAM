@@ -25,14 +25,14 @@ export default function SearchModalize({
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const searchMovies = async () => {
+  const searchMovies = async (query) => {
     if (!searchQuery) return;
 
     setLoading(true);
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/movies/search?query=${searchQuery}`
+        `${API_URL}/api/movies/search?query=${query}`
       );
 
       const updatedMovies = response.data.movies.map((movie) => {
@@ -84,7 +84,7 @@ export default function SearchModalize({
 
   const handleSearch = (text) => {
     setSearchQuery(text);
-    searchMovies();
+    searchMovies(text);
   };
 
   return (

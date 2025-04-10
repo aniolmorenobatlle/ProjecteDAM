@@ -353,7 +353,7 @@ export default function Film() {
     fetchMovieComments();
   }, [filmId, userInfo]);
 
-  if (loading)
+  if (loading) {
     return (
       <View
         style={{
@@ -366,8 +366,9 @@ export default function Film() {
         <ActivityIndicator size="large" color="white" />
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <View
         style={{
@@ -377,9 +378,14 @@ export default function Film() {
           backgroundColor: "#1F1D36",
         }}
       >
-        <Text style={{ color: "white" }}>Error: {error}</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>
+          {error?.message === "401"
+            ? "Unauthorized: Redirecting to login..."
+            : `Error: ${error?.message || "Error desconegut"}`}
+        </Text>
       </View>
     );
+  }
 
   return (
     <KeyboardAvoidingView

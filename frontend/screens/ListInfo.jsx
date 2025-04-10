@@ -77,7 +77,7 @@ export default function ListInfo() {
     fetchListInfo();
   }, [listId]);
 
-  if (loading)
+  if (loading) {
     return (
       <View
         style={{
@@ -90,8 +90,9 @@ export default function ListInfo() {
         <ActivityIndicator size="large" color="white" />
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <View
         style={{
@@ -101,11 +102,14 @@ export default function ListInfo() {
           backgroundColor: "#1F1D36",
         }}
       >
-        <Text style={{ color: "white" }}>
-          Error: {error?.message || "Error desconegut"}
+        <Text style={{ color: "white", fontSize: 16 }}>
+          {error?.message === "401"
+            ? "Unauthorized: Redirecting to login..."
+            : `Error: ${error?.message || "Error desconegut"}`}
         </Text>
       </View>
     );
+  }
 
   return (
     <Provider>

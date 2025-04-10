@@ -1,8 +1,12 @@
-docker exec -it frontend_container bash
+emulator -avd Pixel_6
 
-npx expo start --tunnel
+------------------------------------------------------
 
-npx expo start --tunnel --clear
+cd frontend
+
+npx expo start
+
+npx expo start --clear
 
 ------------------------------------------------------
 

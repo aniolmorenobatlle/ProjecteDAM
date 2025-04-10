@@ -13,13 +13,9 @@ exports.register = async (req, res) => {
   try {
     const userId = await userModel.createUser(name, username, email, password, avatar, poster);
 
-    // Crear token JWS
-    const token = sign({ userId }, SECRET_KEY, { expiresIn: '7d' });
-
     res.status(200).json({
       message: 'Usuari creat correctament',
       userId: userId,
-      token: token,
     });
 
   } catch (error) {
@@ -79,7 +75,7 @@ exports.login = async (req, res) => {
     }
 
     // Crear token JWS
-    const token = sign({ userId: user.id }, SECRET_KEY, { expiresIn: '7d' });
+    const token = sign({ userId: user.id }, SECRET_KEY, { expiresIn: '30d' });
 
     res.status(200).json({
       message: 'Login correcte',

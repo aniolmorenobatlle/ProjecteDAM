@@ -63,7 +63,7 @@ export default function Profile({ setIsModalizeOpen }) {
     }
   }, [favorites, favoritesLoading]);
 
-  if (loading)
+  if (loading) {
     return (
       <View
         style={{
@@ -76,8 +76,9 @@ export default function Profile({ setIsModalizeOpen }) {
         <ActivityIndicator size="large" color="white" />
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <View
         style={{
@@ -87,9 +88,14 @@ export default function Profile({ setIsModalizeOpen }) {
           backgroundColor: "#1F1D36",
         }}
       >
-        <Text style={{ color: "white" }}>Error: {error}</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>
+          {error?.message === "401"
+            ? "Unauthorized: Redirecting to login..."
+            : `Error: ${error?.message || "Error desconegut"}`}
+        </Text>
       </View>
     );
+  }
 
   return (
     <View style={[globalStyles.container, { flex: 1 }]}>

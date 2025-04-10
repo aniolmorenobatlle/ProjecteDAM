@@ -70,7 +70,7 @@ export default function Sidebar({ isOpen, closeMenu }) {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
       <View
         style={{
@@ -83,8 +83,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
         <ActivityIndicator size="large" color="white" />
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <View
         style={{
@@ -94,10 +95,14 @@ export default function Sidebar({ isOpen, closeMenu }) {
           backgroundColor: "#1F1D36",
         }}
       >
-        <Text style={{ color: "white" }}>Error: {error}</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>
+          {error?.message === "401"
+            ? "Unauthorized: Redirecting to login..."
+            : `Error: ${error?.message || "Error desconegut"}`}
+        </Text>
       </View>
     );
-
+  }
   return (
     <TouchableWithoutFeedback onPress={closeMenu}>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>

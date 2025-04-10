@@ -3,9 +3,10 @@ import { NavigationContainer, useNavigationContainerRef } from "@react-navigatio
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { BackHandler } from 'react-native';
-import 'react-native-gesture-handler';
+import { BackHandler, Text } from 'react-native';
 import Navbar from "./components/Navbar";
+import { useUserInfo } from "./hooks/useUserInfo";
+
 import Film from "./screens/Film";
 import Home from "./screens/Home";
 import ListInfo from './screens/ListInfo';
@@ -21,32 +22,56 @@ const Stack = createStackNavigator();
 
 export default function App() {
   const navigationRef = useNavigationContainerRef();
-  const [routeName, setRouteName] = useState("Login");
-  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [routeName, setRouteName] = useState("Login");
+  const [isReady, setIsReady] = useState(false);
   const [isModalizeOpen, setIsModalizeOpen] = useState(false);
 
+  const { loading, unauthenticated } = useUserInfo();
+
+  const isTokenExpired = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp < Math.floor(Date.now() / 1000);
+    } catch (error) {
+      return true;
+    }
+  };
+
+  const checkToken = async () => {
+    const token = await AsyncStorage.getItem('authToken');
+    if (token && !isTokenExpired(token)) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+      if (navigationRef.current) navigationRef.navigate("Login");
+    }
+  };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = await AsyncStorage.getItem('authToken');
-        if (token) {
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error("Error recuperant el token:", error);
-      } finally {
-        setIsLoading(false);
+    checkToken();
+
+    const interval = setInterval(async () => {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token || isTokenExpired(token)) {
+        await AsyncStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        if (navigationRef.current) navigationRef.navigate("Login");
       }
-    };
+    }, 60000);
 
-    checkAuth();
+    return () => clearInterval(interval);
+  }, []);
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      return true; // Bloqueja el botó de tornada
-    });
+  useEffect(() => {
+    if (unauthenticated) {
+      setIsAuthenticated(false);
+      if (navigationRef.current) navigationRef.navigate("Login");
+    }
+  }, [unauthenticated]);
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => backHandler.remove();
   }, []);
 
@@ -55,78 +80,35 @@ export default function App() {
       const currentRoute = navigationRef.getCurrentRoute();
       setRouteName(currentRoute?.name);
     });
-
     return unsubscribe;
   }, [navigationRef]);
 
-  if (isLoading) {
-    return null;
+  if (loading) {
+    return <Text style={{ textAlign: "center", marginTop: 20 }}>Loading...</Text>;
   }
 
   return (
     <>
       <StatusBar style="light" />
-      <NavigationContainer ref={navigationRef}>
+      <NavigationContainer ref={navigationRef} onReady={() => setIsReady(true)}>
         <Stack.Navigator initialRouteName={isAuthenticated ? "Home" : "Login"}>
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Search"
-            component={Search}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Recommend"
-            component={Recommend}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Film"
-            component={Film}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Notifications"
-            component={Notifications}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="Profile"
-            options={{ headerShown: false, gestureEnabled: false, }}
-          >
+          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+          <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+          <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+          <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
+          <Stack.Screen name="Recommend" component={Recommend} options={{ headerShown: false }} />
+          <Stack.Screen name="Film" component={Film} options={{ headerShown: false }} />
+          <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: false }} />
+          <Stack.Screen name="Profile" options={{ headerShown: false }}>
             {(props) => <Profile {...props} setIsModalizeOpen={setIsModalizeOpen} />}
           </Stack.Screen>
-          <Stack.Screen
-            name="Lists"
-            component={Lists}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
-          <Stack.Screen
-            name="ListInfo"
-            component={ListInfo}
-            options={{ headerShown: false, gestureEnabled: false, }}
-          />
+          <Stack.Screen name="Lists" component={Lists} options={{ headerShown: false }} />
+          <Stack.Screen name="ListInfo" component={ListInfo} options={{ headerShown: false }} />
         </Stack.Navigator>
+
+        {/* Mostrar navbar només quan calgui */}
         {!isModalizeOpen &&
-          routeName !== 'Recommend' &&
-          routeName !== 'Film' &&
-          routeName !== "Login" &&
-          routeName !== "Register" &&
-          routeName !== "Lists" &&
-          routeName !== "ListInfo" && (
+          !["Recommend", "Film", "Login", "Register", "Lists", "ListInfo"].includes(routeName) && (
             <Navbar currentPage={routeName} />
           )}
       </NavigationContainer>
