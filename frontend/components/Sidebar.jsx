@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -37,29 +36,34 @@ export default function Sidebar({ isOpen, closeMenu }) {
           useNativeDriver: true,
         }),
       ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(translateX, {
-          toValue: -width * 0.6,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(overlayOpacity, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
     }
   }, [isOpen]);
+
+  const closeSidebar = () => {
+    Animated.parallel([
+      Animated.timing(translateX, {
+        toValue: -width * 0.6,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      console.log("Menu closed timeout");
+      closeMenu();
+    }, 300);
+  };
 
   if (!isOpen && overlayOpacity._value === 0) return null;
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("authToken");
-
-      closeMenu();
 
       navigation.reset({
         index: 0,
@@ -103,98 +107,97 @@ export default function Sidebar({ isOpen, closeMenu }) {
       </View>
     );
   }
+
   return (
-    <TouchableWithoutFeedback onPress={closeMenu}>
+    !!isOpen && (
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
-        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-          <Animated.View
-            style={[styles.container, { transform: [{ translateX }] }]}
-          >
-            <TouchableOpacity onPress={closeMenu} style={styles.closeButton}>
-              <Icon name="close" size={30} color="white" />
+        <Animated.View
+          style={[styles.container, { transform: [{ translateX }] }]}
+        >
+          <TouchableOpacity onPress={closeSidebar} style={styles.closeButton}>
+            <Icon name="close" size={30} color="white" />
+          </TouchableOpacity>
+
+          <View style={styles.avatar}>
+            {userInfo.avatar ? (
+              <Image
+                style={styles.menuIconAvatar}
+                source={{ uri: userInfo.avatar }}
+              />
+            ) : (
+              <Icon
+                name="person-circle-outline"
+                size={80}
+                style={styles.menuIconAvatarNone}
+              />
+            )}
+            <View style={styles.avatarTexts}>
+              <Text style={[styles.username, { color: "#e9a6a6" }]}>
+                {userInfo.name.split(" ")[0]}
+              </Text>
+              <Text style={styles.handle}>@{userInfo.username}</Text>
+            </View>
+          </View>
+
+          <View style={styles.menu}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.menuItem}
+              onPress={closeSidebar}
+            >
+              <Icon
+                name="home-outline"
+                size={24}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.menuText}>Home</Text>
             </TouchableOpacity>
-
-            <View style={styles.avatar}>
-              {userInfo.avatar ? (
-                <Image
-                  style={styles.menuIconAvatar}
-                  source={{ uri: userInfo.avatar }}
-                />
-              ) : (
-                <Icon
-                  name="person-circle-outline"
-                  size={80}
-                  style={styles.menuIconAvatarNone}
-                />
-              )}
-              <View style={styles.avatarTexts}>
-                <Text style={[styles.username, { color: "#e9a6a6" }]}>
-                  {userInfo.name.split(" ")[0]}
-                </Text>
-                <Text style={styles.handle}>@{userInfo.username}</Text>
-              </View>
-            </View>
-
-            <View style={styles.menu}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.menuItem}
-                onPress={closeMenu}
-              >
-                <Icon
-                  name="home-outline"
-                  size={24}
-                  color="white"
-                  style={styles.icon}
-                />
-                <Text style={styles.menuText}>Home</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.menuItem}
-                onPress={() => {
-                  closeMenu();
-                  navigation.navigate("Search");
-                }}
-              >
-                <Icon
-                  name="film-outline"
-                  size={24}
-                  color="white"
-                  style={styles.icon}
-                />
-                <Text style={styles.menuText}>Films</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.menuItem}
-                onPress={() => {
-                  closeMenu();
-                  navigation.navigate("Lists");
-                }}
-              >
-                <Icon
-                  name="list-outline"
-                  size={24}
-                  color="white"
-                  style={styles.icon}
-                />
-                <Text style={styles.menuText}>Lists</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-                <Icon
-                  name="log-out-outline"
-                  size={24}
-                  color="white"
-                  style={styles.icon}
-                />
-                <Text style={styles.menuText}>Logout</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </TouchableWithoutFeedback>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.menuItem}
+              onPress={() => {
+                closeSidebar();
+                navigation.navigate("Search");
+              }}
+            >
+              <Icon
+                name="film-outline"
+                size={24}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.menuText}>Films</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.menuItem}
+              onPress={() => {
+                closeSidebar();
+                navigation.navigate("Lists");
+              }}
+            >
+              <Icon
+                name="list-outline"
+                size={24}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.menuText}>Lists</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+              <Icon
+                name="log-out-outline"
+                size={24}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.menuText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </Animated.View>
-    </TouchableWithoutFeedback>
+    )
   );
 }
 
