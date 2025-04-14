@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -15,6 +16,7 @@ export default function MainProfile({
   newUsername,
   filledFavorites,
 }) {
+  const navigation = useNavigation();
   const [totalFilms, setTotalFilms] = useState(0);
   const [totalFilmsYear, setTotalFilmsYear] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -138,11 +140,20 @@ export default function MainProfile({
               filledFavorites.map(
                 (favorite) =>
                   favorite && (
-                    <Image
-                      style={styles.favoritesImage}
-                      source={{ uri: favorite.poster }}
+                    <TouchableOpacity
+                      activeOpacity={0.8}
                       key={favorite.id_api}
-                    />
+                      onPress={() =>
+                        navigation.navigate("Film", {
+                          filmId: favorite.id_api,
+                        })
+                      }
+                    >
+                      <Image
+                        style={styles.favoritesImage}
+                        source={{ uri: favorite.poster }}
+                      />
+                    </TouchableOpacity>
                   )
               )
             ) : (

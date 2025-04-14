@@ -8,7 +8,6 @@ import {
   Image,
   ImageBackground,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -388,10 +387,7 @@ export default function Film() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }}>
       <ScrollView
         vertical={true}
         showsVerticalScrollIndicator={false}
@@ -408,7 +404,11 @@ export default function Film() {
                 activeOpacity={0.5}
                 onPress={() => navigation.goBack()}
               >
-                <Text style={styles.backArrow}>←</Text>
+                <Icon
+                  name="arrow-back-outline"
+                  size={24}
+                  style={styles.backArrow}
+                />
               </TouchableOpacity>
             </View>
           </SafeAreaView>
@@ -627,10 +627,10 @@ export default function Film() {
               (review, index) => (
                 <View key={index} style={styles.reviewContainer}>
                   <View style={styles.reviewHeader}>
-                    {review.image ? (
+                    {review.avatar ? (
                       <Image
                         style={styles.reviewImageUser}
-                        source={{ uri: review.image }}
+                        source={{ uri: review.avatar }}
                       />
                     ) : (
                       <Icon
@@ -801,7 +801,6 @@ const styles = {
 
   backArrow: {
     color: "#fff",
-    fontSize: 24,
   },
 
   mainContainer: {

@@ -11,7 +11,7 @@ exports.fetchLists = async (req, res) => {
     const lists = await listModel.getLists(user_id);
 
     if (!lists || lists.length === 0) {
-      return res.status(404).json({ message: 'No hi ha llistes disponibles' });
+      return res.status(200).json({ lists: [] });
     }
 
     res.json({ lists });

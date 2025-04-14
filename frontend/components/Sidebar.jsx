@@ -54,7 +54,6 @@ export default function Sidebar({ isOpen, closeMenu }) {
     ]).start();
 
     setTimeout(() => {
-      console.log("Menu closed timeout");
       closeMenu();
     }, 300);
   };

@@ -337,12 +337,12 @@ const styles = {
     position: "relative",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
 
   posterImage: {
     height: 170,
     width: "100%",
-    paddingHorizontal: 20,
     marginTop: 10,
     borderRadius: 10,
     objectFit: "cover",

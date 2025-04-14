@@ -176,7 +176,7 @@ ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
 
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
-ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
+ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 
 ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
 ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);
