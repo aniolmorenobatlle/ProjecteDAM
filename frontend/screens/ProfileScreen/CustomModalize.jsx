@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useEffect } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Modalize } from "react-native-modalize";
 import { screenHeight } from "../../config";
@@ -18,6 +18,16 @@ export default function CustomModalize({
     setIsModalOpen(false);
     setIndex(0);
   };
+
+  // Desactiva console.error per aquesta pantalla
+  useEffect(() => {
+    const originalConsoleError = console.error;
+    console.error = () => {};
+
+    return () => {
+      console.error = originalConsoleError;
+    };
+  }, []);
 
   return (
     <Modalize

@@ -41,7 +41,7 @@ export default function Profile({ setIsModalizeOpen }) {
     }
   };
 
-  const openModalize = (e) => {
+  const openModalize = () => {
     modalizeRef.current?.open();
     setIsModalOpen(true);
     setIsModalizeOpen(true);
