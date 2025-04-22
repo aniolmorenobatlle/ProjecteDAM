@@ -127,9 +127,9 @@ exports.fetchMostPopularMovies = async (_, res) => {
   }
 };
 
-exports.fetchLastMostPopularMovies = async (_, res) => {
+exports.fetchTrendingMovies = async (_, res) => {
   try {
-    const movies = await movieModel.getLastMostPopularMovies();
+    const movies = await movieModel.getTrendingMovies();
     res.json({ movies });
   } catch (error) {
     console.error("Error obtenint les pel·lícules més populars del darrer mes:", error);

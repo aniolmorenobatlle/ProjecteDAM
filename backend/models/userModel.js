@@ -207,9 +207,9 @@ exports.fetchCounts = async (userId) => {
   const queryWatchlist = await pool.query(
     `
       SELECT COUNT(*)
-      FROM movie_list ml
-      JOIN to_watch tw ON ml.movie_id = tw.movie_id
-      WHERE tw.user_id = $1;
+      FROM to_watch tw
+      WHERE user_id = $1
+      AND watchlist = TRUE
     `, [userId]
   )
   const totalWatchlist = parseInt(queryWatchlist.rows[0].count, 10);

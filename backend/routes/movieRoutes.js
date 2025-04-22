@@ -1,11 +1,11 @@
 const { Router } = require('express');
-const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchLastMostPopularMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate } = require('../controllers/movieController.js');
+const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate } = require('../controllers/movieController.js');
 const router = Router();
 
 router.get('/', fetchMovies);
 router.get('/search', fetchMoviesMin);
 router.get('/most_popular', fetchMostPopularMovies);
-router.get('/last_most_popular', fetchLastMostPopularMovies);
+router.get('/trending', fetchTrendingMovies);
 router.get('/:id_api/comments', fetchMovieComments);
 router.get('/:id_api/streaming', fetchMovieStreaming)
 router.get('/:id_api/credits/cast', fetchMovieCast);

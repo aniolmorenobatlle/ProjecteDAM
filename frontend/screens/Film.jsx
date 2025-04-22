@@ -138,10 +138,9 @@ export default function Film() {
     const newStatus = {
       watched: !isWatched,
       likes: isLikes,
-      watchlist: !isInWatchlist,
+      watchlist: isInWatchlist,
     };
     setIsWatched(!isWatched);
-    setIsInWatchlist(false);
     updateMovieStatus(newStatus);
   };
 
@@ -157,12 +156,11 @@ export default function Film() {
 
   const handleIsInWatchlist = () => {
     const newStatus = {
-      watched: !isWatched,
+      watched: isWatched,
       likes: isLikes,
       watchlist: !isInWatchlist,
     };
     setIsInWatchlist(!isInWatchlist);
-    setIsWatched(false);
     updateMovieStatus(newStatus);
   };
 

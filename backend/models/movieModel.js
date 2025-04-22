@@ -45,19 +45,13 @@ exports.getMovieByTitle = async (title) => {
   return result.rows[0];
 };
 
-exports.getLastMostPopularMovies = async () => {
-  const lastMonth = new Date();
-  lastMonth.setMonth(lastMonth.getMonth() - 1);
-  const lastMonthString = lastMonth.toISOString().split("T")[0];
-
+exports.getTrendingMovies = async () => {
   const query = `
     SELECT * FROM "movies"
-    WHERE release_year >= $1
-    ORDER BY vote_average DESC
-    LIMIT 5
+    WHERE "is_trending" = TRUE
   `;
 
-  const result = await pool.query(query, [lastMonthString]);
+  const result = await pool.query(query, []);
   return result.rows;
 };
 
@@ -137,7 +131,7 @@ exports.getMovieStatus = async (user_id, id_api) => {
   return result.rows[0];
 };
 
-exports.updateMovieStatus = async (user_id, id_api, watched, liked, watchlist) => {
+exports.updateMovieStatus = async (user_id, id_api, liked, watched, watchlist) => {
   const query = `
     INSERT INTO to_watch (user_id, movie_id, likes, watched, watchlist, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW())

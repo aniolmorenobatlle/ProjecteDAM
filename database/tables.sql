@@ -26,6 +26,7 @@ CREATE TABLE movies (
   cover varchar,
   synopsis text,
   vote_average DECIMAL(3, 1),
+  is_trending BOOLEAN DEFAULT false,
   director_id int,
   id_api int UNIQUE,
   created_at TIMESTAMP

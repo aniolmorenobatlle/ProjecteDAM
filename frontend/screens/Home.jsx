@@ -27,9 +27,7 @@ export default function Home() {
   const getPopularFilms = async () => {
     try {
       const storedMovies = await AsyncStorage.getItem("popularMovies");
-      const storedTimestamp = await AsyncStorage.getItem(
-        "lastPopularTimestamp"
-      );
+      const storedTimestamp = await AsyncStorage.getItem("trending");
 
       const now = Date.now();
       const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -43,16 +41,14 @@ export default function Home() {
         return;
       }
 
-      const response = await axios.get(
-        `${API_URL}/api/movies/last_most_popular`
-      );
+      const response = await axios.get(`${API_URL}/api/movies/trending`);
       setFilms(response.data.movies);
 
       await AsyncStorage.setItem(
         "popularMovies",
         JSON.stringify(response.data.movies)
       );
-      await AsyncStorage.setItem("lastPopularTimestamp", JSON.stringify(now));
+      await AsyncStorage.setItem("trending", JSON.stringify(now));
     } catch (error) {
       console.error("Error en obtenir les pel·lícules populars: " + error);
     }
@@ -160,14 +156,14 @@ export default function Home() {
 
           <View style={styles.latest}>
             <Text style={[globalStyles.textBase, styles.latestTitle]}>
-              Popular this month
+              Trending this week
             </Text>
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
               <View style={styles.latestFilms}>
-                {films.map((film, index) => (
+                {films.slice(0, 10).map((film, index) => (
                   <View key={index} style={styles.filmsCard}>
                     <TouchableOpacity
                       activeOpacity={0.8}

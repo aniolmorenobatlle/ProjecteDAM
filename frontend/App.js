@@ -3,10 +3,11 @@ import { NavigationContainer, useNavigationContainerRef } from "@react-navigatio
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { BackHandler, Text } from 'react-native';
+import { BackHandler, View } from 'react-native';
 import Navbar from "./components/Navbar";
 import { useUserInfo } from "./hooks/useUserInfo";
 
+import { ActivityIndicator } from 'react-native-paper';
 import Film from "./screens/Film";
 import Home from "./screens/Home";
 import ListInfo from './screens/ListInfo';
@@ -84,7 +85,9 @@ export default function App() {
   }, [navigationRef]);
 
   if (loading) {
-    return <Text style={{ textAlign: "center", marginTop: 20 }}>Loading...</Text>;
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1F1D36' }}>
+      <ActivityIndicator size="large" color="#fff" />
+    </View>;
   }
 
   return (
