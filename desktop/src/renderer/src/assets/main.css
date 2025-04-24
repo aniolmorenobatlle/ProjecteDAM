@@ -1,0 +1,37 @@
+@import './base.css';
+@import 'tailwindcss';
+@tailwind utilities;
+
+body {
+  display: flex;
+  overflow: hidden;
+  background-size: cover;
+  user-select: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .text {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 620px) {
+  .versions {
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  .tip,
+  .actions {
+    display: none;
+  }
+}

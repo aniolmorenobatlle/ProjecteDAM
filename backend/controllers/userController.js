@@ -88,6 +88,36 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.loginDesktop = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const userAdmin = await userModel.findUserAdmin(username);
+
+    if (!userAdmin) {
+      return res.status(401).json({ message: 'Usuari no trobat' });
+    }
+
+    const isMatch = await userModel.comparePasswords(password, userAdmin.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Contrasenya incorrecta' });
+    }
+
+    // Crear token JWS
+    const token = sign({ userId: userAdmin.id }, SECRET_KEY, { expiresIn: '1d' });
+
+    res.status(200).json({
+      message: 'Login correcte',
+      userId: userAdmin.id,
+      token: token
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error en el login' });
+  }
+};
+
 exports.me = async (req, res) => {
   try {
     const user = await userModel.findUserById(req.user.userId);

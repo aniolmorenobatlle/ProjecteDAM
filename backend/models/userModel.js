@@ -19,6 +19,14 @@ exports.findUserByUsername = async (username) => {
   return query.rows[0];
 };
 
+exports.findUserAdmin = async (username) => {
+  const query = await pool.query(
+    `SELECT * FROM "users" WHERE "username" = $1 AND "is_admin" = true`,
+    [username]
+  );
+  return query.rows[0];
+};
+
 exports.checkUserExists = async (username) => {
   const query = await pool.query(
     `SELECT id FROM "users" WHERE "username" = $1`,

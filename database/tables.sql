@@ -17,6 +17,7 @@ CREATE TABLE users (
   avatar_binary BYTEA,
   avatar_mime_type TEXT,
   poster TEXT,
+  is_admin BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const { json } = require('express');
+const cors = require('cors'); // Importar CORS
 const movieRoutes = require('./routes/movieRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
 const listRoutes = require('./routes/listRoutes.js');
@@ -7,6 +8,9 @@ const listRoutes = require('./routes/listRoutes.js');
 const app = express();
 
 const PORT = 3000;
+
+// Configurar CORS abans de les rutes
+app.use(cors()); // Això permetrà totes les peticions des de qualsevol origen
 
 app.use(json());
 
