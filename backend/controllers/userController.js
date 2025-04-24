@@ -98,8 +98,8 @@ exports.me = async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.log("Error en crear l'informació de l'usuari");
-    res.status(500).json({ message: 'Error en el servidor' });
+    console.error('Error en obtenir la informació de l\'usuari:', error);
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
 };
 
@@ -182,7 +182,7 @@ exports.editProfileAvatar = async (req, res) => {
     console.error("Error en editar l'avatar:", error);
     res.status(500).json({ message: "Error al modificar l'avatar" });
   }
-}
+};
 
 exports.fetchFavorites = async (req, res) => {
   const userId = req.user.userId;

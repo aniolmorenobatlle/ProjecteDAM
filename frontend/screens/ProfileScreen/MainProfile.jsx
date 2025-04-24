@@ -59,6 +59,7 @@ export default function MainProfile({
 
   useEffect(() => {
     if (userInfo) {
+      console.log(userInfo.avatar_binary);
       fetchCounts();
     }
   }, [userInfo]);
@@ -80,7 +81,12 @@ export default function MainProfile({
 
       <View style={styles.contentContainer}>
         <View style={styles.avatarContainer}>
-          {userInfo.avatar ? (
+          {userInfo.avatar_binary ? (
+            <Image
+              style={styles.avatar}
+              source={{ uri: userInfo.avatar_binary }}
+            />
+          ) : userInfo.avatar ? (
             <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
           ) : (
             <Icon
@@ -89,6 +95,7 @@ export default function MainProfile({
               style={styles.menuIconAvatarNone}
             />
           )}
+
           <Text style={[globalStyles.textBase, styles.name]}>
             {" "}
             {newName ? newName : userInfo.name}

@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
@@ -75,7 +76,6 @@ export default function SecondTabModalize({
   };
 
   const pickImage = async () => {
-    // Permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -90,64 +90,62 @@ export default function SecondTabModalize({
       allowsEditing: true,
       aspect: [3, 4],
       quality: 1,
+      base64: false,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const extension = result.assets[0].uri.split(".").pop();
+      let mimeType = "image/jpeg";
+      if (extension === "png") mimeType = "image/png";
+
+      setImage({
+        uri: result.assets[0].uri,
+        mimeType: mimeType,
+      });
     }
   };
 
-  const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission denied",
-        "We need camera permissions to make this work!"
-      );
+  const handleChangeAvatar = async () => {
+    if (!image) {
+      Alert.alert("No hi ha cap imatge per pujar");
       return;
     }
 
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const handleUploadCloudinary = async (imageUri) => {
-    const data = new FormData();
-    const filename = imageUri.split("/").pop();
-
-    data.append("file", {
-      uri: imageUri,
-      name: filename,
-      type: "image/jpeg",
-    });
-    data.append("upload_preset", "avatars-recommendme");
-    data.append("folder", "avatars-recommendme");
+    setIsUploading(true);
 
     try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/dwe0on2fw/image/upload`,
+      // Convertir imatge a base64
+      const base64 = await FileSystem.readAsStringAsync(image.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const response = await axios.post(
+        `${API_URL}/api/users/editProfileAvatar`,
+        { avatar: base64, mimeType: image.mimeType },
         {
-          method: "POST",
-          body: data,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      const result = await res.json();
-      return result.secure_url;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      return null;
-    }
-  };
+      const result = response.data;
 
-  const handleChangeAvatar = async () => {};
+      console.log("Resposta:", result);
+
+      if (response.status === 200) {
+        Alert.alert("Avatar actualitzat correctament!");
+      } else {
+        Alert.alert("Error actualitzant l'avatar");
+      }
+    } catch (error) {
+      console.error("Error pujant la imatge:", error);
+      Alert.alert("Error pujant la imatge");
+    }
+
+    setIsUploading(false);
+  };
 
   return (
     <ScrollView
@@ -171,23 +169,7 @@ export default function SecondTabModalize({
               <Text style={styles.profileTitle}>Avatar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={async () => {
-                if (!image) {
-                  Alert.alert("There is no image to upload");
-                  return;
-                }
-                setIsUploading(true);
-                const url = await handleUploadCloudinary(image);
-                setIsUploading(false);
-
-                if (url) {
-                  Alert.alert("Image uploaded successfully!");
-                  console.log("URL de la imatge:", url);
-                }
-              }}
-            >
+            <TouchableOpacity activeOpacity={0.8} onPress={handleChangeAvatar}>
               <Text style={[globalStyles.textBase, styles.btnSave]}>Save</Text>
             </TouchableOpacity>
           </View>
@@ -196,10 +178,10 @@ export default function SecondTabModalize({
 
           <View style={styles.galeryContainer}>
             {image ? (
-              <Image source={{ uri: image }} style={styles.avatarPreview} />
+              <Image source={{ uri: image.uri }} style={styles.avatarPreview} />
             ) : (
               <Image
-                source={{ uri: userInfo.avatar }}
+                source={{ uri: userInfo.avatar_binary || userInfo.avatar }}
                 style={styles.avatarPreview}
               />
             )}
@@ -208,12 +190,6 @@ export default function SecondTabModalize({
               <TouchableOpacity activeOpacity={0.8} onPress={pickImage}>
                 <Text style={[globalStyles.textBase, styles.btnChoose]}>
                   Choose from gallery
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity activeOpacity={0.8} onPress={takePhoto}>
-                <Text style={[globalStyles.textBase, styles.btnChoose]}>
-                  Take a photo
                 </Text>
               </TouchableOpacity>
             </View>

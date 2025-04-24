@@ -14,8 +14,9 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/editProfile', authMiddleware, editProfile);
 router.post('/editProfilePoster', authMiddleware, editProfilePoster);
-router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
 router.post('/addFavorite', authMiddleware, addFavorite);
 router.post('/deleteFavorite', authMiddleware, deleteFavorite);
+
+router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
 
 module.exports = router;

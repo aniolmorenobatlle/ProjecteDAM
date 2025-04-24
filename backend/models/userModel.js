@@ -37,10 +37,24 @@ exports.checkEmailExists = async (email) => {
 
 exports.findUserById = async (userId) => {
   const query = await pool.query(
-    `SELECT id, name, username, email, avatar, poster FROM "users" WHERE id = $1`,
+    `SELECT id, name, username, email, avatar_binary, avatar_mime_type, poster, avatar FROM "users" WHERE id = $1`,
     [userId]
   );
-  return query.rows[0];
+
+  const user = query.rows[0];
+
+  if (user && user.avatar_binary) {
+    const mimeType = user.avatar_mime_type || 'image/jpeg'; // Si tens la columna, millor
+    if (Buffer.isBuffer(user.avatar_binary)) {
+      user.avatar_binary = `data:${mimeType};base64,${user.avatar_binary.toString('base64')}`;
+    } else {
+      console.error('avatar_binary no és un Buffer');
+      user.avatar_binary = null;
+    }
+  }
+
+
+  return user;
 };
 
 exports.comparePasswords = async (password, hashedPassword) => {
@@ -95,9 +109,10 @@ exports.editProfilePoster = async (userId, poster) => {
 exports.editProfileAvatar = async (userId, avatar) => {
   const query = await pool.query(
     `UPDATE "users" 
-    SET avatar = $1 
-    WHERE id = $2 
-    RETURNING id, name, username, avatar, poster`,
+     SET avatar_binary = $1,
+         avatar = NULL
+     WHERE id = $2
+     RETURNING id, name, username, avatar_binary, avatar, poster`,
     [avatar, userId]
   );
   return query.rows[0];

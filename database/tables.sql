@@ -14,6 +14,8 @@ CREATE TABLE users (
   email VARCHAR NOT NULL UNIQUE,
   password VARCHAR NOT NULL,
   avatar VARCHAR,
+  avatar_binary BYTEA,
+  avatar_mime_type TEXT,
   poster TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
