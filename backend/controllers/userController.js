@@ -118,6 +118,25 @@ exports.loginDesktop = async (req, res) => {
   }
 };
 
+exports.fetchUsers = async (_, res) => {
+  try {
+    const users = await userModel.getUsers();
+
+    if (!users) {
+      return res.status(404).json({ message: 'No s\'han trobat usuaris' });
+    }
+
+    res.status(200).json({
+      message: 'Usuaris obtinguts correctament',
+      users: users
+    });
+
+  } catch (error) {
+    console.error('Error en obtenir els usuaris:', error);
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+  }
+}
+
 exports.me = async (req, res) => {
   try {
     const user = await userModel.findUserById(req.user.userId);

@@ -280,3 +280,11 @@ exports.fetchCounts = async (userId) => {
     totalFriends
   }
 }
+
+exports.getUsers = async () => {
+  const query = await pool.query(
+    `SELECT * FROM users`
+  );
+
+  return query.rows;
+}

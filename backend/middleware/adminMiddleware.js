@@ -1,10 +1,24 @@
-const adminMiddleware = (req, res, next) => {
-  // Comprovar si l'usuari té el camp isAdmin a true
-  if (req.user.isAdmin !== true) {
-    return res.status(403).json({ message: 'Accés denegat. Usuari no és administrador' });
-  }
+const userModel = require('../models/userModel');
 
-  next(); // Permet l'accés a la ruta si l'usuari és administrador
+const verifyUserAdmin = async (req, res, next) => {
+  const { username } = req.body;
+
+  try {
+    const userAdmin = await userModel.findUserAdmin(username);
+
+    if (!userAdmin) {
+      return res.status(401).json({ message: 'Usuari no trobat o no autoritzat' });
+    }
+
+    req.userAdmin = userAdmin;
+
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Error en la verificació de l\'usuari' });
+  }
 };
 
-module.exports = adminMiddleware;
+module.exports = {
+  verifyUserAdmin,
+};

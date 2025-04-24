@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import InputLogin from '../components/InputLogin'
+import { API_URL } from '../../../../config'
 
 function Login() {
   const navigate = useNavigate()
@@ -13,13 +14,11 @@ function Login() {
     e.preventDefault()
 
     try {
-      // Petició POST al backend per al login
-      const response = await axios.post('http://192.168.19.215:3000/api/users/login-desktop', {
+      const response = await axios.post(`${API_URL}/api/users/login-desktop`, {
         username,
         password
       })
 
-      // Si el login és correcte, guarda el token i navega a la pàgina d'inici
       localStorage.setItem('token', response.data.token)
       navigate('/home')
     } catch (error) {

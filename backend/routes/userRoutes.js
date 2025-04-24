@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
-const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop } = require('../controllers/userController.js');
+const adminMiddleware = require('../middleware/adminMiddleware.js');
+const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers } = require('../controllers/userController.js');
 
 const router = Router();
 
@@ -13,12 +14,16 @@ router.get('/userCounts', authMiddleware, fetchCounts);
 
 router.post('/register', register);
 router.post('/login', login);
-router.post('/login-desktop', loginDesktop);
 
 router.post('/editProfile', authMiddleware, editProfile);
 router.post('/editProfilePoster', authMiddleware, editProfilePoster);
 router.post('/addFavorite', authMiddleware, addFavorite);
 router.post('/deleteFavorite', authMiddleware, deleteFavorite);
 router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
+
+// Desktop app
+router.get('/', adminMiddleware, fetchUsers);
+
+router.post('/login-desktop', loginDesktop);
 
 module.exports = router;
