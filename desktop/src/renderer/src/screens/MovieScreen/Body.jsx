@@ -22,7 +22,7 @@ export default function Body() {
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/movies?page=${pageNumber}&limit=${itemsPerPage}`
+        `${API_URL}/api/movies?page=${pageNumber + 1}&limit=${itemsPerPage}`
       )
       const movies = response.data.movies
       const total = response.data.total

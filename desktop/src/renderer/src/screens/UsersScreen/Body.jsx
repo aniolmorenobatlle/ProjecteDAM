@@ -6,30 +6,36 @@ import axios from 'axios'
 import { API_URL } from '../../../../../config'
 
 export default function Body() {
-  const [cachePages, setCachePages] = useState([])
+  const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 7
   const [loading, setLoading] = useState(false)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(3)
 
-  const moviesToShow = cachePages[currentPage] || []
+  const usersToShow = cachePages[currentPage] || []
 
   const fetchPage = async (pageNumber) => {
     // Verificar si la pagina ja esta en cache
-    if (cachePages[pageNumber]) return
-
+    if (cachePages[pageNumber]) {
+      return
+    }
     setLoading(true)
 
     try {
-      const response = await axios.get(
-        `${API_URL}/api/users?page=${pageNumber}&limit=${itemsPerPage}`
-      )
-      const movies = response.data.movies
-      const total = response.data.total
+      const token = localStorage.getItem('token')
+
+      const response = await axios.get(`${API_URL}/api/users?page=${pageNumber + 1}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const users = response.data.users
+      const total = response.data.totalUsers
 
       setCachePages((prev) => ({
         ...prev,
-        [pageNumber]: movies
+        [pageNumber]: users // Guardar les dades de la pàgina a l'objecte cachePages
       }))
 
       setTotalPages(Math.ceil(total / itemsPerPage))
@@ -60,9 +66,10 @@ export default function Body() {
     <div className="flex flex-col gap-4 w-full mx-auto mt-10">
       <div className="flex font-semibold text-gray-500 px-6 py-3 rounded-t-lg">
         <div className="w-15 !mr-5"></div>
-        <div className="flex-1">Title</div>
-        <div className="flex-1">Release Year</div>
-        <div className="flex-1">Director</div>
+        <div className="flex-1">Name</div>
+        <div className="flex-1">Email</div>
+        <div className="flex-1">Username</div>
+        <div className="flex-1">Role</div>
         <div className="flex-1 !pr-2">
           <button className="flex flex-row items-center gap-2">
             Date of creation
@@ -75,17 +82,14 @@ export default function Body() {
       {loading ? (
         <div className="text-center text-xl">Loading...</div>
       ) : (
-        moviesToShow.map((movie) => (
-          <div key={movie.id} className="flex bg-gray-100 items-center px-6 py-4 rounded-lg">
-            <img
-              src={movie.poster}
-              alt="poster"
-              className="w-15 h-15 rounded-full object-cover !mr-5"
-            />
-            <div className="flex-1">{movie.title}</div>
-            <div className="flex-1">{new Date(movie.release_year).getFullYear()}</div>
-            <div className="flex-1">{movie.director}</div>
-            <div className="flex-1">{new Date(movie.created_at).toLocaleDateString()}</div>
+        usersToShow.map((user) => (
+          <div key={user.id} className="flex bg-gray-100 items-center px-6 py-4 rounded-lg">
+            <img src={user.avatar} alt="avatar" className="w-15 h-15 rounded-full !mr-5" />
+            <div className="flex-1">{user.name}</div>
+            <div className="flex-1">{user.email}</div>
+            <div className="flex-1">{user.username}</div>
+            <div className="flex-1">{user.is_admin ? 'Admin' : 'Normal'}</div>{' '}
+            <div className="flex-1">{new Date(user.created_at).toLocaleDateString()}</div>
             <div className="w-18 flex justify-between text-2xl text-orange-400">
               <button>
                 <GoPencil />
