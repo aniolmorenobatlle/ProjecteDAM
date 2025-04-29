@@ -281,10 +281,19 @@ exports.fetchCounts = async (userId) => {
   }
 }
 
-exports.getUsers = async () => {
+exports.getUsers = async (limit, offset) => {
   const query = await pool.query(
-    `SELECT * FROM users`
+    `SELECT * FROM users ORDER BY id LIMIT $1 OFFSET $2`,
+    [limit, offset]
   );
 
   return query.rows;
+};
+
+exports.countUsers = async () => {
+  const query = await pool.query(
+    `SELECT COUNT(*) FROM users`
+  );
+
+  return parseInt(query.rows[0].count, 10);
 }

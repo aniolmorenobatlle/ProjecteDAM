@@ -1,7 +1,23 @@
 const pool = require('../config/db.js');
 
 exports.getMovies = async (limit, offset) => {
-  const query = 'SELECT * FROM "movies" LIMIT $1 OFFSET $2';
+  const query = `
+    SELECT 
+      m.id,
+      m.title,
+      m.release_year,
+      m.poster,
+      m.cover,
+      m.synopsis,
+      m.vote_average,
+      m.id_api,
+      d.name AS director,
+      m.created_at,
+      m.is_trending
+    FROM movies m
+    JOIN directors d ON m.director_id = d.id
+    LIMIT $1 OFFSET $2;`;
+
   const result = await pool.query(query, [limit, offset]);
   return result.rows;
 };
@@ -16,6 +32,17 @@ exports.getMoviesQuery = async (limit, offset, query) => {
   `;
   const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
   return result.rows;
+};
+
+exports.getMoviesCountByQuery = async (query) => {
+  const countQuery = `
+    SELECT COUNT(*) 
+    FROM movies
+    WHERE LOWER(title) LIKE LOWER($1)
+    AND poster IS NOT NULL;
+  `;
+  const result = await pool.query(countQuery, [`%${query}%`]);
+  return parseInt(result.rows[0].count);
 };
 
 exports.getMoviesMin = async (limit, offset, query) => {

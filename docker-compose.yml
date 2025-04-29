@@ -31,25 +31,6 @@ services:
     networks:
       - backend_network
 
-  # Frontend
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend_container
-    env_file:
-      - ./frontend/.env
-    ports:
-      - "19000:19000"
-      - "19001:19001"
-    volumes:
-      - ./frontend:/app
-      - ./frontend/assets:/app/assets:delegated
-    depends_on:
-      - backend
-    networks:
-      - backend_network
-
 volumes:
   postgres_data:
 

@@ -51,7 +51,7 @@ exports.fetchMovies = async (req, res) => {
 
     if (query) {
       movies = await movieModel.getMoviesQuery(limit, offset, query);
-      totalMovies = await movieModel.getMoviesCount(query);
+      totalMovies = await movieModel.getMoviesCountByQuery(query);
     } else {
       movies = await movieModel.getMovies(limit, offset);
       totalMovies = await movieModel.getMoviesCount();
@@ -86,7 +86,7 @@ exports.fetchMoviesMin = async (req, res) => {
 
     if (query) {
       movies = await movieModel.getMoviesMin(limit, offset, query);
-      totalMovies = await movieModel.getMoviesCount(query);
+      totalMovies = await movieModel.getMoviesCountByQuery(query);
     } else {
       movies = await movieModel.getMoviesMin(limit, offset);
       totalMovies = await movieModel.getMoviesCount();

@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { AiOutlineDelete } from 'react-icons/ai'
-import { CiSearch } from 'react-icons/ci'
 import { GoPencil } from 'react-icons/go'
-import { IoCloseCircleOutline } from 'react-icons/io5'
 import { RiExpandUpDownFill } from 'react-icons/ri'
 import profileImage from '../assets/profile.jpg'
 import Sidebar from './../components/Sidebar'
+import Header from '../components/Header'
 
 function Users() {
   const students = Array.from({ length: 10 }, (_, i) => ({
@@ -42,22 +41,7 @@ function Users() {
       <Sidebar activePage="users" />
 
       <div className="flex flex-col flex-1 gap-5 py-5 !mr-5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl !font-bold">Users List</h1>
-
-          <div className="flex items-center gap-2 border-2 border-[#bfbfbf] rounded-lg p-1 w-[30%]">
-            <CiSearch className="text-2xl text-gray-500" />
-            <input type="text" placeholder="Search..." className="flex-1 text-xl" />
-            <IoCloseCircleOutline className="text-2xl text-gray-500 ml-auto" />
-          </div>
-
-          <button
-            className="p-2 px-5 bg-amber-400 rounded-lg text-xl text-white"
-            onClick={() => document.getElementById('modal_add_user').showModal()}
-          >
-            Add new user
-          </button>
-        </div>
+        <Header title="Users List" titleButton="Add new User" />
 
         <div className="w-full h-0.5 bg-[#dbdee3]" />
 

@@ -22,7 +22,7 @@ router.post('/deleteFavorite', authMiddleware, deleteFavorite);
 router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
 
 // Desktop app
-router.get('/', adminMiddleware, fetchUsers);
+router.get('/', authMiddleware, adminMiddleware, fetchUsers);
 
 router.post('/login-desktop', loginDesktop);
 

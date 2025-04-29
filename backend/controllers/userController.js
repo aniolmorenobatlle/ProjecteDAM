@@ -105,7 +105,7 @@ exports.loginDesktop = async (req, res) => {
     }
 
     // Crear token JWS
-    const token = sign({ userId: userAdmin.id }, SECRET_KEY, { expiresIn: '1d' });
+    const token = sign({ userId: userAdmin.id, is_admin: true }, SECRET_KEY, { expiresIn: '1d' });
 
     res.status(200).json({
       message: 'Login correcte',
@@ -118,24 +118,35 @@ exports.loginDesktop = async (req, res) => {
   }
 };
 
-exports.fetchUsers = async (_, res) => {
-  try {
-    const users = await userModel.getUsers();
+exports.fetchUsers = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 20;
+  const offset = (page - 1) * limit;
 
-    if (!users) {
+  try {
+    // Obtenir usuaris amb límit i desplaçament
+    const users = await userModel.getUsers(limit, offset);
+
+    // Comptar el total d'usuaris
+    const totalUsers = await userModel.countUsers();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    if (!users || users.length === 0) {
       return res.status(404).json({ message: 'No s\'han trobat usuaris' });
     }
 
     res.status(200).json({
-      message: 'Usuaris obtinguts correctament',
-      users: users
+      users,
+      currentPage: page,
+      totalUsers,
+      totalPages,
     });
 
   } catch (error) {
     console.error('Error en obtenir els usuaris:', error);
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
-}
+};
 
 exports.me = async (req, res) => {
   try {
