@@ -5,8 +5,9 @@ import { RiExpandUpDownFill } from 'react-icons/ri'
 import axios from 'axios'
 import { API_URL } from '../../../../../config'
 
-export default function Body() {
-  const [cachePages, setCachePages] = useState([])
+// eslint-disable-next-line react/prop-types
+export default function Body({ movieTitleQuery }) {
+  const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 7
   const [loading, setLoading] = useState(false)
@@ -15,14 +16,12 @@ export default function Body() {
   const moviesToShow = cachePages[currentPage] || []
 
   const fetchPage = async (pageNumber) => {
-    // Verificar si la pagina ja esta en cache
-    if (cachePages[pageNumber]) return
-
     setLoading(true)
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/movies?page=${pageNumber + 1}&limit=${itemsPerPage}`
+        // eslint-disable-next-line react/prop-types
+        `${API_URL}/api/movies?page=${pageNumber + 1}&limit=${itemsPerPage}&query=${movieTitleQuery.toLowerCase()}`
       )
       const movies = response.data.movies
       const total = response.data.total
@@ -54,7 +53,7 @@ export default function Body() {
 
   useEffect(() => {
     fetchPage(currentPage)
-  }, [currentPage])
+  }, [currentPage, movieTitleQuery])
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto mt-10">
