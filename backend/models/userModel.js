@@ -281,10 +281,13 @@ exports.fetchCounts = async (userId) => {
   }
 }
 
-exports.getUsers = async (limit, offset) => {
+exports.getUsers = async (limit, offset, search) => {
   const query = await pool.query(
-    `SELECT * FROM users ORDER BY id LIMIT $1 OFFSET $2`,
-    [limit, offset]
+    `SELECT * FROM users 
+     WHERE name ILIKE $1 OR email ILIKE $1 OR username ILIKE $1
+     ORDER BY id
+     LIMIT $2 OFFSET $3`,
+    [`%${search || ''}%`, limit, offset]
   );
 
   return query.rows;
@@ -296,4 +299,4 @@ exports.countUsers = async () => {
   );
 
   return parseInt(query.rows[0].count, 10);
-}
+};

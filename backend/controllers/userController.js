@@ -123,13 +123,11 @@ exports.fetchUsers = async (req, res) => {
   const limit = 7;
   const offset = (page - 1) * limit;
 
+  const query = req.query.query || '';
+
   try {
-    // Obtenir usuaris amb límit i desplaçament
-    const users = await userModel.getUsers(limit, offset);
-
-    // Comptar el total d'usuaris
+    const users = await userModel.getUsers(limit, offset, query);
     const totalUsers = await userModel.countUsers();
-
     const totalPages = Math.ceil(totalUsers / limit);
 
     if (!users || users.length === 0) {

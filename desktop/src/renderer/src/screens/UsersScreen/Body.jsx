@@ -5,7 +5,8 @@ import { RiExpandUpDownFill } from 'react-icons/ri'
 import axios from 'axios'
 import { API_URL } from '../../../../../config'
 
-export default function Body() {
+// eslint-disable-next-line react/prop-types
+export default function Body({ userQuery }) {
   const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 7
@@ -15,20 +16,20 @@ export default function Body() {
   const usersToShow = cachePages[currentPage] || []
 
   const fetchPage = async (pageNumber) => {
-    // Verificar si la pagina ja esta en cache
-    if (cachePages[pageNumber]) {
-      return
-    }
     setLoading(true)
 
     try {
       const token = localStorage.getItem('token')
 
-      const response = await axios.get(`${API_URL}/api/users?page=${pageNumber + 1}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.get(
+        // eslint-disable-next-line react/prop-types
+        `${API_URL}/api/users?page=${pageNumber + 1}&query=${userQuery.toLowerCase()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      })
+      )
 
       const users = response.data.users
       const total = response.data.totalUsers
@@ -60,7 +61,7 @@ export default function Body() {
 
   useEffect(() => {
     fetchPage(currentPage)
-  }, [currentPage])
+  }, [currentPage, userQuery])
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto mt-10">

@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Header from '../components/Header'
 import Sidebar from './../components/Sidebar'
 import Body from './MovieScreen/Body'
 
 function Movies() {
   const [searchTerm, setSearchTerm] = useState('')
-
-  // useEffect(() => {
-  //   console.log('Search term', searchTerm)
-  // })
 
   return (
     <div className="flex w-screen h-screen gap-5">
@@ -18,7 +14,7 @@ function Movies() {
         <Header
           title="Movies List"
           titleButton="Add new Movie"
-          onTitleChange={(value) => setSearchTerm(value)}
+          onQueryChange={(value) => setSearchTerm(value)}
           setTerm={searchTerm}
         />
 
