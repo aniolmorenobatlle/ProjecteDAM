@@ -2,7 +2,7 @@ import { CiSearch } from 'react-icons/ci'
 import { IoCloseCircleOutline } from 'react-icons/io5'
 
 // eslint-disable-next-line react/prop-types
-export default function Header({ title, titleButton, onQueryChange, setTerm }) {
+export default function Header({ title, titleButton, onQueryChange, setTerm, onButtonClick }) {
   const handleSearchChange = (e) => {
     onQueryChange(e.target.value)
     if (onQueryChange) {
@@ -36,7 +36,12 @@ export default function Header({ title, titleButton, onQueryChange, setTerm }) {
         />
       </div>
 
-      <button className="p-2 px-5 bg-amber-400 rounded-lg text-xl text-white">{titleButton}</button>
+      <button
+        className="p-2 px-5 bg-amber-400 rounded-lg text-xl text-white"
+        onClick={onButtonClick}
+      >
+        {titleButton}
+      </button>
     </div>
   )
 }
