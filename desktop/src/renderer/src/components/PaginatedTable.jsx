@@ -3,7 +3,14 @@ import { useState, useEffect } from 'react'
 import { RiExpandUpDownFill } from 'react-icons/ri'
 import axios from 'axios'
 
-export default function PaginatedTable({ apiEndpoint, query, headers, columns, renderRow }) {
+export default function PaginatedTable({
+  apiEndpoint,
+  query,
+  headers,
+  columns,
+  refreshTrigger,
+  renderRow
+}) {
   const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -51,7 +58,7 @@ export default function PaginatedTable({ apiEndpoint, query, headers, columns, r
 
   useEffect(() => {
     fetchPage(currentPage)
-  }, [currentPage, query])
+  }, [currentPage, query, refreshTrigger])
 
   return (
     <div className="flex flex-col gap-4 w-full mx-auto mt-10">

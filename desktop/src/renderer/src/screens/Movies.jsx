@@ -6,7 +6,7 @@ import { API_URL } from '../../../../config'
 import { GoPencil } from 'react-icons/go'
 import { AiOutlineDelete } from 'react-icons/ai'
 
-function Movies() {
+export default function Movies() {
   const [searchTerm, setSearchTerm] = useState('')
 
   return (
@@ -53,5 +53,3 @@ function Movies() {
     </div>
   )
 }
-
-export default Movies

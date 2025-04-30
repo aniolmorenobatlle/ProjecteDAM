@@ -300,3 +300,12 @@ exports.countUsers = async () => {
 
   return parseInt(query.rows[0].count, 10);
 };
+
+exports.deleteUser = async (userId) => {
+  const query = await pool.query(
+    `DELETE FROM users WHERE id = $1 RETURNING id`,
+    [userId]
+  );
+
+  return query.rows[0];
+}

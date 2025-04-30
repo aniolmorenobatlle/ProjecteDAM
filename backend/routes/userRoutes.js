@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
 const adminMiddleware = require('../middleware/adminMiddleware.js');
-const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers } = require('../controllers/userController.js');
+const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers, deleteUser } = require('../controllers/userController.js');
 
 const router = Router();
 
@@ -25,5 +25,6 @@ router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
 router.get('/', authMiddleware, adminMiddleware, fetchUsers);
 
 router.post('/login-desktop', loginDesktop);
+router.post('/delete-user', authMiddleware, adminMiddleware, deleteUser);
 
 module.exports = router;
