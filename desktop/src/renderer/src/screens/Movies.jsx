@@ -70,7 +70,7 @@ export default function Movies() {
               <div className="flex-1">{movie.title}</div>
               <div className="flex-1">{new Date(movie.release_year).getFullYear()}</div>
               <div className="flex-1">{movie.director}</div>
-              <div className="flex-1">{new Date(movie.created_at).toLocaleDateString()}</div>
+              <div className="flex-1">{new Date(movie.created_at).toLocaleDateString('es-ES')}</div>
               <div className="w-18 flex justify-between text-2xl text-orange-400">
                 <button>
                   <GoPencil />

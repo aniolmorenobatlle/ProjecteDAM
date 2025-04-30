@@ -6,8 +6,7 @@ import { Link } from 'react-router-dom'
 
 import profileImage from '../assets/profile.jpg'
 
-// eslint-disable-next-line react/prop-types
-function Sidebar({ activePage }) {
+export default function Sidebar({ activePage }) {
   const listMenu = [
     {
       name: 'Home',
@@ -71,5 +70,3 @@ function Sidebar({ activePage }) {
     </div>
   )
 }
-
-export default Sidebar

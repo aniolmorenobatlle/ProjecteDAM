@@ -24,7 +24,7 @@ function Login() {
     } catch (error) {
       console.error('Error en el login', error)
 
-      alert('Credencials incorrectes o error del servidor')
+      alert('Incorrect username or password. Please try again.')
     }
   }
 

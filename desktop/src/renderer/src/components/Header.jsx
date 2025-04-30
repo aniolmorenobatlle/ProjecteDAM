@@ -1,7 +1,6 @@
 import { CiSearch } from 'react-icons/ci'
 import { IoCloseCircleOutline } from 'react-icons/io5'
 
-// eslint-disable-next-line react/prop-types
 export default function Header({ title, titleButton, onQueryChange, setTerm, onButtonClick }) {
   const handleSearchChange = (e) => {
     onQueryChange(e.target.value)

@@ -1,4 +1,3 @@
-// eslint-disable-next-line react/prop-types
 function InputLogin({ type, placeholder, value, onChange }) {
   return (
     <input

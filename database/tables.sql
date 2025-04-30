@@ -161,21 +161,21 @@ CREATE TABLE messages (
 );
 
 -- Relacions i claus foranees
-ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 
 ALTER TABLE notifications ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE notifications ADD FOREIGN KEY (friend_id) REFERENCES users (id);
 ALTER TABLE notifications ADD FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE;
 
-ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id);
+ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id) ON DELETE CASCADE;
 
-ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 
-ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
 
@@ -188,8 +188,8 @@ ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);
 ALTER TABLE movies_genres ADD FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE;
 ALTER TABLE movies_genres ADD FOREIGN KEY (genre_id) REFERENCES genres (id);
 
-ALTER TABLE user_chat ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE user_chat ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE user_chat ADD FOREIGN KEY (chat_id) REFERENCES chat (id);
 
 ALTER TABLE messages ADD FOREIGN KEY (chat_id) REFERENCES chat (id);
-ALTER TABLE messages ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE messages ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;

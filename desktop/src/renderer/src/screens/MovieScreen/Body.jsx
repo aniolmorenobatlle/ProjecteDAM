@@ -5,7 +5,6 @@ import { RiExpandUpDownFill } from 'react-icons/ri'
 import axios from 'axios'
 import { API_URL } from '../../../../../config'
 
-// eslint-disable-next-line react/prop-types
 export default function Body({ movieTitleQuery }) {
   const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
@@ -20,7 +19,6 @@ export default function Body({ movieTitleQuery }) {
 
     try {
       const response = await axios.get(
-        // eslint-disable-next-line react/prop-types
         `${API_URL}/api/movies?page=${pageNumber + 1}&limit=${itemsPerPage}&query=${movieTitleQuery.toLowerCase()}`
       )
       const movies = response.data.movies
@@ -84,7 +82,7 @@ export default function Body({ movieTitleQuery }) {
             <div className="flex-1">{movie.title}</div>
             <div className="flex-1">{new Date(movie.release_year).getFullYear()}</div>
             <div className="flex-1">{movie.director}</div>
-            <div className="flex-1">{new Date(movie.created_at).toLocaleDateString()}</div>
+            <div className="flex-1">{new Date(movie.created_at).toLocaleDateString('es-ES')}</div>
             <div className="w-18 flex justify-between text-2xl text-orange-400">
               <button>
                 <GoPencil />

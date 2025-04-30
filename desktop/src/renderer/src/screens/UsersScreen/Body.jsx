@@ -5,7 +5,6 @@ import { RiExpandUpDownFill } from 'react-icons/ri'
 import axios from 'axios'
 import { API_URL } from '../../../../../config'
 
-// eslint-disable-next-line react/prop-types
 export default function Body({ userQuery }) {
   const [cachePages, setCachePages] = useState({})
   const [currentPage, setCurrentPage] = useState(0)
@@ -22,7 +21,6 @@ export default function Body({ userQuery }) {
       const token = localStorage.getItem('token')
 
       const response = await axios.get(
-        // eslint-disable-next-line react/prop-types
         `${API_URL}/api/users?page=${pageNumber + 1}&query=${userQuery.toLowerCase()}`,
         {
           headers: {
@@ -90,7 +88,7 @@ export default function Body({ userQuery }) {
             <div className="flex-1">{user.email}</div>
             <div className="flex-1">{user.username}</div>
             <div className="flex-1">{user.is_admin ? 'Admin' : 'Normal'}</div>{' '}
-            <div className="flex-1">{new Date(user.created_at).toLocaleDateString()}</div>
+            <div className="flex-1">{new Date(user.created_at).toLocaleDateString('es-ES')}</div>
             <div className="w-18 flex justify-between text-2xl text-orange-400">
               <button>
                 <GoPencil />
