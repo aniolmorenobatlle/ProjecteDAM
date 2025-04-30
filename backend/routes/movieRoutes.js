@@ -1,5 +1,9 @@
 const { Router } = require('express');
-const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate } = require('../controllers/movieController.js');
+const authMiddleware = require('../middleware/authMiddleware.js');
+const adminMiddleware = require('../middleware/adminMiddleware.js');
+
+const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate, deleteMovie } = require('../controllers/movieController.js');
+
 const router = Router();
 
 router.get('/', fetchMovies);
@@ -21,6 +25,9 @@ router.post('/:id_api/watchlist', fetchAddMovieToWatchlist);
 
 router.put('/:id_api/status', updateMovieStatus);
 router.put('/:id_api/status/rate', updateMovieRate);
+
+// Desktop
+router.post('/delete-movie', authMiddleware, adminMiddleware, deleteMovie)
 
 
 module.exports = router;

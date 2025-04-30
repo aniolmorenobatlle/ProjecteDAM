@@ -121,7 +121,7 @@ CREATE TABLE movies_streaming (
   display_priority INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (movie_id, streaming_id),
-  FOREIGN KEY (movie_id) REFERENCES movies (id_api),
+  FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE,
   FOREIGN KEY (streaming_id) REFERENCES streaming (id_api)
 );
 
@@ -162,17 +162,17 @@ CREATE TABLE messages (
 
 -- Relacions i claus foranees
 ALTER TABLE comments ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
+ALTER TABLE comments ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 
 ALTER TABLE notifications ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE notifications ADD FOREIGN KEY (friend_id) REFERENCES users (id);
-ALTER TABLE notifications ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE notifications ADD FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE;
 
 ALTER TABLE friends ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE friends ADD FOREIGN KEY (friend_id) REFERENCES users (id);
 
 ALTER TABLE to_watch ADD FOREIGN KEY (user_id) REFERENCES users (id);
-ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
+ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id);
@@ -182,10 +182,10 @@ ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENC
 ALTER TABLE movie_list ADD FOREIGN KEY (list_id) REFERENCES lists (id);
 ALTER TABLE movie_list ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 
-ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api);
+ALTER TABLE movies_actors ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DELETE CASCADE;
 ALTER TABLE movies_actors ADD FOREIGN KEY (actor_id) REFERENCES actors (id);
 
-ALTER TABLE movies_genres ADD FOREIGN KEY (movie_id) REFERENCES movies (id);
+ALTER TABLE movies_genres ADD FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE;
 ALTER TABLE movies_genres ADD FOREIGN KEY (genre_id) REFERENCES genres (id);
 
 ALTER TABLE user_chat ADD FOREIGN KEY (user_id) REFERENCES users (id);

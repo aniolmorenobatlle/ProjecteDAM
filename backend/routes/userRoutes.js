@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
 const adminMiddleware = require('../middleware/adminMiddleware.js');
+
 const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers, deleteUser } = require('../controllers/userController.js');
 
 const router = Router();

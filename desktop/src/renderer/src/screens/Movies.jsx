@@ -5,9 +5,41 @@ import PaginatedTable from '../components/PaginatedTable'
 import { API_URL } from '../../../../config'
 import { GoPencil } from 'react-icons/go'
 import { AiOutlineDelete } from 'react-icons/ai'
+import axios from 'axios'
 
 export default function Movies() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  const token = localStorage.getItem('token')
+
+  const handleOpenDeleteModal = (movie) => {
+    setSelectedMovie(movie)
+    document.getElementById('delete_movie').showModal()
+  }
+
+  const handleDeleteMovie = async () => {
+    if (selectedMovie) {
+      try {
+        await axios.post(
+          `${API_URL}/api/movies/delete-movie`,
+          { id_api: selectedMovie.id_api },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        document.getElementById('delete_movie').close()
+        setRefreshTrigger((prev) => prev + 1)
+      } catch (error) {
+        alert('Error deleting the movie. Try again later.')
+        console.error('Error deleting user:', error)
+      }
+    }
+  }
 
   return (
     <div className="flex w-screen h-screen gap-5">
@@ -27,6 +59,7 @@ export default function Movies() {
           apiEndpoint={`${API_URL}/api/movies`}
           query={searchTerm}
           columns={['Title', 'Release Year', 'Director']}
+          refreshTrigger={refreshTrigger}
           renderRow={(movie) => (
             <div key={movie.id} className="flex bg-gray-100 items-center px-6 py-4 rounded-lg">
               <img
@@ -42,7 +75,7 @@ export default function Movies() {
                 <button>
                   <GoPencil />
                 </button>
-                <button>
+                <button onClick={() => handleOpenDeleteModal(movie)}>
                   <AiOutlineDelete />
                 </button>
               </div>
@@ -50,6 +83,27 @@ export default function Movies() {
           )}
         />
       </div>
+
+      <dialog id="delete_movie" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <h3 className="!font-bold text-lg">Delete movie</h3>
+          <p className="py-4">
+            Are you sure you want to delete{' '}
+            <span className="!font-bold">
+              {selectedMovie?.title} ({new Date(selectedMovie?.release_year).getFullYear()})
+            </span>
+            ?
+          </p>
+          <div className="flex justify-between !mt-5">
+            <button className="btn btn-error" onClick={handleDeleteMovie}>
+              Delete
+            </button>
+            <form method="dialog">
+              <button className="btn">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </div>
   )
 }

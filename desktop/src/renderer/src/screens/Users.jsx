@@ -32,7 +32,6 @@ export default function Users() {
           }
         )
 
-        console.log('Deleting user:', selectedUser)
         document.getElementById('delete_user').close()
         setRefreshTrigger((prev) => prev + 1)
       } catch (error) {

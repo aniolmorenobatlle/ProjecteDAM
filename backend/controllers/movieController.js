@@ -420,3 +420,28 @@ exports.fetchAddMovieToWatchlist = async (req, res) => {
     res.status(500).json({ message: "Error del servidor" });
   }
 };
+
+exports.deleteMovie = async (req, res) => {
+  try {
+    const { id_api } = req.body;
+
+    if (!id_api) {
+      return res.status(400).json({ message: "Falten dades (id_api)" });
+    }
+
+    const movie = await movieModel.deleteMovie(id_api);
+
+    if (!movie) {
+      return res.status(404).json({ message: "Pel·lícula no trobada" });
+    }
+
+    res.json({
+      message: "Pel·lícula eliminada correctament",
+      movie
+    });
+
+  } catch (error) {
+    console.error("Error eliminant la pel·lícula:", error);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+}

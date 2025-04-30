@@ -190,7 +190,6 @@ exports.getFavoritesUserMovies = async (user_id) => {
   return result.rows;
 };
 
-
 exports.addMovieComment = async (id_api, user_id, comment) => {
   const query = `
     INSERT INTO comments (movie_id, user_id, comment, created_at)
@@ -238,4 +237,13 @@ exports.addMovieIsWatchlist = async (user_id, id_api) => {
 
   const result = await pool.query(query, [user_id, id_api]);
   return result.rows[0];
+}
+
+exports.deleteMovie = async (id_api) => {
+  const query = await pool.query(
+    `DELETE FROM movies WHERE id_api = $1 RETURNING id_api`,
+    [id_api]
+  );
+
+  return query.rows[0];
 }
