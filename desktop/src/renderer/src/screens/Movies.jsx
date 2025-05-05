@@ -1,44 +1,22 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Header from '../components/Header'
 import Sidebar from './../components/Sidebar'
 import PaginatedTable from '../components/PaginatedTable'
 import { API_URL } from '../../../../config'
 import { GoPencil } from 'react-icons/go'
 import { AiOutlineDelete } from 'react-icons/ai'
-import axios from 'axios'
+import ModalDeleteMovie from './MovieScreen/ModalDeleteMovie'
 
 export default function Movies() {
+  const modalDeleteRef = useRef()
+
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMovie, setSelectedMovie] = useState(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const token = localStorage.getItem('token')
 
   const handleOpenDeleteModal = (movie) => {
-    setSelectedMovie(movie)
-    document.getElementById('delete_movie').showModal()
-  }
-
-  const handleDeleteMovie = async () => {
-    if (selectedMovie) {
-      try {
-        await axios.post(
-          `${API_URL}/api/movies/delete-movie`,
-          { id_api: selectedMovie.id_api },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
-
-        document.getElementById('delete_movie').close()
-        setRefreshTrigger((prev) => prev + 1)
-      } catch (error) {
-        alert('Error deleting the movie. Try again later.')
-        console.error('Error deleting user:', error)
-      }
-    }
+    modalDeleteRef.current?.open(movie)
   }
 
   return (
@@ -84,26 +62,12 @@ export default function Movies() {
         />
       </div>
 
-      <dialog id="delete_movie" className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
-          <h3 className="!font-bold text-lg">Delete movie</h3>
-          <p className="py-4">
-            Are you sure you want to delete{' '}
-            <span className="!font-bold">
-              {selectedMovie?.title} ({new Date(selectedMovie?.release_year).getFullYear()})
-            </span>
-            ?
-          </p>
-          <div className="flex justify-between !mt-5">
-            <button className="btn btn-error" onClick={handleDeleteMovie}>
-              Delete
-            </button>
-            <form method="dialog">
-              <button className="btn">Cancel</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
+      <ModalDeleteMovie
+        ref={modalDeleteRef}
+        token={token}
+        API_URL={API_URL}
+        onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
+      />
     </div>
   )
 }

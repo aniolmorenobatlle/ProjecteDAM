@@ -423,7 +423,7 @@ exports.fetchAddMovieToWatchlist = async (req, res) => {
 
 exports.deleteMovie = async (req, res) => {
   try {
-    const { id_api } = req.body;
+    const { id_api } = req.params;
 
     if (!id_api) {
       return res.status(400).json({ message: "Falten dades (id_api)" });

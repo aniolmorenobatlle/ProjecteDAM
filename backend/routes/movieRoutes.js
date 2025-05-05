@@ -27,7 +27,7 @@ router.put('/:id_api/status', updateMovieStatus);
 router.put('/:id_api/status/rate', updateMovieRate);
 
 // Desktop
-router.post('/delete-movie', authMiddleware, adminMiddleware, deleteMovie)
+router.delete('/delete-movie/:id_api', authMiddleware, adminMiddleware, deleteMovie)
 
 
 module.exports = router;
