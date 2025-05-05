@@ -309,3 +309,21 @@ exports.deleteUser = async (userId) => {
 
   return query.rows[0];
 }
+
+exports.updateUserById = async (userId, updates) => {
+  const { name, username, email, avatar, is_admin } = updates;
+
+  const result = await pool.query(
+    `UPDATE users
+     SET name = $1,
+         username = $2,
+         email = $3,
+         avatar = $4,
+         is_admin = $5
+     WHERE id = $6
+     RETURNING id, name, username, email, avatar, is_admin`,
+    [name, username, email, avatar, is_admin, userId]
+  );
+
+  return result.rows[0];
+};

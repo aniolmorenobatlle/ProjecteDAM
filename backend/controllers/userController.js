@@ -338,7 +338,7 @@ exports.fetchCounts = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
 
     if (!userId) {
       return res.status(400).json({ message: "User id not provided" });
@@ -360,3 +360,35 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: "Error deleting this user" });
   }
 }
+
+
+exports.updateUserById = async (req, res) => {
+  const { userId, name, username, email, avatar, is_admin } = req.body;
+
+  try {
+    const currentUsername = await userModel.getCurrentUsername(userId);
+
+    if (username && username !== currentUsername) {
+      const exists = await userModel.checkUserExists(username);
+      if (exists) {
+        return res.status(400).json({ message: "El nom d'usuari ja està en ús" });
+      }
+    }
+
+    const updates = { name, username, email, avatar, is_admin };
+    const updatedUser = await userModel.updateUserById(userId, updates);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Usuari modificat correctament",
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error("Error en editar l'usuari:", error);
+    res.status(500).json({ message: "Error al modificar l'usuari" });
+  }
+};

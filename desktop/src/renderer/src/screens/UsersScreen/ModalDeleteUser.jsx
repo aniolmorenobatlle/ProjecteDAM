@@ -19,15 +19,11 @@ const ModalDeleteUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     if (!user) return
 
     try {
-      await axios.post(
-        `${API_URL}/api/users/delete-user`,
-        { userId: user.id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      await axios.delete(`${API_URL}/api/users/delete-user/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      )
+      })
 
       modalRef.current?.close()
       onSuccess?.() // Per refrescar dades
