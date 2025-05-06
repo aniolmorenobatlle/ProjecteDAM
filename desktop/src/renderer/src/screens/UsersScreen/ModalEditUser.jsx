@@ -5,6 +5,7 @@ import InputAddUser from '../../components/InputAddUser'
 const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const modalRef = useRef()
   const [user, setUser] = useState(null)
+  const [loadingAvatar, setLoadingAvatar] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -26,8 +27,12 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   }
 
   const handleChangePhoto = () => {
+    setLoadingAvatar(true)
     const newAvatar = getAvatarUrl(formData.name)
-    setFormData({ ...formData, avatar: newAvatar })
+    setFormData((prev) => ({ ...prev, avatar: newAvatar }))
+    setTimeout(() => {
+      setLoadingAvatar(false)
+    }, 300)
   }
 
   const handleUpdateUser = async () => {
@@ -52,6 +57,17 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     }
   }
 
+  // Funció per convertir un array de bytes a base64
+  const arrayBufferToBase64 = (arrayBuffer) => {
+    let binary = ''
+    const bytes = new Uint8Array(arrayBuffer)
+    const length = bytes.byteLength
+    for (let i = 0; i < length; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary) // codifica a base64
+  }
+
   useImperativeHandle(ref, () => ({
     open: (userToDelete) => {
       setUser(userToDelete)
@@ -71,12 +87,22 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
         <div className="flex flex-col gap-5 !my-8">
           <div className="flex items-center gap-5">
             <img
-              src={formData.avatar || null}
+              src={
+                formData.avatar
+                  ? formData.avatar
+                  : formData.avatar_binary && formData.avatar_binary.data
+                    ? `data:image/jpeg;base64,${arrayBufferToBase64(formData.avatar_binary.data)}`
+                    : ''
+              }
               alt="Avatar"
               className="w-20 h-20 rounded-full object-cover"
             />
-            <button className="text-blue-500" onClick={handleChangePhoto}>
-              Change profile photo
+            <button className="text-blue-500 flex items-center gap-2" onClick={handleChangePhoto}>
+              {loadingAvatar ? (
+                <span className="loading loading-spinner loading-md"></span>
+              ) : (
+                'Change profile photo'
+              )}
             </button>
           </div>
 

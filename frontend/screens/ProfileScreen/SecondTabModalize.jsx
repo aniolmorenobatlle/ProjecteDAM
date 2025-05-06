@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  ActivityIndicator,
   Image,
   ScrollView,
   Text,
@@ -14,6 +15,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
+import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 
 const CLOUNDINARY_URL =
   "https://res.cloudinary.com/dwe0on2fw/image/upload/recommendme-cover";
@@ -41,7 +43,7 @@ export default function SecondTabModalize({
   setIndex,
 }) {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (userInfo && !selectedPoster) {
@@ -168,6 +170,14 @@ export default function SecondTabModalize({
                   uri: userInfo.avatar_binary || userInfo.avatar,
                 }}
                 style={styles.avatarPreview}
+              />
+            )}
+
+            {uploading && (
+              <ActivityIndicator
+                size="large"
+                color="#9B4D94"
+                style={{ marginTop: 10 }}
               />
             )}
 

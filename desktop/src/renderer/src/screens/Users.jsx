@@ -74,7 +74,7 @@ export default function Users() {
                       : ''
                 }
                 alt="avatar"
-                className="w-15 h-15 rounded-full !mr-5"
+                className="w-15 h-15 rounded-full object-cover !mr-5"
               />
               <div className="flex-1">{user.name}</div>
               <div className="flex-1">{user.email}</div>

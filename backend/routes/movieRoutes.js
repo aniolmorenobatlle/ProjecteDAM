@@ -7,7 +7,7 @@ const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies
 const router = Router();
 
 router.get('/', fetchMovies);
-// router.get('/directors', fetchDirectors);
+router.get('/directors', fetchDirectors);
 router.get('/search', fetchMoviesMin);
 router.get('/most_popular', fetchMostPopularMovies);
 router.get('/trending', fetchTrendingMovies);

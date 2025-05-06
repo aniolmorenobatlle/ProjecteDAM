@@ -78,21 +78,20 @@ exports.fetchDirectors = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20; // Limit de 20 pelis per pagina
     const offset = (page - 1) * limit; // Calcula l'offset
 
-    // Cerca pelis
+    // Cercar
     const query = req.query.query || '';
 
     let directors;
     let totalDirectors;
 
     if (query) {
-      directors = await movieModel.getMoviesQuery(limit, offset, query);
+      directors = await movieModel.getDirectorsQuery(limit, offset, query);
       totalDirectors = await movieModel.getDirectorsCount(query);
     } else {
-      directors = await movieModel.getMovies(limit, offset);
+      directors = await movieModel.getDirectors(limit, offset);
       totalDirectors = await movieModel.getDirectorsCount();
     }
 
-    // Retornar directors
     res.json({
       directors,
       page,

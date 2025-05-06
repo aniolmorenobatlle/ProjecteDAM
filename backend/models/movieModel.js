@@ -22,9 +22,10 @@ exports.getMovies = async (limit, offset) => {
   return result.rows;
 };
 
-exports.getDirectors = async () => {
+exports.getDirectors = async (limit, offset) => {
   const query = await pool.query(
-    `SELECT * FROM directors`
+    `SELECT * FROM directors LIMIT $1 OFFSET $2`,
+    [limit, offset]
   );
 
   return query.rows;
@@ -38,7 +39,7 @@ exports.getDirectorsCount = async () => {
   return parseInt(query.rows[0].count);
 };
 
-exports.getMoviesQuery = async (limit, offset, query) => {
+exports.getDirectorsQuery = async (limit, offset, query) => {
   const directorQuery = `
     SELECT *
     FROM directors
