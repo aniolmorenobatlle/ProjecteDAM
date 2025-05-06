@@ -1,11 +1,13 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import axios from 'axios'
 import InputAddUser from '../../components/InputAddUser'
 import TextArea from '../../components/TextArea'
+import Select from 'react-select'
 
 const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const modalRef = useRef()
-  const [movie, setMovie] = useState(null)
+  const [, setMovie] = useState(null)
+  const [directors, setDirectors] = useState([])
   const [formData, setFormData] = useState({
     title: '',
     release_year: '',
@@ -14,6 +16,20 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     cover: '',
     synopsis: ''
   })
+
+  const fetchDirectors = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/movies/directors`)
+      setDirectors(response.data.directors)
+      console.log('Directors:', response.data)
+    } catch (error) {
+      console.error('Error fetching directors:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchDirectors() // Crida a fetchDirectors quan el component es munta
+  }, [])
 
   useImperativeHandle(ref, () => ({
     open: (movieToDelete) => {
@@ -32,17 +48,6 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
         <h3 className="!font-bold text-lg">Edit the movie!</h3>
 
         <div className="flex flex-col gap-5 !my-8">
-          {/* <div className="flex items-center gap-5">
-            <img
-              src={formData.poster || null}
-              alt="Avatar"
-              className="w-20 h-20 rounded-full object-cover"
-            />
-            <button className="text-blue-500" onClick={() => alert('Change profile photo')}>
-              Change profile photo
-            </button>
-          </div> */}
-
           <div className="flex gap-5">
             <InputAddUser
               placeholder="Title"
@@ -64,11 +69,26 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
 
           <div className="flex gap-5">
             <div className="flex-1">
-              <InputAddUser
-                placeholder="Director"
-                type="text"
-                value={formData.director}
-                onChange={(e) => setFormData({ ...formData, director: e.target.value })}
+              <Select
+                options={directors.map((dir) => ({
+                  value: dir.id,
+                  label: dir.name
+                }))}
+                value={directors
+                  .map((dir) => ({ value: dir.id, label: dir.name }))
+                  .find((option) => option.value === formData.director)}
+                onChange={(selectedOption) =>
+                  setFormData({ ...formData, director: selectedOption?.value })
+                }
+                isSearchable={true}
+                placeholder="Select a director..."
+                styles={{
+                  menuList: (provided) => ({
+                    ...provided,
+                    maxHeight: '150px',
+                    overflowY: 'auto'
+                  })
+                }}
               />
             </div>
 

@@ -43,7 +43,7 @@ exports.getDirectorsQuery = async (limit, offset, query) => {
   const directorQuery = `
     SELECT *
     FROM directors
-    WHERE LOWER(title) LIKE LOWER($1)
+    WHERE LOWER(name) LIKE LOWER($1)
     LIMIT $2 OFFSET $3
   `;
   const result = await pool.query(directorQuery, [`%${query}%`, limit, offset]);
