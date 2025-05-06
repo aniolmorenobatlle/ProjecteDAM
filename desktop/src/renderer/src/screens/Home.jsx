@@ -30,6 +30,8 @@ function Home() {
         }
       })
 
+      console.log(response.data.users)
+
       const total = response.data.totalUsers
       setTotalUsers(total)
     } catch (error) {

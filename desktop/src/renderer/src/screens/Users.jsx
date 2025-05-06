@@ -31,6 +31,17 @@ export default function Users() {
     modalDeleteRef.current?.open(user)
   }
 
+  // Funció per convertir un array de bytes a base64
+  const arrayBufferToBase64 = (arrayBuffer) => {
+    let binary = ''
+    const bytes = new Uint8Array(arrayBuffer)
+    const length = bytes.byteLength
+    for (let i = 0; i < length; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary) // codifica a base64
+  }
+
   return (
     <div className="flex w-screen h-screen gap-5">
       <Sidebar activePage="users" />
@@ -54,7 +65,17 @@ export default function Users() {
           refreshTrigger={refreshTrigger}
           renderRow={(user) => (
             <div key={user.id} className="flex bg-gray-100 items-center px-6 py-4 rounded-lg">
-              <img src={user.avatar} alt="avatar" className="w-15 h-15 rounded-full !mr-5" />
+              <img
+                src={
+                  user.avatar
+                    ? user.avatar
+                    : user.avatar_binary && user.avatar_binary.data
+                      ? `data:image/jpeg;base64,${arrayBufferToBase64(user.avatar_binary.data)}`
+                      : ''
+                }
+                alt="avatar"
+                className="w-15 h-15 rounded-full !mr-5"
+              />
               <div className="flex-1">{user.name}</div>
               <div className="flex-1">{user.email}</div>
               <div className="flex-1">{user.username}</div>

@@ -22,6 +22,33 @@ exports.getMovies = async (limit, offset) => {
   return result.rows;
 };
 
+exports.getDirectors = async () => {
+  const query = await pool.query(
+    `SELECT * FROM directors`
+  );
+
+  return query.rows;
+};
+
+exports.getDirectorsCount = async () => {
+  const query = await pool.query(
+    `SELECT COUNT(*) FROM directors`
+  );
+
+  return parseInt(query.rows[0].count);
+};
+
+exports.getMoviesQuery = async (limit, offset, query) => {
+  const directorQuery = `
+    SELECT *
+    FROM directors
+    WHERE LOWER(title) LIKE LOWER($1)
+    LIMIT $2 OFFSET $3
+  `;
+  const result = await pool.query(directorQuery, [`%${query}%`, limit, offset]);
+  return result.rows;
+};
+
 exports.getMoviesQuery = async (limit, offset, query) => {
   const movieQuery = `
     SELECT *

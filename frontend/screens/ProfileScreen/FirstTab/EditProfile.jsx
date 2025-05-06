@@ -183,10 +183,18 @@ export default function EditProfile({
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
-                <Image
-                  source={{ uri: userInfo.avatar }}
-                  style={{ width: 50, height: 50, borderRadius: 50 }}
-                />
+                {userInfo.avatar ? (
+                  <Image
+                    source={{ uri: userInfo.avatar }}
+                    style={{ width: 50, height: 50, borderRadius: 50 }}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: userInfo.avatar_binary }}
+                    style={{ width: 50, height: 50, borderRadius: 50 }}
+                  />
+                )}
+
                 <Icon
                   name="chevron-forward-outline"
                   size={15}

@@ -127,10 +127,9 @@ export default function Home() {
               source={{ uri: userInfo.avatar }}
             />
           ) : (
-            <Icon
-              name="person-circle-outline"
-              size={50}
-              style={styles.menuIconAvatarNone}
+            <Image
+              style={styles.menuIconAvatar}
+              source={{ uri: userInfo.avatar_binary }}
             />
           )}
         </TouchableOpacity>

@@ -59,7 +59,6 @@ export default function MainProfile({
 
   useEffect(() => {
     if (userInfo) {
-      console.log(userInfo.avatar_binary);
       fetchCounts();
     }
   }, [userInfo]);

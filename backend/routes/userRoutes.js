@@ -2,6 +2,11 @@ const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
 const adminMiddleware = require('../middleware/adminMiddleware.js');
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+
 const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers, deleteUser, updateUserById } = require('../controllers/userController.js');
 
 const router = Router();
@@ -20,7 +25,7 @@ router.post('/editProfile', authMiddleware, editProfile);
 router.post('/editProfilePoster', authMiddleware, editProfilePoster);
 router.post('/addFavorite', authMiddleware, addFavorite);
 router.post('/deleteFavorite', authMiddleware, deleteFavorite);
-router.post('/editProfileAvatar', authMiddleware, editProfileAvatar);
+router.post('/editProfileAvatar', authMiddleware, upload.single('image'), editProfileAvatar);
 
 // Desktop app
 router.get('/', authMiddleware, adminMiddleware, fetchUsers);

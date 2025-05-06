@@ -6,14 +6,20 @@ import { API_URL } from '../../../../config'
 import { GoPencil } from 'react-icons/go'
 import { AiOutlineDelete } from 'react-icons/ai'
 import ModalDeleteMovie from './MovieScreen/ModalDeleteMovie'
+import ModalEditMovie from './MovieScreen/ModalEditMovie'
 
 export default function Movies() {
+  const modalEditRef = useRef()
   const modalDeleteRef = useRef()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const token = localStorage.getItem('token')
+
+  const handleOpenEditModal = (user) => {
+    modalEditRef.current?.open(user)
+  }
 
   const handleOpenDeleteModal = (movie) => {
     modalDeleteRef.current?.open(movie)
@@ -50,7 +56,7 @@ export default function Movies() {
               <div className="flex-1">{movie.director}</div>
               <div className="flex-1">{new Date(movie.created_at).toLocaleDateString('es-ES')}</div>
               <div className="w-18 flex justify-between text-2xl text-orange-400">
-                <button>
+                <button onClick={() => handleOpenEditModal(movie)}>
                   <GoPencil />
                 </button>
                 <button onClick={() => handleOpenDeleteModal(movie)}>
@@ -61,6 +67,13 @@ export default function Movies() {
           )}
         />
       </div>
+
+      <ModalEditMovie
+        ref={modalEditRef}
+        token={token}
+        API_URL={API_URL}
+        onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
+      />
 
       <ModalDeleteMovie
         ref={modalDeleteRef}

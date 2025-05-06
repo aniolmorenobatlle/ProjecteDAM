@@ -40,8 +40,8 @@ export default function SecondTabModalize({
   setPoster,
   setIndex,
 }) {
-  const [image, setImage] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [setUploading] = useState(false);
 
   useEffect(() => {
     if (userInfo && !selectedPoster) {
@@ -76,75 +76,55 @@ export default function SecondTabModalize({
   };
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission denied",
-        "We need camera roll permissions to make this work!"
-      );
-      return;
-    }
-
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "Images",
-      allowsEditing: true,
-      aspect: [3, 4],
-      quality: 1,
-      base64: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
-    if (!result.canceled) {
-      const extension = result.assets[0].uri.split(".").pop();
-      let mimeType = "image/jpeg";
-      if (extension === "png") mimeType = "image/png";
-
-      setImage({
-        uri: result.assets[0].uri,
-        mimeType: mimeType,
-      });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const selectedUri = result.assets[0].uri;
+      setSelectedImage(selectedUri);
     }
   };
 
   const handleChangeAvatar = async () => {
-    if (!image) {
-      Alert.alert("No hi ha cap imatge per pujar");
+    if (!selectedImage) {
+      alert("No s'ha seleccionat cap imatge!");
       return;
     }
 
-    setIsUploading(true);
+    setUploading(true);
+
+    const token = await AsyncStorage.getItem("authToken");
+
+    const formData = new FormData();
+    formData.append("image", {
+      uri: selectedImage,
+      type: "image/jpeg",
+      name: "avatar.jpg",
+    });
 
     try {
-      // Convertir imatge a base64
-      const base64 = await FileSystem.readAsStringAsync(image.uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
       const response = await axios.post(
         `${API_URL}/api/users/editProfileAvatar`,
-        { avatar: base64, mimeType: image.mimeType },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      const result = response.data;
-
-      console.log("Resposta:", result);
-
       if (response.status === 200) {
-        Alert.alert("Avatar actualitzat correctament!");
-      } else {
-        Alert.alert("Error actualitzant l'avatar");
+        alert("Imatge carregada correctament!");
+        setSelectedImage(null);
       }
     } catch (error) {
-      console.error("Error pujant la imatge:", error);
-      Alert.alert("Error pujant la imatge");
+      console.error("Error al carregar la imatge:", error);
+      alert("Error al carregar la imatge.");
+    } finally {
+      setUploading(false);
     }
-
-    setIsUploading(false);
   };
 
   return (
@@ -177,11 +157,16 @@ export default function SecondTabModalize({
           <View style={styles.longLine}></View>
 
           <View style={styles.galeryContainer}>
-            {image ? (
-              <Image source={{ uri: image.uri }} style={styles.avatarPreview} />
+            {selectedImage ? (
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.avatarPreview}
+              />
             ) : (
               <Image
-                source={{ uri: userInfo.avatar_binary || userInfo.avatar }}
+                source={{
+                  uri: userInfo.avatar_binary || userInfo.avatar,
+                }}
                 style={styles.avatarPreview}
               />
             )}

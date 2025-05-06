@@ -222,11 +222,16 @@ exports.editProfilePoster = async (req, res) => {
 };
 
 exports.editProfileAvatar = async (req, res) => {
-  const { avatar } = req.body;
   const userId = req.user.userId;
 
   try {
-    const user = await userModel.editProfileAvatar(userId, avatar);
+    if (!req.file) {
+      return res.status(400).json({ message: "No s'ha carregat cap imatge" });
+    }
+
+    const avatarBuffer = req.file.buffer;
+
+    const user = await userModel.editProfileAvatar(userId, avatarBuffer);
 
     if (!user) {
       return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
@@ -360,7 +365,6 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: "Error deleting this user" });
   }
 }
-
 
 exports.updateUserById = async (req, res) => {
   const { userId, name, username, email, avatar, is_admin } = req.body;

@@ -60,7 +60,7 @@ export default function PaginatedTable({
   }, [currentPage, query, refreshTrigger])
 
   return (
-    <div className="flex flex-col gap-4 w-full mx-auto mt-10">
+    <div className="flex flex-col gap-4 w-full mx-auto mt-10 overflow-y-auto">
       <div className="flex font-semibold text-gray-500 px-6 py-3 rounded-t-lg">
         <div className="w-15 !mr-5"></div>
         {columns.map((col, idx) => (

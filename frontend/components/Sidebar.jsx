@@ -124,10 +124,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
                 source={{ uri: userInfo.avatar }}
               />
             ) : (
-              <Icon
-                name="person-circle-outline"
-                size={80}
-                style={styles.menuIconAvatarNone}
+              <Image
+                style={styles.menuIconAvatar}
+                source={{ uri: userInfo.avatar_binary }}
               />
             )}
             <View style={styles.avatarTexts}>

@@ -2,11 +2,12 @@ const { Router } = require('express');
 const authMiddleware = require('../middleware/authMiddleware.js');
 const adminMiddleware = require('../middleware/adminMiddleware.js');
 
-const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate, deleteMovie } = require('../controllers/movieController.js');
+const { fetchMovies, fetchMoviesMin, fetchMostPopularMovies, fetchTrendingMovies, fetchMovieComments, fetchAddMovieComment, fetchMovieStreaming, fetchMovieCast, fetchMovieDirector, fetchMovieDetails, fetchAddMovieToWatched, fetchAddMovieToLike, fetchAddMovieToWatchlist, fetchMovieStatus, updateMovieStatus, fetchFavoriteUserMovies, updateMovieRate, deleteMovie, fetchDirectors } = require('../controllers/movieController.js');
 
 const router = Router();
 
 router.get('/', fetchMovies);
+// router.get('/directors', fetchDirectors);
 router.get('/search', fetchMoviesMin);
 router.get('/most_popular', fetchMostPopularMovies);
 router.get('/trending', fetchTrendingMovies);

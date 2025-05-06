@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import axios from 'axios'
 import InputAddUser from '../../components/InputAddUser'
 
-const ModalDeleteUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
+const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const modalRef = useRef()
   const [user, setUser] = useState(null)
   const [formData, setFormData] = useState({
@@ -149,4 +149,4 @@ const ModalDeleteUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   )
 })
 
-export default ModalDeleteUser
+export default ModalEditUser

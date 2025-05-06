@@ -56,9 +56,14 @@ export default function CustomModalize({
             <Text style={styles.cancel}>Close</Text>
           </TouchableOpacity>
           <Text style={styles.searchFilm}>{title}</Text>
-          {userInfo.avatar && (
+          {userInfo.avatar ? (
             <Image
               source={{ uri: userInfo.avatar }}
+              style={styles.searchAvatar}
+            />
+          ) : (
+            <Image
+              source={{ uri: userInfo.avatar_binary }}
               style={styles.searchAvatar}
             />
           )}
