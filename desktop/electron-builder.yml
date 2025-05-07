@@ -18,7 +18,7 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  allowToChangeInstallationDirectory: true
+  oneClick: false # Aquí canviem a false
   installerIcon: resources/icon.png
   uninstallerIcon: resources/icon.png
   installerHeaderIcon: resources/icon.png
