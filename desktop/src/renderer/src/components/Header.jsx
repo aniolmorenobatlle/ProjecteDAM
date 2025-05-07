@@ -35,12 +35,16 @@ export default function Header({ title, titleButton, onQueryChange, setTerm, onB
         />
       </div>
 
-      <button
-        className="p-2 px-5 bg-amber-400 rounded-lg text-xl text-white"
-        onClick={onButtonClick}
-      >
-        {titleButton}
-      </button>
+      {titleButton?.toLowerCase().includes('movie') ? (
+        <div className="w-[180px]" />
+      ) : (
+        <button
+          className="p-2 px-5 bg-amber-400 rounded-lg text-xl text-white"
+          onClick={onButtonClick}
+        >
+          {titleButton}
+        </button>
+      )}
     </div>
   )
 }

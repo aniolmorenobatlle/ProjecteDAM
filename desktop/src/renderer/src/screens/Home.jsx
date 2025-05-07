@@ -1,14 +1,15 @@
 import { FiUsers } from 'react-icons/fi'
 import { MdOutlineLocalMovies } from 'react-icons/md'
-import Sidebar from '../components/Sidebar'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../../../config'
 import { useEffect, useState } from 'react'
 
-function Home() {
+export default function Home() {
   const [totalMovies, setTotalMovies] = useState(0)
   const [totalUsers, setTotalUsers] = useState(0)
+
+  const token = localStorage.getItem('token')
 
   const fetchTotalMovie = async () => {
     try {
@@ -22,15 +23,11 @@ function Home() {
 
   const fetchTotalUsers = async () => {
     try {
-      const token = localStorage.getItem('token')
-
       const response = await axios.get(`${API_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-
-      console.log(response.data.users)
 
       const total = response.data.totalUsers
       setTotalUsers(total)
@@ -45,9 +42,7 @@ function Home() {
   })
 
   return (
-    <div className="flex w-screen h-screen gap-5">
-      <Sidebar activePage="home" />
-
+    <div className="flex h-screen gap-5">
       <div className="flex gap-5 h-fit !mt-5">
         <Link
           to="/users"
@@ -71,5 +66,3 @@ function Home() {
     </div>
   )
 }
-
-export default Home

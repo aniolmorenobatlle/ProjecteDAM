@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import Sidebar from './../components/Sidebar'
 import Header from '../components/Header'
 import PaginatedTable from '../components/PaginatedTable'
 import { API_URL } from '../../../../config'
@@ -43,9 +42,7 @@ export default function Users() {
   }
 
   return (
-    <div className="flex w-screen h-screen gap-5">
-      <Sidebar activePage="users" />
-
+    <div className="flex h-screen gap-5">
       <div className="flex flex-col flex-1 gap-5 py-5 !mr-5">
         <Header
           title="Users List"

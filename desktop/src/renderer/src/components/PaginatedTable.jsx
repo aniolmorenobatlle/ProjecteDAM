@@ -92,7 +92,7 @@ export default function PaginatedTable({
           onClick={handlePrevious}
           disabled={currentPage === 0}
           className={`${
-            currentPage === 0 ? 'bg-gray-300 !cursor-default' : 'bg-[#FEAF00]'
+            currentPage === 0 ? 'bg-gray-300 !cursor-not-allowed' : 'bg-[#FEAF00]'
           } text-white p-2 px-5 rounded-lg text-xl`}
         >
           Previous
@@ -106,7 +106,7 @@ export default function PaginatedTable({
           onClick={handleNext}
           disabled={currentPage >= totalPages - 1}
           className={`${
-            currentPage >= totalPages - 1 ? 'bg-gray-300 !cursor-default' : 'bg-[#FEAF00]'
+            currentPage >= totalPages - 1 ? 'bg-gray-300 !cursor-not-allowed' : 'bg-[#FEAF00]'
           } text-white p-2 px-5 rounded-lg text-xl`}
         >
           Next

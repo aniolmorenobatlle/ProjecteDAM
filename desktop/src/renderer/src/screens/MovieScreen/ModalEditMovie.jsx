@@ -16,8 +16,6 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     id_api: null
   })
 
-  console.log('Director id', formData.director_id)
-
   const loadDirectorOptions = async (inputValue) => {
     try {
       const response = await axios.get(`${API_URL}/api/movies/directors?query=${inputValue}`)
@@ -50,7 +48,6 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
         }
       })
 
-      alert('Movie edited successfully!')
       onSuccess()
       modalRef.current?.close()
     } catch (error) {
@@ -84,26 +81,33 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
 
         <div className="flex flex-col gap-5 !my-8">
           <div className="flex gap-5">
-            <InputAddUser
-              placeholder="Title"
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            />
-            <InputAddUser
-              placeholder="Release Year"
-              type="date"
-              value={
-                formData.release_year
-                  ? new Date(formData.release_year).toISOString().split('T')[0]
-                  : ''
-              }
-              onChange={(e) => setFormData({ ...formData, release_year: e.target.value })}
-            />
+            <div className="flex flex-col flex-1">
+              <label className="text-sm">Title</label>
+              <InputAddUser
+                placeholder="Title"
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col flex-1">
+              <label className="text-sm">Release Year</label>
+              <InputAddUser
+                placeholder="Release Year"
+                type="date"
+                value={
+                  formData.release_year
+                    ? new Date(formData.release_year).toISOString().split('T')[0]
+                    : ''
+                }
+                onChange={(e) => setFormData({ ...formData, release_year: e.target.value })}
+              />
+            </div>
           </div>
 
           <div className="flex gap-5">
-            <div className="flex-1">
+            <div className="flex flex-col flex-1">
+              <label className="text-sm">Director</label>
               <AsyncSelect
                 cacheOptions
                 loadOptions={loadDirectorOptions}
@@ -134,9 +138,10 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
               />
             </div>
 
-            <div className="flex-1">
+            <div className="flex flex-col flex-1">
+              <label className="text-sm">Synopsis</label>
               <TextArea
-                placeholder="Director"
+                placeholder="Synopsis"
                 rows={6}
                 value={formData.synopsis}
                 onChange={(e) => setFormData({ ...formData, synopsis: e.target.value })}
