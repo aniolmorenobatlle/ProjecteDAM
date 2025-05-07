@@ -1,4 +1,4 @@
-# prova-electron
+# RecommendMe
 
 An Electron application with React
 
