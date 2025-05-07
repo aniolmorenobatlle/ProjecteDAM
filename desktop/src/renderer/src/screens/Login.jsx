@@ -7,6 +7,7 @@ import { API_URL } from '../../../../config'
 function Login() {
   const navigate = useNavigate()
 
+  const [error, setError] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -24,7 +25,7 @@ function Login() {
     } catch (error) {
       console.error('Error en el login', error)
 
-      alert('Incorrect username or password. Please try again.')
+      setError('Incorrect username or password. Please try again.')
     }
   }
 
@@ -65,6 +66,12 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+
+              {error && (
+                <div className="w-full flex flex-col">
+                  <p className="text-md text-red-500">{error}</p>
+                </div>
+              )}
             </div>
 
             <button className="text-white !mt-10 w-full h-12 bg-amber-400 rounded-lg focus:bg-amber-500 transition-all duration-300">
