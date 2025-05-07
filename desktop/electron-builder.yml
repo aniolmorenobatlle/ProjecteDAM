@@ -12,8 +12,6 @@ asarUnpack:
   - resources/**
 win:
   executableName: RecommendMe
-  certificateFile: null
-  sign: false
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
