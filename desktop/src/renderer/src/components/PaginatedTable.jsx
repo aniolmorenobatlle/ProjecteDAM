@@ -56,6 +56,10 @@ export default function PaginatedTable({
   }
 
   useEffect(() => {
+    setCurrentPage(0)
+  }, [query])
+
+  useEffect(() => {
     fetchPage(currentPage)
   }, [currentPage, query, refreshTrigger])
 
@@ -93,6 +97,11 @@ export default function PaginatedTable({
         >
           Previous
         </button>
+
+        <span className="text-xl text-gray-500">
+          Page {currentPage + 1} of {totalPages}
+        </span>
+
         <button
           onClick={handleNext}
           disabled={currentPage >= totalPages - 1}
