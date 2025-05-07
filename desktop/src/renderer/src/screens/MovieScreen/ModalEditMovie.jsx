@@ -16,6 +16,8 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     id_api: null
   })
 
+  console.log('Director id', formData.director_id)
+
   const loadDirectorOptions = async (inputValue) => {
     try {
       const response = await axios.get(`${API_URL}/api/movies/directors?query=${inputValue}`)
@@ -58,9 +60,16 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   }
 
   useImperativeHandle(ref, () => ({
-    open: (movieToDelete) => {
-      setMovie(movieToDelete)
-      setFormData(movieToDelete)
+    open: (movieToEdit) => {
+      setMovie(movieToEdit)
+      setFormData({
+        title: movieToEdit.title || '',
+        release_year: movieToEdit.release_year || '',
+        synopsis: movieToEdit.synopsis || '',
+        id_api: movieToEdit.id_api || null,
+        director: movieToEdit.director || '',
+        director_id: movieToEdit.director_id || null
+      })
       modalRef.current?.showModal()
     },
     close: () => {

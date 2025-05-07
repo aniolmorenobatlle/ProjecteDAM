@@ -12,6 +12,7 @@ exports.getMovies = async (limit, offset) => {
       m.vote_average,
       m.id_api,
       d.name AS director,
+      m.director_id,
       m.created_at,
       m.is_trending
     FROM movies m
@@ -52,7 +53,7 @@ exports.getDirectorsQuery = async (limit, offset, query) => {
 
 exports.getMoviesQuery = async (limit, offset, query) => {
   const movieQuery = `
-    SELECT
+    SELECT 
       m.id,
       m.title,
       m.release_year,
@@ -62,15 +63,15 @@ exports.getMoviesQuery = async (limit, offset, query) => {
       m.vote_average,
       m.id_api,
       d.name AS director,
+      m.director_id,
       m.created_at,
       m.is_trending
     FROM movies m
-    JOIN directors d ON m.director_id = d.id
+    LEFT JOIN directors d ON m.director_id = d.id
     WHERE LOWER(m.title) LIKE LOWER($1)
       AND m.poster IS NOT NULL
     LIMIT $2 OFFSET $3
   `;
-
   const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
   return result.rows;
 };
@@ -107,25 +108,9 @@ exports.getMoviesCount = async () => {
 };
 
 exports.getMovieByTitle = async (title) => {
-  const query = `
-    SELECT 
-      m.id,
-      m.title,
-      m.release_year,
-      m.poster,
-      m.cover,
-      m.synopsis,
-      m.vote_average,
-      m.id_api,
-      d.name AS director,
-      m.created_at,
-      m.is_trending
-    FROM movies m
-    JOIN directors d ON m.director_id = d.id
-    WHERE LOWER(m.title) = LOWER($1)
-    LIMIT 1;`;
-
+  const query = 'SELECT * FROM "movies" WHERE title = $1 LIMIT 1';
   const result = await pool.query(query, [title]);
+
   return result.rows[0];
 };
 
