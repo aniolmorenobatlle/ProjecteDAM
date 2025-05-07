@@ -52,12 +52,25 @@ exports.getDirectorsQuery = async (limit, offset, query) => {
 
 exports.getMoviesQuery = async (limit, offset, query) => {
   const movieQuery = `
-    SELECT *
-    FROM movies
-    WHERE LOWER(title) LIKE LOWER($1)
-    AND poster IS NOT NULL
+    SELECT
+      m.id,
+      m.title,
+      m.release_year,
+      m.poster,
+      m.cover,
+      m.synopsis,
+      m.vote_average,
+      m.id_api,
+      d.name AS director,
+      m.created_at,
+      m.is_trending
+    FROM movies m
+    JOIN directors d ON m.director_id = d.id
+    WHERE LOWER(m.title) LIKE LOWER($1)
+      AND m.poster IS NOT NULL
     LIMIT $2 OFFSET $3
   `;
+
   const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
   return result.rows;
 };
@@ -94,9 +107,25 @@ exports.getMoviesCount = async () => {
 };
 
 exports.getMovieByTitle = async (title) => {
-  const query = 'SELECT * FROM "movies" WHERE title = $1 LIMIT 1';
-  const result = await pool.query(query, [title]);
+  const query = `
+    SELECT 
+      m.id,
+      m.title,
+      m.release_year,
+      m.poster,
+      m.cover,
+      m.synopsis,
+      m.vote_average,
+      m.id_api,
+      d.name AS director,
+      m.created_at,
+      m.is_trending
+    FROM movies m
+    JOIN directors d ON m.director_id = d.id
+    WHERE LOWER(m.title) = LOWER($1)
+    LIMIT 1;`;
 
+  const result = await pool.query(query, [title]);
   return result.rows[0];
 };
 
@@ -271,6 +300,22 @@ exports.deleteMovie = async (id_api) => {
   const query = await pool.query(
     `DELETE FROM movies WHERE id_api = $1 RETURNING id_api`,
     [id_api]
+  );
+
+  return query.rows[0];
+}
+
+exports.updateMovie = async (id_api, title, release_year, synopsis, director_id) => {
+  const query = await pool.query(
+    `UPDATE movies 
+      SET
+        title = $1,
+        release_year = $2,
+        synopsis = $3,
+        director_id = $4
+      WHERE id_api = $5
+      RETURNING id_api`,
+    [title, release_year, synopsis, director_id, id_api]
   );
 
   return query.rows[0];

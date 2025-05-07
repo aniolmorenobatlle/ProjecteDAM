@@ -479,3 +479,24 @@ exports.deleteMovie = async (req, res) => {
     return res.status(500).json({ message: "Error del servidor" });
   }
 }
+
+exports.updateMovie = async (req, res) => {
+  const { id_api } = req.params;
+  const { title, release_year, synopsis, director_id } = req.body;
+
+  try {
+    const movie = await movieModel.updateMovie(id_api, title, release_year, synopsis, director_id);
+
+    if (!movie) {
+      return res.status(404).json({ message: "Pel·lícula no trobada" });
+    }
+
+    res.json({
+      message: "Pel·lícula actualitzada correctament",
+      movie
+    });
+  } catch (error) {
+    console.error("Error actualitzant la pel·lícula:", error);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+}

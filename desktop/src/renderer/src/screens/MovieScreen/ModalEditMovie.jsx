@@ -1,35 +1,61 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import axios from 'axios'
 import InputAddUser from '../../components/InputAddUser'
 import TextArea from '../../components/TextArea'
-import Select from 'react-select'
+import AsyncSelect from 'react-select/async'
 
 const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const modalRef = useRef()
   const [, setMovie] = useState(null)
-  const [directors, setDirectors] = useState([])
   const [formData, setFormData] = useState({
     title: '',
     release_year: '',
     director: '',
-    poster: '',
-    cover: '',
-    synopsis: ''
+    director_id: null,
+    synopsis: '',
+    id_api: null
   })
 
-  const fetchDirectors = async () => {
+  const loadDirectorOptions = async (inputValue) => {
     try {
-      const response = await axios.get(`${API_URL}/api/movies/directors`)
-      setDirectors(response.data.directors)
-      console.log('Directors:', response.data)
+      const response = await axios.get(`${API_URL}/api/movies/directors?query=${inputValue}`)
+      return response.data.directors.map((dir) => ({
+        value: dir.id,
+        label: dir.name
+      }))
     } catch (error) {
-      console.error('Error fetching directors:', error)
+      console.error('Error loading director options:', error)
+      return []
     }
   }
 
-  useEffect(() => {
-    fetchDirectors() // Crida a fetchDirectors quan el component es munta
-  }, [])
+  const handleEditMovie = async () => {
+    try {
+      const updatedData = {
+        title: formData.title,
+        release_year: formData.release_year,
+        synopsis: formData.synopsis
+      }
+
+      // Afegir nomes si s'ha canviat
+      if (formData.director_id !== null) {
+        updatedData.director_id = formData.director_id
+      }
+
+      await axios.put(`${API_URL}/api/movies/update-movie/${formData.id_api}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      alert('Movie edited successfully!')
+      onSuccess()
+      modalRef.current?.close()
+    } catch (error) {
+      console.error('Error editing movie:', error)
+      alert('Error editing movie')
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     open: (movieToDelete) => {
@@ -69,18 +95,25 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
 
           <div className="flex gap-5">
             <div className="flex-1">
-              <Select
-                options={directors.map((dir) => ({
-                  value: dir.id,
-                  label: dir.name
-                }))}
-                value={directors
-                  .map((dir) => ({ value: dir.id, label: dir.name }))
-                  .find((option) => option.value === formData.director)}
-                onChange={(selectedOption) =>
-                  setFormData({ ...formData, director: selectedOption?.value })
+              <AsyncSelect
+                cacheOptions
+                loadOptions={loadDirectorOptions}
+                value={
+                  formData.director
+                    ? {
+                        value: formData.director_id,
+                        label: formData.director
+                      }
+                    : null
                 }
-                isSearchable={true}
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    director: selectedOption?.label || '',
+                    director_id: selectedOption?.value || null
+                  })
+                }
+                isSearchable
                 placeholder="Select a director..."
                 styles={{
                   menuList: (provided) => ({
@@ -106,7 +139,7 @@ const ModalEditMovie = forwardRef(({ token, API_URL, onSuccess }, ref) => {
         <div className="flex justify-between modal-action">
           <button
             className="btn bg-green-400 hover:bg-green-500 transition-all duration-300 ease-in-out"
-            onClick={() => alert('Confirm changes')}
+            onClick={handleEditMovie}
           >
             Confirm changes
           </button>
