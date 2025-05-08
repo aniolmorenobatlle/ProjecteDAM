@@ -110,56 +110,24 @@ export default function Film() {
     }
   };
 
-  const updateMovieStatus = async (newStatus) => {
-    try {
-      await axios.put(`${API_URL}/api/movies/${filmId}/status`, {
-        user_id: userInfo.id,
-        likes: newStatus.likes,
-        watched: newStatus.watched,
-        watchlist: newStatus.watchlist,
-      });
-    } catch (error) {
-      Alert.alert(
-        "Error",
-        "There was an error updating the movie status. Please try again."
-      );
-      console.error(
-        "Error actualitzant l'estat de la pel·lícula:",
-        error.response?.data || error
-      );
-    }
-  };
-
   const handleOpenModalWatchlist = () => {
     setModalWatchlist(true);
   };
 
   const handleIsWatched = () => {
-    const newStatus = {
-      watched: !isWatched,
-      likes: isLikes,
-      watchlist: isInWatchlist,
-    };
+    const newStatus = { watched: !isWatched };
     setIsWatched(!isWatched);
     updateMovieStatus(newStatus);
   };
 
-  const handleisLikes = () => {
-    const newStatus = {
-      watched: isWatched,
-      likes: !isLikes,
-      watchlist: isInWatchlist,
-    };
+  const handleIsLikes = () => {
+    const newStatus = { likes: !isLikes };
     setIsLikes(!isLikes);
     updateMovieStatus(newStatus);
   };
 
   const handleIsInWatchlist = () => {
-    const newStatus = {
-      watched: isWatched,
-      likes: isLikes,
-      watchlist: !isInWatchlist,
-    };
+    const newStatus = { watchlist: !isInWatchlist };
     setIsInWatchlist(!isInWatchlist);
     updateMovieStatus(newStatus);
   };
@@ -223,6 +191,34 @@ export default function Film() {
       );
     }
     return stars;
+  };
+
+  const updateMovieStatus = async (newStatus) => {
+    try {
+      const statusToSend = {
+        watched:
+          newStatus.watched !== undefined ? newStatus.watched : isWatched,
+        likes: newStatus.likes !== undefined ? newStatus.likes : isLikes,
+        watchlist:
+          newStatus.watchlist !== undefined
+            ? newStatus.watchlist
+            : isInWatchlist,
+      };
+
+      await axios.put(`${API_URL}/api/movies/${filmId}/status`, {
+        user_id: userInfo.id,
+        ...statusToSend,
+      });
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "There was an error updating the movie status. Please try again."
+      );
+      console.error(
+        "Error actualitzant l'estat de la pel·lícula:",
+        error.response?.data || error
+      );
+    }
   };
 
   const handleOpenModalList = () => {
@@ -694,7 +690,7 @@ export default function Film() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.8} onPress={handleisLikes}>
+          <TouchableOpacity activeOpacity={0.8} onPress={handleIsLikes}>
             <View style={styles.optionContainer}>
               <Icon
                 name={isLikes ? "heart" : "heart-outline"}

@@ -31,9 +31,9 @@ export default function MainProfile({
     { title: "Watchlist", number: totalWatchlist },
     { title: "Watched", number: totalFilms },
     { title: "Watched This Year", number: totalFilmsYear },
-    { title: "Reviews", number: totalReviews },
     { title: "Likes", number: totalFavorites },
     { title: "Ratings", number: totalRates },
+    { title: "Total Reviews", number: totalReviews },
     { title: "Friends", number: totalFriends },
   ];
 
@@ -142,7 +142,7 @@ export default function MainProfile({
                   {totalReviews}
                 </Text>
                 <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-                  Review
+                  Reviews
                 </Text>
               </View>
             </View>
@@ -186,27 +186,31 @@ export default function MainProfile({
 
             <View style={{ alignItems: "center" }}>
               {lists.map((list, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => setSelectedList(list.title)}
-                  style={{ width: "100%" }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
+                <>
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => setSelectedList(list.title)}
+                    style={{ width: "100%" }}
                   >
-                    <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                      {list.title}
-                    </Text>
-                    <Text
-                      style={[globalStyles.textBase, styles.listInfoNumber]}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
                     >
-                      {list.number}
-                    </Text>
-                  </View>
+                      <Text
+                        style={[globalStyles.textBase, styles.listInfoTitle]}
+                      >
+                        {list.title}
+                      </Text>
+                      <Text
+                        style={[globalStyles.textBase, styles.listInfoNumber]}
+                      >
+                        {list.number}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
 
                   <View
                     style={{
@@ -216,7 +220,7 @@ export default function MainProfile({
                       marginVertical: 10,
                     }}
                   ></View>
-                </TouchableOpacity>
+                </>
               ))}
             </View>
           </View>

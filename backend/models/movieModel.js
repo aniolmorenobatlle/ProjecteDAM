@@ -200,14 +200,18 @@ exports.getMovieStatus = async (user_id, id_api) => {
   return result.rows[0];
 };
 
-exports.updateMovieStatus = async (user_id, id_api, liked, watched, watchlist) => {
+exports.updateMovieStatus = async (user_id, id_api, watched, likes, watchlist) => {
   const query = `
-    INSERT INTO to_watch (user_id, movie_id, likes, watched, watchlist, created_at)
+    INSERT INTO to_watch (user_id, movie_id, watched, likes, watchlist, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW())
     ON CONFLICT (user_id, movie_id)
-    DO UPDATE SET likes = $3, watched = $4, watchlist = $5;
+    DO UPDATE SET 
+      watched = $3,
+      likes = $4,
+      watchlist = $5;
   `;
-  await pool.query(query, [user_id, id_api, liked, watched, watchlist]);
+
+  await pool.query(query, [user_id, id_api, watched, likes, watchlist]);
 };
 
 exports.updateMovieRate = async (user_id, id_api, rate) => {

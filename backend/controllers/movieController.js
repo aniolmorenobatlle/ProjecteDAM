@@ -303,21 +303,15 @@ exports.fetchMovieStatus = async (req, res) => {
 exports.updateMovieStatus = async (req, res) => {
   try {
     const { id_api } = req.params;
-    const { user_id, likes, watched, watchlist } = req.body;
+    const { user_id, watched, likes, watchlist } = req.body;
 
-    if (!user_id) {
-      console.log("Falta l'identificador de l'usuari");
-      return res.status(400).json({ message: "Falta l'identificador de l'usuari" });
-    }
-
-    if (likes === undefined || watched === undefined || watchlist === undefined) {
-      console.log("Falten valors necessaris", { likes, watched, watchlist });
-      return res.status(400).json({ message: "Falten valors necessaris" });
+    if (!user_id || !id_api) {
+      return res.status(400).json({ message: "Falten dades (user_id o id_api)" });
     }
 
     await movieModel.updateMovieStatus(user_id, id_api, watched, likes, watchlist);
 
-    res.json({ message: "Estat actualitzat correctament" });
+    res.json({ message: "Estat de la pel·lícula actualitzat correctament" });
   } catch (error) {
     console.error("Error actualitzant l'estat de la pel·lícula:", error);
     res.status(500).json({ message: "Error del servidor" });

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
-import { Menu, Provider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import CustomModal from "../../../components/CustomModal";
 import { API_URL } from "../../../config";
@@ -15,22 +14,13 @@ export default function ListInfoProfile({
   userInfo,
 }) {
   const navigation = useNavigation();
-  const [visible, setVisible] = useState(false);
   const [movies, setMovies] = useState([]);
-  const [modalDeleteList, setModalDeleteList] = useState(false);
-  const [dropdownList, setDropdownList] = useState([]);
-
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-
-  const handleOpenModalDeleteList = () => {
-    closeMenu();
-    setModalDeleteList(true);
-  };
 
   const formatListName = (listName) => {
     if (listName === "Watched This Year") {
       return "watchedThisYear";
+    } else if (listName === "Total Reviews") {
+      return "reviews";
     }
     return listName.charAt(0).toLowerCase() + listName.slice(1); // Convertir la primera a minuscula
   };
@@ -50,6 +40,7 @@ export default function ListInfoProfile({
       );
 
       if (response.status === 200 && response.data.movies.length === 0) {
+        setMovies([]);
         return;
       }
 
@@ -65,72 +56,46 @@ export default function ListInfoProfile({
   }, []);
 
   return (
-    <Provider>
-      <SafeAreaView style={{ paddingHorizontal: 15 }}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setSelectedList(null)}
-          >
-            <Icon
-              name="arrow-back-outline"
-              size={30}
-              style={styles.headerIcon}
-            />
-          </TouchableOpacity>
+    <SafeAreaView style={{ paddingHorizontal: 15 }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setSelectedList(null)}
+        >
+          <Icon name="arrow-back-outline" size={30} style={styles.headerIcon} />
+        </TouchableOpacity>
 
-          <Text style={styles.listName}>{selectedList}</Text>
+        <Text style={styles.listName}>{selectedList}</Text>
 
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            anchor={
-              <TouchableOpacity onPress={openMenu}>
-                <Icon
-                  name="ellipsis-vertical"
-                  size={30}
-                  style={styles.headerIcon}
+        <View />
+      </View>
+
+      {movies.length === 0 ? (
+        <Text style={styles.emptyMessage}>
+          There are no films on this list yet
+        </Text>
+      ) : (
+        <View style={styles.listGrid}>
+          {movies.map((movie, index) => (
+            <TouchableOpacity
+              key={movie.id_api}
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate("Film", { filmId: movie.id_api })
+              }
+            >
+              <View style={styles.listItem} key={index}>
+                <Image
+                  source={{ uri: movie.poster }}
+                  style={styles.listImage}
                 />
-              </TouchableOpacity>
-            }
-          >
-            <Menu.Item
-              onPress={() => navigation.navigate("Search")}
-              title="Add film"
-            />
-            <Menu.Item
-              onPress={handleOpenModalDeleteList}
-              title="Delete film"
-            />
-          </Menu>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
+      )}
 
-        {movies.length === 0 ? (
-          <Text style={styles.emptyMessage}>
-            There are no films on this list yet
-          </Text>
-        ) : (
-          <View style={styles.listGrid}>
-            {movies.map((movie, index) => (
-              <TouchableOpacity
-                key={movie.id_api}
-                activeOpacity={0.8}
-                onPress={() =>
-                  navigation.navigate("Film", { filmId: movie.id_api })
-                }
-              >
-                <View style={styles.listItem} key={index}>
-                  <Image
-                    source={{ uri: movie.poster }}
-                    style={styles.listImage}
-                  />
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        {/* <CustomModal
+      {/* <CustomModal
           visible={modalDeleteList}
           onClose={() => setModalDeleteList(false)}
         >
@@ -171,8 +136,7 @@ export default function ListInfoProfile({
             </TouchableOpacity>
           </View>
         </CustomModal> */}
-      </SafeAreaView>
-    </Provider>
+    </SafeAreaView>
   );
 }
 

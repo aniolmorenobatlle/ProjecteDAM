@@ -328,7 +328,7 @@ exports.fetchCounts = async (userId) => {
       SELECT COUNT(*)
       FROM to_watch
       WHERE user_id = $1
-      AND favorite = TRUE
+      AND likes = TRUE
     `, [userId]
   )
   const totalFavorites = parseInt(queryFavorites.rows[0].count, 10);
