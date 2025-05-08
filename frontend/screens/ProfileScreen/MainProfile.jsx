@@ -7,6 +7,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
 import ListInfoProfile from "./FirstTab/ListInfoProfile";
+import ReviewsInfoProfile from "./FirstTab/ReviewsInfoProfile";
 
 export default function MainProfile({
   userInfo,
@@ -66,12 +67,12 @@ export default function MainProfile({
   }, [userInfo]);
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={!isModalOpen}
-    >
+    <>
       {selectedList === null ? (
-        <>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={!isModalOpen}
+        >
           <Image source={{ uri: poster }} style={styles.backgroundImage} />
 
           <TouchableOpacity
@@ -186,9 +187,8 @@ export default function MainProfile({
 
             <View style={{ alignItems: "center" }}>
               {lists.map((list, index) => (
-                <>
+                <View key={index} style={{ width: "100%" }}>
                   <TouchableOpacity
-                    key={index}
                     onPress={() => setSelectedList(list.title)}
                     style={{ width: "100%" }}
                   >
@@ -220,19 +220,25 @@ export default function MainProfile({
                       marginVertical: 10,
                     }}
                   ></View>
-                </>
+                </View>
               ))}
             </View>
           </View>
-        </>
-      ) : selectedList != "Friends" ? (
+        </ScrollView>
+      ) : selectedList != "Friends" && selectedList != "Total Reviews" ? (
         <ListInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
           userInfo={userInfo}
         />
+      ) : selectedList === "Total Reviews" ? (
+        <ReviewsInfoProfile
+          selectedList={selectedList}
+          setSelectedList={setSelectedList}
+          userInfo={userInfo}
+        />
       ) : null}
-    </ScrollView>
+    </>
   );
 }
 

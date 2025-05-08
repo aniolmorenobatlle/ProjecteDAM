@@ -356,20 +356,22 @@ exports.fetchReviews = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const reviews = await userModel.getReviews(userId);
+    const reviewsResult = await userModel.getReviews(userId);
 
-    if (!reviews || reviews.length === 0) {
-      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    if (!reviewsResult || reviewsResult.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", reviews: [] });
     }
 
-    const movies = reviews.map(movie => ({
-      id_api: movie.id_api,
-      poster: movie.poster
+    const reviews = reviewsResult.map(review => ({
+      id_api: review.id_api,
+      poster: review.poster,
+      comment: review.comment,
+      created_at: review.created_at
     }));
 
     res.status(200).json({
       message: "Pel·lícules de la llista de seguiment obtingudes correctament",
-      movies: movies
+      reviews: reviews
     });
 
   } catch (error) {

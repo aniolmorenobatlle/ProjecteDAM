@@ -30,7 +30,7 @@ export default function Navbar({ currentPage }) {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleIconClick("Recommend")}>
+      {/* <TouchableOpacity onPress={() => handleIconClick("Recommend")}>
         <Icon
           name="star-outline"
           color={currentPage === "Recommend" ? "#E9A6A6" : "white"}
@@ -46,7 +46,7 @@ export default function Navbar({ currentPage }) {
           size={35}
           style={styles.navbarIcon}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity onPress={() => handleIconClick("Profile")}>
         <Icon

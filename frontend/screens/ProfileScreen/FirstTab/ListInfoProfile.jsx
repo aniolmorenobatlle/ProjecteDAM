@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  FlatList,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import CustomModal from "../../../components/CustomModal";
 import { API_URL } from "../../../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -47,7 +53,7 @@ export default function ListInfoProfile({
       setMovies(response.data.movies);
     } catch (error) {
       console.error("Error fetching movies:", error);
-      alert("Error fetching movies, please try again later");
+      Alert.alert("Error", "Error fetching movies, please try again later");
     }
   };
 
@@ -56,7 +62,7 @@ export default function ListInfoProfile({
   }, []);
 
   return (
-    <SafeAreaView style={{ paddingHorizontal: 15 }}>
+    <SafeAreaView style={{ paddingHorizontal: 15, paddingBottom: 50 }}>
       <View style={styles.header}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -66,8 +72,6 @@ export default function ListInfoProfile({
         </TouchableOpacity>
 
         <Text style={styles.listName}>{selectedList}</Text>
-
-        <View />
       </View>
 
       {movies.length === 0 ? (
@@ -75,67 +79,25 @@ export default function ListInfoProfile({
           There are no films on this list yet
         </Text>
       ) : (
-        <View style={styles.listGrid}>
-          {movies.map((movie, index) => (
+        <FlatList
+          data={movies}
+          keyExtractor={(item) => item.id_api.toString()}
+          renderItem={({ item }) => (
             <TouchableOpacity
-              key={movie.id_api}
+              key={item.id_api}
               activeOpacity={0.8}
               onPress={() =>
-                navigation.navigate("Film", { filmId: movie.id_api })
+                navigation.navigate("Film", { filmId: item.id_api })
               }
             >
-              <View style={styles.listItem} key={index}>
-                <Image
-                  source={{ uri: movie.poster }}
-                  style={styles.listImage}
-                />
+              <View style={styles.listItem}>
+                <Image source={{ uri: item.poster }} style={styles.listImage} />
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
+          )}
+          contentContainerStyle={styles.listGrid}
+        />
       )}
-
-      {/* <CustomModal
-          visible={modalDeleteList}
-          onClose={() => setModalDeleteList(false)}
-        >
-          <Text style={styles.modalTitle}>Delete a list</Text>
-
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={dropdownList}
-            maxHeight={300}
-            search
-            searchPlaceholder="Search"
-            labelField="label"
-            valueField="value"
-            placeholder="Select item"
-            value={selectedFilmId}
-            onChange={(item) => {
-              setSelectedFilmId(item.value);
-            }}
-          />
-
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleDeleteFilmFromList}
-            >
-              <Text style={styles.confirmButtonText}>Done</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCloseModalDeleteList}
-            >
-              <Text style={styles.confirmButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </CustomModal> */}
     </SafeAreaView>
   );
 }
@@ -150,12 +112,16 @@ const styles = {
   },
 
   listName: {
+    flex: 1,
+    textAlign: "center",
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
   },
 
   headerIcon: {
+    flex: 1,
+    textAlign: "left",
     color: "white",
   },
 

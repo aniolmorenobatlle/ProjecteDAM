@@ -186,11 +186,11 @@ exports.getWatchedThisYear = async (userId) => {
 exports.getReviews = async (userId) => {
   const query = await pool.query(
     `
-      SELECT DISTINCT ON (m.id_api) m.id_api, m.poster, c.created_at
+      SELECT m.id_api, m.poster, c.comment, c.created_at
       FROM comments AS c
       JOIN movies AS m ON c.movie_id = m.id_api
       WHERE c.user_id = $1
-      ORDER BY m.id_api, c.created_at DESC
+      ORDER BY c.created_at DESC
     `, [userId]
   );
   return query.rows;
