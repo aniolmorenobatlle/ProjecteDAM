@@ -140,6 +140,92 @@ exports.getFavorites = async (userId) => {
   return query.rows;
 };
 
+exports.getWatchlist = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster 
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.watchlist = true
+      ORDER BY tw.created_at ASC
+    `, [userId]
+  );
+  return query.rows;
+};
+
+exports.getWatched = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster 
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.watched = true
+      ORDER BY tw.created_at ASC
+    `, [userId]
+  );
+  return query.rows;
+};
+
+exports.getWatchedThisYear = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster 
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.watched = true
+      AND EXTRACT(YEAR FROM tw.created_at) = EXTRACT(YEAR FROM NOW())
+      ORDER BY tw.created_at ASC
+    `, [userId]
+  );
+  return query.rows;
+};
+
+exports.getReviews = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT DISTINCT ON (m.id_api) m.id_api, m.poster, c.created_at
+      FROM comments AS c
+      JOIN movies AS m ON c.movie_id = m.id_api
+      WHERE c.user_id = $1
+      ORDER BY m.id_api, c.created_at DESC
+    `, [userId]
+  );
+  return query.rows;
+};
+
+exports.getLikes = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster 
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.likes = true
+      ORDER BY tw.created_at ASC
+    `, [userId]
+  );
+
+  return query.rows;
+};
+
+exports.getRatings = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT m.id_api, m.poster
+      FROM to_watch AS tw
+      JOIN movies AS m ON tw.movie_id = m.id_api
+      WHERE tw.user_id = $1
+      AND tw.rating IS NOT NULL
+      ORDER BY tw.created_at ASC
+    `, [userId]
+  );
+
+  return query.rows;
+};
+
 exports.addFavorite = async (userId, movieId) => {
   const existingFavorite = await pool.query(
     `SELECT * FROM to_watch WHERE user_id = $1 AND movie_id = $2`,

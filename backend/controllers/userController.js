@@ -274,6 +274,162 @@ exports.fetchFavorites = async (req, res) => {
   }
 };
 
+exports.fetchWatchlist = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const watchlist = await userModel.getWatchlist(userId);
+
+    if (!watchlist || watchlist.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = watchlist.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
+exports.fetchWatched = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const watched = await userModel.getWatched(userId);
+
+    if (!watched || watched.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = watched.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
+exports.fetchWatchedThisYear = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const watchedThisYear = await userModel.getWatchedThisYear(userId);
+
+    if (!watchedThisYear || watchedThisYear.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = watchedThisYear.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
+exports.fetchReviews = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const reviews = await userModel.getReviews(userId);
+
+    if (!reviews || reviews.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = reviews.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
+exports.fetchLikes = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const likes = await userModel.getLikes(userId);
+
+    if (!likes || likes.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = likes.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
+exports.fetchRatings = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const ratings = await userModel.getRatings(userId);
+
+    if (!ratings || ratings.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat pel·lícules a la llista de seguiment", movies: [] });
+    }
+
+    const movies = ratings.map(movie => ({
+      id_api: movie.id_api,
+      poster: movie.poster
+    }));
+
+    res.status(200).json({
+      message: "Pel·lícules de la llista de seguiment obtingudes correctament",
+      movies: movies
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la llista de pel·lícules:", error);
+    res.status(500).json({ message: "Error al obtenir la llista de pel·lícules" });
+  }
+};
+
 exports.addFavorite = async (req, res) => {
   const { movieId } = req.body;
   const userId = req.user.userId;
@@ -296,7 +452,7 @@ exports.addFavorite = async (req, res) => {
     console.error("Error en afegir la pel·lícula a les favorites:", error);
     res.status(500).json({ message: "Error al afegir la pel·lícula a les favorites" });
   }
-}
+};
 
 exports.deleteFavorite = async (req, res) => {
   const { movieId } = req.body;
@@ -318,7 +474,7 @@ exports.deleteFavorite = async (req, res) => {
     console.error("Error en eliminar la pel·lícula favorita:", error);
     res.status(500).json({ message: "Error al eliminar la pel·lícula favorita" });
   }
-}
+};
 
 exports.fetchCounts = async (req, res) => {
   const userId = req.user.userId;
@@ -339,7 +495,7 @@ exports.fetchCounts = async (req, res) => {
     console.error("Error en obtenir els comptes:", error);
     res.status(500).json({ message: "Error al obtenir els comptes" });
   }
-}
+};
 
 exports.deleteUser = async (req, res) => {
   try {
@@ -364,7 +520,7 @@ exports.deleteUser = async (req, res) => {
     console.error("Error deleting the user:", error);
     res.status(500).json({ message: "Error deleting this user" });
   }
-}
+};
 
 exports.updateUserById = async (req, res) => {
   const { userId, name, username, email, avatar, is_admin } = req.body;

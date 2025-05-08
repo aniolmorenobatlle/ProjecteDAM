@@ -6,8 +6,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
-const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers, deleteUser, updateUserById } = require('../controllers/userController.js');
+const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsers, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
 
 const router = Router();
 
@@ -16,6 +15,12 @@ router.get('/check-email/:email', checkEmail);
 
 router.get("/me", authMiddleware, me);
 router.get('/favorites', authMiddleware, fetchFavorites);
+router.get('/watchlist', authMiddleware, fetchWatchlist);
+router.get('/watched', authMiddleware, fetchWatched);
+router.get('/watchedThisYear', authMiddleware, fetchWatchedThisYear);
+router.get('/reviews', authMiddleware, fetchReviews);
+router.get('/likes', authMiddleware, fetchLikes);
+router.get('/ratings', authMiddleware, fetchRatings);
 router.get('/userCounts', authMiddleware, fetchCounts);
 
 router.post('/register', register);

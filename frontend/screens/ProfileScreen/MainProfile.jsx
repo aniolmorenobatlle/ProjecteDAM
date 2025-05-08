@@ -6,6 +6,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
+import ListInfoProfile from "./FirstTab/ListInfoProfile";
 
 export default function MainProfile({
   userInfo,
@@ -17,6 +18,7 @@ export default function MainProfile({
   filledFavorites,
 }) {
   const navigation = useNavigation();
+  const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
   const [totalFilmsYear, setTotalFilmsYear] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -68,140 +70,164 @@ export default function MainProfile({
       showsVerticalScrollIndicator={false}
       scrollEnabled={!isModalOpen}
     >
-      <Image source={{ uri: poster }} style={styles.backgroundImage} />
+      {selectedList === null ? (
+        <>
+          <Image source={{ uri: poster }} style={styles.backgroundImage} />
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={openModalize}
-        style={styles.editProfile}
-      >
-        <Icon name="cog-outline" size={40} />
-      </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={openModalize}
+            style={styles.editProfile}
+          >
+            <Icon name="cog-outline" size={40} />
+          </TouchableOpacity>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.avatarContainer}>
-          {userInfo.avatar_binary ? (
-            <Image
-              style={styles.avatar}
-              source={{ uri: userInfo.avatar_binary }}
-            />
-          ) : userInfo.avatar ? (
-            <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
-          ) : (
-            <Icon
-              name="person-circle-outline"
-              size={100}
-              style={styles.menuIconAvatarNone}
-            />
-          )}
+          <View style={styles.contentContainer}>
+            <View style={styles.avatarContainer}>
+              {userInfo.avatar_binary ? (
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: userInfo.avatar_binary }}
+                />
+              ) : userInfo.avatar ? (
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: userInfo.avatar }}
+                />
+              ) : (
+                <Icon
+                  name="person-circle-outline"
+                  size={100}
+                  style={styles.menuIconAvatarNone}
+                />
+              )}
 
-          <Text style={[globalStyles.textBase, styles.name]}>
-            {" "}
-            {newName ? newName : userInfo.name}
-          </Text>
-          <Text style={[globalStyles.textBase, styles.username]}>
-            @{newUsername ? newUsername : userInfo.username}
-          </Text>
-        </View>
-
-        <View style={styles.stats}>
-          <View style={styles.statsContainer}>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}>
-              {totalFilms}
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Total Films
-            </Text>
-          </View>
-          <View style={styles.statsContainer}>
-            <Text
-              style={[globalStyles.textBase, styles.statsTotalFilmsYearNumber]}
-            >
-              {totalFilmsYear}
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Films This Year
-            </Text>
-          </View>
-          <View style={styles.statsContainer}>
-            <Text
-              style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
-            >
-              {totalReviews}
-            </Text>
-            <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
-              Review
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.favoritesContainer}>
-          <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
-            {userInfo.name.split(" ")[0]}'s Top Favorite Films
-          </Text>
-
-          <View style={styles.favorites}>
-            {filledFavorites.filter((favorite) => favorite !== null).length >
-            0 ? (
-              filledFavorites.map(
-                (favorite) =>
-                  favorite && (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      key={favorite.id_api}
-                      onPress={() =>
-                        navigation.navigate("Film", {
-                          filmId: favorite.id_api,
-                        })
-                      }
-                    >
-                      <Image
-                        style={styles.favoritesImage}
-                        source={{ uri: favorite.poster }}
-                      />
-                    </TouchableOpacity>
-                  )
-              )
-            ) : (
-              <Text style={[globalStyles.textBase, styles.noFavoritesText]}>
-                User didn't put any as favorite
+              <Text style={[globalStyles.textBase, styles.name]}>
+                {" "}
+                {newName ? newName : userInfo.name}
               </Text>
-            )}
-          </View>
-        </View>
+              <Text style={[globalStyles.textBase, styles.username]}>
+                @{newUsername ? newUsername : userInfo.username}
+              </Text>
+            </View>
 
-        <View style={styles.line}></View>
-
-        <View contentContainerStyle={{ alignItems: "center" }}>
-          {lists.map((list, index) => (
-            <View key={index} style={{ width: "100%" }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
-                  {list.title}
+            <View style={styles.stats}>
+              <View style={styles.statsContainer}>
+                <Text
+                  style={[globalStyles.textBase, styles.statsTotalFilmsNumber]}
+                >
+                  {totalFilms}
                 </Text>
-                <Text style={[globalStyles.textBase, styles.listInfoNumber]}>
-                  {list.number}
+                <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                  Total Films
                 </Text>
               </View>
-
-              <View
-                style={{
-                  width: "100%",
-                  height: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  marginVertical: 10,
-                }}
-              ></View>
+              <View style={styles.statsContainer}>
+                <Text
+                  style={[
+                    globalStyles.textBase,
+                    styles.statsTotalFilmsYearNumber,
+                  ]}
+                >
+                  {totalFilmsYear}
+                </Text>
+                <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                  Films This Year
+                </Text>
+              </View>
+              <View style={styles.statsContainer}>
+                <Text
+                  style={[globalStyles.textBase, styles.statsTotalReviewNumber]}
+                >
+                  {totalReviews}
+                </Text>
+                <Text style={[globalStyles.textBase, styles.statsTotalFilms]}>
+                  Review
+                </Text>
+              </View>
             </View>
-          ))}
-        </View>
-      </View>
+
+            <View style={styles.favoritesContainer}>
+              <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
+                {userInfo.name.split(" ")[0]}'s Top Favorite Films
+              </Text>
+
+              <View style={styles.favorites}>
+                {filledFavorites.filter((favorite) => favorite !== null)
+                  .length > 0 ? (
+                  filledFavorites.map(
+                    (favorite) =>
+                      favorite && (
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          key={favorite.id_api}
+                          onPress={() =>
+                            navigation.navigate("Film", {
+                              filmId: favorite.id_api,
+                            })
+                          }
+                        >
+                          <Image
+                            style={styles.favoritesImage}
+                            source={{ uri: favorite.poster }}
+                          />
+                        </TouchableOpacity>
+                      )
+                  )
+                ) : (
+                  <Text style={[globalStyles.textBase, styles.noFavoritesText]}>
+                    User didn't put any as favorite
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.line}></View>
+
+            <View style={{ alignItems: "center" }}>
+              {lists.map((list, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setSelectedList(list.title)}
+                  style={{ width: "100%" }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
+                      {list.title}
+                    </Text>
+                    <Text
+                      style={[globalStyles.textBase, styles.listInfoNumber]}
+                    >
+                      {list.number}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      width: "100%",
+                      height: 1,
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      marginVertical: 10,
+                    }}
+                  ></View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </>
+      ) : selectedList != "Friends" ? (
+        <ListInfoProfile
+          selectedList={selectedList}
+          setSelectedList={setSelectedList}
+          userInfo={userInfo}
+        />
+      ) : null}
     </ScrollView>
   );
 }
