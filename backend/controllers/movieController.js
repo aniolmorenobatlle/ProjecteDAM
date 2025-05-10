@@ -38,26 +38,31 @@ const mostPopularMovies = [
 
 exports.fetchMovies = async (req, res) => {
   try {
-    // Parametres de la paginacio
-    const page = parseInt(req.query.page) || 1; // Per defecte comença per la 1
-    const limit = parseInt(req.query.limit) || 20; // Limit de 20 pelis per pagina
-    const offset = (page - 1) * limit; // Calcula l'offset
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
 
-    // Cerca pelis
     const query = req.query.query || '';
+    const sort = req.query.sort || 'created_at';
+    const order = req.query.order || 'desc';
+
+    const validSorts = ['title', 'release_year', 'vote_average', 'created_at'];
+    const validOrders = ['ASC', 'DESC'];
+
+    const safeSort = validSorts.includes(sort) ? sort : 'created_at';
+    const safeOrder = validOrders.includes(order.toUpperCase()) ? order.toUpperCase() : 'DESC';
 
     let movies;
     let totalMovies;
 
     if (query) {
-      movies = await movieModel.getMoviesQuery(limit, offset, query);
+      movies = await movieModel.getMoviesQuery(limit, offset, query, safeSort, safeOrder);
       totalMovies = await movieModel.getMoviesCount(query);
     } else {
-      movies = await movieModel.getMovies(limit, offset);
+      movies = await movieModel.getMovies(limit, offset, safeSort, safeOrder);
       totalMovies = await movieModel.getMoviesCount();
     }
 
-    // Retornar pelis
     res.json({
       movies,
       page,
@@ -70,6 +75,7 @@ exports.fetchMovies = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
+
 
 exports.fetchDirectors = async (req, res) => {
   try {

@@ -31,7 +31,7 @@ function Login() {
 
   return (
     <div className="flex items-center justify-center min-w-screen min-h-screen bg-gradient-to-l from-[#FEAF00] to-[#ffda44]">
-      <div className="flex flex-col p-10 py-15 w-[50dvh] bg-gray-100 rounded-3xl">
+      <div className="flex flex-col p-10 py-15 max-w-[50dvh] bg-gray-100 rounded-3xl">
         <div className="flex items-center justify-center gap-5">
           <div className="h-15 w-2 bg-amber-300" />
           <h1 className="text-5xl !font-bold leading-none">ADMIN PANEL</h1>

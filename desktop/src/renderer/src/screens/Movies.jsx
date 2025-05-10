@@ -39,8 +39,9 @@ export default function Movies() {
         <PaginatedTable
           apiEndpoint={`${API_URL}/api/movies`}
           query={searchTerm}
-          columns={['Title', 'Release Year', 'Director']}
+          columns={['Title', 'Release Year', 'Director', 'Vote average']}
           refreshTrigger={refreshTrigger}
+          enableSorting={true}
           renderRow={(movie) => (
             <div key={movie.id} className="flex bg-gray-100 items-center px-6 py-4 rounded-lg">
               <img
@@ -51,6 +52,7 @@ export default function Movies() {
               <div className="flex-1">{movie.title}</div>
               <div className="flex-1">{new Date(movie.release_year).getFullYear()}</div>
               <div className="flex-1">{movie.director}</div>
+              <div className="flex-1">{movie.vote_average}</div>
               <div className="flex-1">{new Date(movie.created_at).toLocaleDateString('es-ES')}</div>
               <div className="w-18 flex justify-between text-2xl text-orange-400">
                 <button onClick={() => handleOpenEditModal(movie)}>

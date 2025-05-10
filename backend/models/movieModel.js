@@ -1,7 +1,13 @@
 const pool = require('../config/db.js');
 
-exports.getMovies = async (limit, offset) => {
-  const query = `
+exports.getMovies = async (limit, offset, sort = 'created_at', order = 'DESC') => {
+  const validSorts = ['title', 'release_year', 'vote_average', 'created_at'];
+  const validOrders = ['ASC', 'DESC'];
+
+  const safeSort = validSorts.includes(sort) ? sort : 'created_at';
+  const safeOrder = validOrders.includes(order.toUpperCase()) ? order.toUpperCase() : 'DESC';
+
+  const query = await pool.query(`
     SELECT 
       m.id,
       m.title,
@@ -17,10 +23,12 @@ exports.getMovies = async (limit, offset) => {
       m.is_trending
     FROM movies m
     JOIN directors d ON m.director_id = d.id
-    LIMIT $1 OFFSET $2;`;
+    ORDER BY m.${safeSort} ${safeOrder}
+    LIMIT $1 OFFSET $2;`,
+    [limit, offset]
+  );
 
-  const result = await pool.query(query, [limit, offset]);
-  return result.rows;
+  return query.rows;
 };
 
 exports.getDirectors = async (limit, offset) => {
@@ -51,8 +59,14 @@ exports.getDirectorsQuery = async (limit, offset, query) => {
   return result.rows;
 };
 
-exports.getMoviesQuery = async (limit, offset, query) => {
-  const movieQuery = `
+exports.getMoviesQuery = async (limit, offset, query, sort = 'created_at', order = 'DESC') => {
+  const validSorts = ['title', 'release_year', 'vote_average', 'created_at'];
+  const validOrders = ['ASC', 'DESC'];
+
+  const safeSort = validSorts.includes(sort) ? sort : 'created_at';
+  const safeOrder = validOrders.includes(order.toUpperCase()) ? order.toUpperCase() : 'DESC';
+
+  const moviesQuery = await pool.query(`
     SELECT 
       m.id,
       m.title,
@@ -68,12 +82,14 @@ exports.getMoviesQuery = async (limit, offset, query) => {
       m.is_trending
     FROM movies m
     LEFT JOIN directors d ON m.director_id = d.id
-    WHERE LOWER(m.title) LIKE LOWER($1)
+    WHERE (LOWER(m.title) LIKE LOWER($1) OR LOWER(d.name) LIKE LOWER($1))
       AND m.poster IS NOT NULL
-    LIMIT $2 OFFSET $3
-  `;
-  const result = await pool.query(movieQuery, [`%${query}%`, limit, offset]);
-  return result.rows;
+    ORDER BY m.${safeSort} ${safeOrder}
+    LIMIT $2 OFFSET $3;`,
+    [`%${query}%`, limit, offset]
+  );
+
+  return moviesQuery.rows;
 };
 
 exports.getMoviesCountByQuery = async (query) => {

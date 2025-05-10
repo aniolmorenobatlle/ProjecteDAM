@@ -8,11 +8,14 @@ export default function PaginatedTable({
   headers,
   columns,
   refreshTrigger,
+  enableSorting,
   renderRow
 }) {
   const [cachePages, setCachePages] = useState({})
-  const [currentPage, setCurrentPage] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [orderDirection, setOrderDirection] = useState('desc')
+
+  const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const itemsPerPage = 7
 
@@ -25,13 +28,23 @@ export default function PaginatedTable({
         headers: headers || {}
       }
 
-      const response = await axios.get(
-        `${apiEndpoint}?page=${pageNumber + 1}&limit=${itemsPerPage}&query=${query.toLowerCase()}`,
-        config
-      )
+      const params = new URLSearchParams({
+        page: pageNumber + 1,
+        limit: itemsPerPage,
+        query: query.toLowerCase(),
+        sort: 'created_at',
+        order: orderDirection
+      })
+
+      if (enableSorting) {
+        params.append('orderBy', 'created_at')
+        params.append('orderDirection', orderDirection)
+      }
+
+      const response = await axios.get(`${apiEndpoint}?${params.toString()}`, config)
 
       const data = response.data
-      const items = data.movies || data.users || [] // adaptat
+      const items = data.movies || data.users || []
       const total = data.total || data.totalUsers || 0
 
       setCachePages((prev) => ({
@@ -73,7 +86,15 @@ export default function PaginatedTable({
           </div>
         ))}
         <div className="flex-1 !pr-2">
-          <button className="flex flex-row items-center gap-2">
+          <button
+            className="flex flex-row items-center gap-2"
+            onClick={() => {
+              setOrderDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              setCachePages({})
+              fetchPage(0)
+              setCurrentPage(0)
+            }}
+          >
             Date of creation
             <RiExpandUpDownFill className="text-lg" />
           </button>
