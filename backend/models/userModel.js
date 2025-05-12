@@ -436,7 +436,7 @@ exports.updateUserById = async (userId, updates) => {
          avatar_binary = NULL,
          avatar_mime_type = NULL
      WHERE id = $6
-     RETURNING id, name, username, email, avatar, is_admin`,
+     RETURNING id, name, username, email, avatar, avatar_binary, avatar_mime_type, is_admin`,
     [name, username, email, avatar, is_admin, userId]
   );
 

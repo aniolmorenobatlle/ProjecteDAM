@@ -39,7 +39,11 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const handleUpdateUser = async () => {
     if (!user) return
 
-    const { ...dataToSend } = formData
+    // eslint-disable-next-line no-unused-vars
+    const { avatar_binary, avatar_mime_type, ...dataToSend } = formData
+
+    dataToSend.avatar_binary = null
+    dataToSend.avatar_mime_type = null
 
     try {
       await axios.put(
