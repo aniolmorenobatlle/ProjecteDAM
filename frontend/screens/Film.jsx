@@ -624,7 +624,11 @@ export default function Film() {
                     {review.avatar ? (
                       <Image
                         style={styles.reviewImageUser}
-                        source={{ uri: review.avatar }}
+                        source={{
+                          uri:
+                            `${review.avatar}&nocache=true` ||
+                            review.avatar_binary,
+                        }}
                       />
                     ) : (
                       <Icon
