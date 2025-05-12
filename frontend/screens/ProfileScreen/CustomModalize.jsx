@@ -58,7 +58,7 @@ export default function CustomModalize({
           <Text style={styles.searchFilm}>{title}</Text>
           {userInfo.avatar ? (
             <Image
-              source={{ uri: userInfo.avatar }}
+              source={{ uri: `${userInfo.avatar}&nocache=true` }}
               style={styles.searchAvatar}
             />
           ) : (

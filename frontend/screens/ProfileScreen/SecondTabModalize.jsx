@@ -166,7 +166,8 @@ export default function SecondTabModalize({
             ) : (
               <Image
                 source={{
-                  uri: userInfo.avatar_binary || userInfo.avatar,
+                  uri:
+                    `${userInfo.avatar}&nocache=true` || userInfo.avatar_binary,
                 }}
                 style={styles.avatarPreview}
               />

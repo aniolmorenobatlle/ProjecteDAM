@@ -23,7 +23,7 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     if (!name) return ''
     const onlyNamePart = name.split(' ')[0]
     const backgroundColor = getRandomLightColor()
-    return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}&nocache=true`
+    return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}`
   }
 
   const handleChangePhoto = () => {

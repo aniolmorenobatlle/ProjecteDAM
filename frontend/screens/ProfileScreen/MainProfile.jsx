@@ -90,7 +90,7 @@ export default function MainProfile({
                 <Image
                   style={styles.avatar}
                   source={{
-                    uri: `${userInfo.avatar}`,
+                    uri: `${userInfo.avatar}&nocache=true`,
                   }}
                 />
               ) : (
