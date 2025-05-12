@@ -122,7 +122,7 @@ export default function Sidebar({ isOpen, closeMenu }) {
               <Image
                 style={styles.menuIconAvatar}
                 source={{
-                  uri: `${userInfo.avatar}&nocache=true`,
+                  uri: `${userInfo.avatar}`,
                 }}
               />
             ) : (

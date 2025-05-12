@@ -186,7 +186,7 @@ export default function EditProfile({
                 {userInfo.avatar ? (
                   <Image
                     source={{
-                      uri: `${userInfo.avatar}&nocache=true`,
+                      uri: `${userInfo.avatar}`,
                     }}
                     style={{ width: 50, height: 50, borderRadius: 50 }}
                   />

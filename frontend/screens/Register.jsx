@@ -82,7 +82,7 @@ export default function Register() {
 
     const onlyNamePart = name.split(" ")[0];
     const backgroundColor = getRandomLightColor();
-    return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}`;
+    return `https://ui-avatars.com/api/?length=1&name=${onlyNamePart}&size=128&bold=true&background=${backgroundColor}&nocache=true`;
   };
 
   const getRandomPoster = () => {

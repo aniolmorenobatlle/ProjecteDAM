@@ -73,7 +73,7 @@ export default function FriendsInfoProfile({
                 <Image
                   source={{
                     uri: user.avatar
-                      ? `${user.avatar}&nocache=true`
+                      ? `${user.avatar}`
                       : `${API_URL}/api/users/${user.id}/avatar`,
                   }}
                   style={styles.listImage}
