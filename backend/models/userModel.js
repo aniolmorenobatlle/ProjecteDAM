@@ -1,6 +1,31 @@
 const { hash, compare } = require('bcrypt');
 const pool = require('../config/db.js');
 
+exports.getUsers = async (limit, offset) => {
+  const query = await pool.query(
+    `
+      SELECT id, name, username, email, avatar, poster, created_at
+      FROM users
+      ORDER BY id
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]
+  )
+
+  return query.rows;
+};
+
+exports.getUserAvatar = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT avatar_binary, avatar_mime_type
+      FROM users
+      WHERE id = $1
+    `, [userId]
+  );
+
+  return query.rows[0];
+};
+
 exports.createUser = async (name, username, email, password, avatar, poster) => {
   const hashedPassword = await hash(password, 10);
   const query = await pool.query(
@@ -114,15 +139,17 @@ exports.editProfilePoster = async (userId, poster) => {
   return query.rows[0];
 };
 
-exports.editProfileAvatar = async (userId, avatar) => {
+exports.editProfileAvatar = async (userId, avatarBuffer, mimeType) => {
   const query = await pool.query(
     `UPDATE "users" 
      SET avatar_binary = $1,
+         avatar_mime_type = $2,
          avatar = NULL
-     WHERE id = $2
-     RETURNING id, name, username, avatar_binary, avatar, poster`,
-    [avatar, userId]
+     WHERE id = $3
+     RETURNING id, name, username, avatar_binary, avatar, avatar_mime_type, poster`,
+    [avatarBuffer, mimeType, userId]
   );
+
   return query.rows[0];
 };
 
@@ -369,7 +396,7 @@ exports.fetchCounts = async (userId) => {
 
 exports.getUsersDesktop = async (limit, offset, search) => {
   const query = await pool.query(
-    `SELECT id, name, username, email, avatar, avatar_binary, is_admin, created_at FROM users 
+    `SELECT id, name, username, email, avatar, avatar_binary, avatar_mime_type, is_admin, created_at FROM users 
      WHERE name ILIKE $1 OR email ILIKE $1 OR username ILIKE $1
      ORDER BY id
      LIMIT $2 OFFSET $3`,
@@ -405,7 +432,9 @@ exports.updateUserById = async (userId, updates) => {
          username = $2,
          email = $3,
          avatar = $4,
-         is_admin = $5
+         is_admin = $5,
+         avatar_binary = NULL,
+         avatar_mime_type = NULL
      WHERE id = $6
      RETURNING id, name, username, email, avatar, is_admin`,
     [name, username, email, avatar, is_admin, userId]

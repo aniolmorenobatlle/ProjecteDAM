@@ -86,26 +86,21 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              {userInfo.avatar_binary ? (
+              {userInfo.avatar ? (
+                <Image
+                  style={styles.avatar}
+                  source={{
+                    uri: `${userInfo.avatar}&nocache=true`,
+                  }}
+                />
+              ) : (
                 <Image
                   style={styles.avatar}
                   source={{ uri: userInfo.avatar_binary }}
                 />
-              ) : userInfo.avatar ? (
-                <Image
-                  style={styles.avatar}
-                  source={{ uri: userInfo.avatar }}
-                />
-              ) : (
-                <Icon
-                  name="person-circle-outline"
-                  size={100}
-                  style={styles.menuIconAvatarNone}
-                />
               )}
 
               <Text style={[globalStyles.textBase, styles.name]}>
-                {" "}
                 {newName ? newName : userInfo.name}
               </Text>
               <Text style={[globalStyles.textBase, styles.username]}>

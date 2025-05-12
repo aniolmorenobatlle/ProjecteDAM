@@ -124,7 +124,9 @@ export default function Home() {
           {userInfo.avatar ? (
             <Image
               style={styles.menuIconAvatar}
-              source={{ uri: userInfo.avatar }}
+              source={{
+                uri: `${userInfo.avatar}&nocache=true`,
+              }}
             />
           ) : (
             <Image

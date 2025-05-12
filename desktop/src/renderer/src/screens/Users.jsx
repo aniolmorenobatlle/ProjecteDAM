@@ -67,7 +67,7 @@ export default function Users() {
                   user.avatar
                     ? user.avatar
                     : user.avatar_binary && user.avatar_binary.data
-                      ? `data:image/jpeg;base64,${arrayBufferToBase64(user.avatar_binary.data)}`
+                      ? `data:${user.avatar_mime_type};base64,${arrayBufferToBase64(user.avatar_binary.data)}`
                       : ''
                 }
                 alt="avatar"

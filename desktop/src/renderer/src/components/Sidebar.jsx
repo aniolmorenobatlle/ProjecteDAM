@@ -67,7 +67,7 @@ export default function Sidebar({ activePage }) {
         <img
           src={userInfo.avatar ? userInfo.avatar : userInfo.avatar_binary}
           alt="Profile"
-          className="w-32 h-32 rounded-full"
+          className="w-32 h-32 rounded-full object-cover"
         />
         <h2 className="text-lg !font-bold">{userInfo.name}</h2>
       </div>

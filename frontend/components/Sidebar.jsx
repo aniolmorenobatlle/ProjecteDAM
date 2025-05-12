@@ -121,7 +121,9 @@ export default function Sidebar({ isOpen, closeMenu }) {
             {userInfo.avatar ? (
               <Image
                 style={styles.menuIconAvatar}
-                source={{ uri: userInfo.avatar }}
+                source={{
+                  uri: `${userInfo.avatar}&nocache=true`,
+                }}
               />
             ) : (
               <Image

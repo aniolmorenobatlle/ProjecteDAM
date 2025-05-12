@@ -83,8 +83,7 @@ export default function SecondTabModalize({
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      const selectedUri = result.assets[0].uri;
-      setSelectedImage(selectedUri);
+      setSelectedImage(result.assets[0]);
     }
   };
 
@@ -100,9 +99,9 @@ export default function SecondTabModalize({
 
     const formData = new FormData();
     formData.append("image", {
-      uri: selectedImage,
-      type: "image/jpeg",
-      name: "avatar.jpg",
+      uri: selectedImage.uri,
+      type: selectedImage.mimeType,
+      name: selectedImage.fileName || "avatar.jpg",
     });
 
     try {
@@ -122,7 +121,7 @@ export default function SecondTabModalize({
         setSelectedImage(null);
       }
     } catch (error) {
-      console.error("Error al carregar la imatge:", error);
+      console.log("Error al carregar la imatge:", error);
       alert("Error al carregar la imatge.");
     } finally {
       setUploading(false);
@@ -161,7 +160,7 @@ export default function SecondTabModalize({
           <View style={styles.galeryContainer}>
             {selectedImage ? (
               <Image
-                source={{ uri: selectedImage }}
+                source={{ uri: selectedImage.uri }}
                 style={styles.avatarPreview}
               />
             ) : (

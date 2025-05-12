@@ -7,6 +7,53 @@ dotenv.config();
 const { sign } = pkg;
 const SECRET_KEY = process.env.SECRET_KEY;
 
+exports.fetchUsers = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 20;
+  const offset = (page - 1) * limit;
+
+  try {
+    const users = await userModel.getUsers(limit, offset);
+    const totalUsers = await userModel.countUsers();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: 'No s\'han trobat usuaris' });
+    }
+
+    res.status(200).json({
+      users,
+      currentPage: page,
+      totalUsers,
+      totalPages,
+    });
+
+  } catch (error) {
+    console.error('Error en obtenir els usuaris:', error);
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+  }
+}
+
+exports.fetchUserAvatar = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await userModel.getUserAvatar(userId);
+
+    if (!user || !user.avatar_binary) {
+      return res.status(404).json({ message: 'Avatar no trobat' });
+    }
+
+    const imgBuffer = Buffer.from(user.avatar_binary);
+
+    res.set('Content-Type', user.avatar_mime_type || 'image/jpeg');
+    res.status(200).send(imgBuffer);
+  } catch (error) {
+    console.error('Error en obtenir l\'avatar de l\'usuari:', error);
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+  }
+};
+
 exports.register = async (req, res) => {
   const { name, username, email, password, avatar, poster } = req.body;
 
@@ -230,8 +277,9 @@ exports.editProfileAvatar = async (req, res) => {
     }
 
     const avatarBuffer = req.file.buffer;
+    const mimeType = req.file.mimetype;
 
-    const user = await userModel.editProfileAvatar(userId, avatarBuffer);
+    const user = await userModel.editProfileAvatar(userId, avatarBuffer, mimeType);
 
     if (!user) {
       return res.status(404).json({ message: "No s'ha trobat cap usuari amb aquest ID" });
@@ -239,11 +287,11 @@ exports.editProfileAvatar = async (req, res) => {
 
     res.status(200).json({
       message: "Avatar modificat correctament",
-      avatar: user.avatar
+      avatar: user.avatar,
+      avatar_mime_type: user.avatar_mime_type,
     });
-
   } catch (error) {
-    console.error("Error en editar l'avatar:", error);
+    console.log("Error en editar l'avatar:", error);
     res.status(500).json({ message: "Error al modificar l'avatar" });
   }
 };

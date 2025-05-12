@@ -21,37 +21,29 @@ export default function FriendsInfoProfile({
   userInfo,
 }) {
   const navigation = useNavigation();
-  const [reviews, setReviews] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  const fetchReviews = async () => {
+  const fetchUsers = async () => {
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-      const response = await axios.get(`${API_URL}/api/users/reviews`, {
+      const response = await axios.get(`${API_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (response.status === 200 && response.data.reviews.length === 0) {
-        setReviews([]);
-        return;
-      }
+      console.log("Fetched users:", response.data.users);
 
-      setReviews(response.data.reviews);
+      setUsers(response.data.users);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       Alert.alert("Error", "Error fetching reviews, please try again later");
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES");
-  };
-
   useEffect(() => {
-    fetchReviews();
+    fetchUsers();
   }, []);
 
   return (
@@ -67,44 +59,26 @@ export default function FriendsInfoProfile({
         <Text style={styles.listName}>{selectedList}</Text>
       </View>
 
-      {reviews.length === 0 ? (
+      {users.length === 0 ? (
         <Text style={styles.emptyMessage}>
           There are no films on this list yet
         </Text>
       ) : (
         <FlatList
-          data={reviews}
-          keyExtractor={(item) => item.id_api.toString()}
-          renderItem={({ item }) => (
+          data={users}
+          keyExtractor={(user) => user.id_api}
+          renderItem={({ item: user }) => (
             <View style={styles.listGrid}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() =>
-                  navigation.navigate("Film", { filmId: item.id_api })
-                }
-              >
-                <View style={styles.listItem}>
-                  <View>
-                    <Image
-                      source={{ uri: item.poster }}
-                      style={styles.listImage}
-                    />
-                  </View>
-
-                  <View style={{ flex: 1 }}>
-                    <Text style={[globalStyles.textBase, styles.comment]}>
-                      {item.comment}
-                    </Text>
-                  </View>
-
-                  <View style={{ alignItems: "flex-end" }}>
-                    <Text style={[globalStyles.textBase, styles.date]}>
-                      {formatDate(item.created_at)}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-
+              <View style={styles.listItem}>
+                <Image
+                  source={{
+                    uri: user.avatar
+                      ? `${user.avatar}&nocache=true`
+                      : `${API_URL}/api/users/${user.id}/avatar`,
+                  }}
+                  style={styles.listImage}
+                />
+              </View>
               <View style={styles.line}></View>
             </View>
           )}

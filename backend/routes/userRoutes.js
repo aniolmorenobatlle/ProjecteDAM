@@ -6,9 +6,12 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const { register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
+const { fetchUsers, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
 
 const router = Router();
+
+router.get('/', fetchUsers);
+router.get('/:userId/avatar', fetchUserAvatar);
 
 router.get('/check-username/:username', checkUsername);
 router.get('/check-email/:email', checkEmail);

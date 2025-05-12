@@ -30,6 +30,7 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
     setLoadingAvatar(true)
     const newAvatar = getAvatarUrl(formData.name)
     setFormData((prev) => ({ ...prev, avatar: newAvatar }))
+
     setTimeout(() => {
       setLoadingAvatar(false)
     }, 300)
@@ -38,10 +39,12 @@ const ModalEditUser = forwardRef(({ token, API_URL, onSuccess }, ref) => {
   const handleUpdateUser = async () => {
     if (!user) return
 
+    const { ...dataToSend } = formData
+
     try {
       await axios.put(
         `${API_URL}/api/users/edit-user`,
-        { userId: user.id, ...formData },
+        { userId: user.id, ...dataToSend },
         {
           headers: {
             Authorization: `Bearer ${token}`
