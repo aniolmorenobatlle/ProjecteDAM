@@ -118,7 +118,7 @@ exports.loginDesktop = async (req, res) => {
   }
 };
 
-exports.fetchUsers = async (req, res) => {
+exports.fetchUsersDesktop = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 7;
   const offset = (page - 1) * limit;
@@ -126,7 +126,7 @@ exports.fetchUsers = async (req, res) => {
   const query = req.query.query || '';
 
   try {
-    const users = await userModel.getUsers(limit, offset, query);
+    const users = await userModel.getUsersDesktop(limit, offset, query);
     const totalUsers = await userModel.countUsers();
     const totalPages = Math.ceil(totalUsers / limit);
 

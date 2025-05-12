@@ -8,6 +8,7 @@ import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
 import ListInfoProfile from "./FirstTab/ListInfoProfile";
 import ReviewsInfoProfile from "./FirstTab/ReviewsInfoProfile";
+import FriendsInfoProfile from "./FirstTab/FriendsInfoProfile";
 
 export default function MainProfile({
   userInfo,
@@ -34,7 +35,7 @@ export default function MainProfile({
     { title: "Watched This Year", number: totalFilmsYear },
     { title: "Likes", number: totalFavorites },
     { title: "Ratings", number: totalRates },
-    { title: "Total Reviews", number: totalReviews },
+    { title: "Reviews", number: totalReviews },
     { title: "Friends", number: totalFriends },
   ];
 
@@ -225,14 +226,20 @@ export default function MainProfile({
             </View>
           </View>
         </ScrollView>
-      ) : selectedList != "Friends" && selectedList != "Total Reviews" ? (
+      ) : selectedList != "Friends" && selectedList != "Reviews" ? (
         <ListInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
           userInfo={userInfo}
         />
-      ) : selectedList === "Total Reviews" ? (
+      ) : selectedList === "Reviews" ? (
         <ReviewsInfoProfile
+          selectedList={selectedList}
+          setSelectedList={setSelectedList}
+          userInfo={userInfo}
+        />
+      ) : selectedList === "Friends" ? (
+        <FriendsInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
           userInfo={userInfo}

@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { globalStyles } from "../../../globalStyles";
 
-export default function ReviewsInfoProfile({
+export default function FriendsInfoProfile({
   selectedList,
   setSelectedList,
   userInfo,

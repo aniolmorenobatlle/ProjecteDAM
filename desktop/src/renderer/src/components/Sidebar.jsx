@@ -69,7 +69,7 @@ export default function Sidebar({ activePage }) {
           alt="Profile"
           className="w-32 h-32 rounded-full"
         />
-        <h2 className="text-lg !font-bold">Aniol Moreno Batlle</h2>
+        <h2 className="text-lg !font-bold">{userInfo.name}</h2>
       </div>
 
       <div className="flex flex-col gap-5 w-full">

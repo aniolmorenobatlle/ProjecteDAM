@@ -1,5 +1,4 @@
-import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { globalStyles } from "../globalStyles";
@@ -149,160 +148,7 @@ const friendsActivity = [
   },
 ];
 
-const chatActivity = [
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-  {
-    avatar: paulDano,
-    name: "Paul Dano",
-    message: "Hey, have you seen The Batman?",
-    time: "1h",
-  },
-  {
-    avatar: robertPattinson,
-    name: "Robert Pattinson",
-    message: "Do you want to see some movie?",
-    time: "2h",
-  },
-  {
-    avatar: zoeKravitz,
-    name: "Zoe Kravitz",
-    message: "I'm going to watch The Batman tonight",
-    time: "3h",
-  },
-];
-
 export default function Notifications() {
-  const [activeButton, setActiveButton] = React.useState("friends");
-
-  const handleButtonPress = (buttonName) => {
-    setActiveButton(buttonName);
-  };
-
   return (
     <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
       <View style={styles.header}>
@@ -311,70 +157,19 @@ export default function Notifications() {
         </Text>
       </View>
 
-      <View style={styles.superiorNav}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={[
-            styles.navButton,
-            activeButton === "friends" ? styles.navButtonActive : {},
-          ]}
-          onPress={() => handleButtonPress("friends")}
-        >
-          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>
-            Friends activity
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={[
-            styles.navButton,
-            activeButton === "chat" ? styles.navButtonActive : {},
-          ]}
-          onPress={() => handleButtonPress("chat")}
-        >
-          <Text style={[globalStyles.textBase, styles.superiorNavTitle]}>
-            Chat
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {activeButton === "friends" && (
-        <ScrollView vertical={true} style={styles.body}>
-          {friendsActivity.map((activity, index) => (
-            <View key={index} style={styles.messageActivity}>
-              <Image style={styles.avatar} source={{ uri: activity.avatar }} />
-              <Text style={[globalStyles.textBase, styles.notificationText]}>
-                {activity.text}
-              </Text>
-              <Text style={[globalStyles.textBase, styles.notificationTime]}>
-                {activity.time}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
-      )}
-
-      {activeButton === "chat" && (
-        <ScrollView vertical={true} style={styles.body}>
-          {chatActivity.map((activity, index) => (
-            <View key={index} style={styles.messageActivity}>
-              <Image style={styles.avatar} source={{ uri: activity.avatar }} />
-              <View style={styles.chatTexts}>
-                <Text style={[globalStyles.textBase, styles.chatTextUser]}>
-                  {activity.name}
-                </Text>
-                <Text style={[globalStyles.textBase, styles.chatTextMessage]}>
-                  {activity.message}
-                </Text>
-              </View>
-              <Text style={[globalStyles.textBase, styles.notificationTime]}>
-                {activity.time}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
-      )}
+      <ScrollView vertical={true} style={styles.body}>
+        {friendsActivity.map((activity, index) => (
+          <View key={index} style={styles.messageActivity}>
+            <Image style={styles.avatar} source={{ uri: activity.avatar }} />
+            <Text style={[globalStyles.textBase, styles.notificationText]}>
+              {activity.text}
+            </Text>
+            <Text style={[globalStyles.textBase, styles.notificationTime]}>
+              {activity.time}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -392,28 +187,6 @@ const styles = {
   headerTitle: {
     fontSize: 25,
     fontWeight: "bold",
-  },
-
-  superiorNav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 20,
-    alignItems: "center",
-    width: "100%",
-  },
-
-  navButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 5,
-  },
-
-  navButtonActive: {
-    backgroundColor: "#9C4A8B",
   },
 
   superiorNavTitle: {
@@ -445,20 +218,6 @@ const styles = {
     flex: 1,
     paddingLeft: 10,
     fontSize: 14,
-  },
-
-  chatTexts: {
-    flex: 1,
-    paddingLeft: 10,
-  },
-
-  chatTextUser: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-
-  chatTextMessage: {
-    fontSize: 12,
   },
 
   notificationTime: {

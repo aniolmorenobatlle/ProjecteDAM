@@ -55,7 +55,7 @@ export default function Users() {
         <div className="w-full h-0.5 bg-[#dbdee3]" />
 
         <PaginatedTable
-          apiEndpoint={`${API_URL}/api/users`}
+          apiEndpoint={`${API_URL}/api/users/desktop`}
           query={searchTerm}
           headers={{ Authorization: `Bearer ${token}` }}
           columns={['Full Name', 'Email', 'Username', 'Role']}

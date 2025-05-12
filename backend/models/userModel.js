@@ -367,9 +367,9 @@ exports.fetchCounts = async (userId) => {
   }
 }
 
-exports.getUsers = async (limit, offset, search) => {
+exports.getUsersDesktop = async (limit, offset, search) => {
   const query = await pool.query(
-    `SELECT * FROM users 
+    `SELECT id, name, username, email, avatar, avatar_binary, is_admin, created_at FROM users 
      WHERE name ILIKE $1 OR email ILIKE $1 OR username ILIKE $1
      ORDER BY id
      LIMIT $2 OFFSET $3`,

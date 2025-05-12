@@ -23,7 +23,7 @@ export default function Home() {
 
   const fetchTotalUsers = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/users`, {
+      const response = await axios.get(`${API_URL}/api/users/desktop`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

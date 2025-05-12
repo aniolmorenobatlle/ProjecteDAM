@@ -37,7 +37,7 @@ export default function Navbar({ currentPage }) {
           size={35}
           style={styles.navbarIcon}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity onPress={() => handleIconClick("Notifications")}>
         <Icon
@@ -46,7 +46,7 @@ export default function Navbar({ currentPage }) {
           size={35}
           style={styles.navbarIcon}
         />
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => handleIconClick("Profile")}>
         <Icon
