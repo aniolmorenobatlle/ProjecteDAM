@@ -21,7 +21,10 @@ export default function FriendsInfoProfile({
   selectedList,
   setSelectedList,
   userInfo,
+  editable,
 }) {
+  editable = editable || false;
+
   const navigation = useNavigation();
 
   const [visible, setVisible] = useState(false);
@@ -72,26 +75,31 @@ export default function FriendsInfoProfile({
             />
           </TouchableOpacity>
           <Text style={styles.listName}>{selectedList}</Text>
-          <Menu
-            style={{ marginTop: 40 }}
-            visible={visible}
-            onDismiss={closeMenu}
-            anchor={
-              <TouchableOpacity onPress={openMenu}>
-                <Icon
-                  name="ellipsis-vertical"
-                  size={30}
-                  style={{ color: "white" }}
-                />
-              </TouchableOpacity>
-            }
-          >
-            <Menu.Item onPress={onOpen} title="Add a friend" />
-            <Menu.Item
-              onPress={() => console.log("delete film")}
-              title="Delete a friend"
-            />
-          </Menu>{" "}
+
+          {editable ? (
+            <Menu
+              style={{ marginTop: 40 }}
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <TouchableOpacity onPress={openMenu}>
+                  <Icon
+                    name="ellipsis-vertical"
+                    size={30}
+                    style={{ color: "white" }}
+                  />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item onPress={onOpen} title="Add a friend" />
+              <Menu.Item
+                onPress={() => console.log("delete film")}
+                title="Delete a friend"
+              />
+            </Menu>
+          ) : (
+            <View />
+          )}
         </View>
 
         {users.length === 0 ? (

@@ -111,6 +111,7 @@ export default function Profile({ setIsModalizeOpen }) {
         newUsername={newUsername}
         filledFavorites={filledFavorites}
         fetchFavorites={fetchFavorites}
+        editable={true}
       />
 
       <CustomModalize

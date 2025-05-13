@@ -18,7 +18,10 @@ export default function MainProfile({
   newName,
   newUsername,
   filledFavorites,
+  editable,
 }) {
+  editable = editable || false;
+
   const navigation = useNavigation();
   const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
@@ -79,13 +82,15 @@ export default function MainProfile({
         >
           <Image source={{ uri: poster }} style={styles.backgroundImage} />
 
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={openModalize}
-            style={styles.editProfile}
-          >
-            <Icon name="cog-outline" size={40} />
-          </TouchableOpacity>
+          {editable && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={openModalize}
+              style={styles.editProfile}
+            >
+              <Icon name="cog-outline" size={40} />
+            </TouchableOpacity>
+          )}
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
@@ -110,6 +115,14 @@ export default function MainProfile({
                 @{newUsername ? newUsername : userInfo?.username}
               </Text>
             </View>
+
+            {!editable && (
+              <View style={styles.followContainer}>
+                <View style={styles.follow}>
+                  <Text style={[globalStyles.textBase]}>Follow</Text>
+                </View>
+              </View>
+            )}
 
             <View style={styles.stats}>
               <View style={styles.statsContainer}>
@@ -241,6 +254,7 @@ export default function MainProfile({
           selectedList={selectedList}
           setSelectedList={setSelectedList}
           userInfo={userInfo}
+          editable={editable}
         />
       ) : null}
     </>
@@ -297,6 +311,21 @@ const styles = {
 
   username: {
     fontSize: 12,
+  },
+
+  followContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  follow: {
+    width: "80%",
+    height: 30,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   stats: {
