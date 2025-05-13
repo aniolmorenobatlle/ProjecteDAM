@@ -15,7 +15,7 @@ router.get('/:id_api/comments', fetchMovieComments);
 router.get('/:id_api/streaming', fetchMovieStreaming)
 router.get('/:id_api/credits/cast', fetchMovieCast);
 router.get('/:id_api/credits/director', fetchMovieDirector);
-router.get('/favorites', fetchFavoriteUserMovies);
+router.get('/favorites/:userId', fetchFavoriteUserMovies);
 router.get('/:id', fetchMovieDetails);
 router.get('/:id_api/status', fetchMovieStatus);
 

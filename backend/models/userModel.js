@@ -15,6 +15,18 @@ exports.getUsers = async (limit, offset, query) => {
   return queryUsers.rows;
 };
 
+exports.getUserById = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT id, name, username, email, avatar, poster, created_at
+      FROM users
+      WHERE id = $1
+    `, [userId]
+  )
+
+  return query.rows[0];
+}
+
 exports.getUserAvatar = async (userId) => {
   const query = await pool.query(
     `

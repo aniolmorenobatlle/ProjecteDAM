@@ -101,10 +101,16 @@ export default function FriendsInfoProfile({
         ) : (
           <FlatList
             data={users}
-            keyExtractor={(user) => user.id_api}
+            keyExtractor={(user) => user.id}
             renderItem={({ item: user }) => (
               <View style={styles.listGrid}>
-                <View style={styles.listItem}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("UserProfile", { userId: user.id })
+                  }
+                  activeOpacity={0.8}
+                  style={styles.listItem}
+                >
                   <Image
                     source={{
                       uri: user.avatar
@@ -115,7 +121,7 @@ export default function FriendsInfoProfile({
                   />
 
                   <Text style={globalStyles.textBase}>{user.name}</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.line}></View>
               </View>
             )}

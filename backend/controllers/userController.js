@@ -34,7 +34,24 @@ exports.fetchUsers = async (req, res) => {
     console.error('Error en obtenir els usuaris:', error);
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
-}
+};
+
+exports.fetchUserById = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await userModel.getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuari no trobat' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error en obtenir l\'usuari:', error);
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+  }
+};
 
 exports.fetchUserAvatar = async (req, res) => {
   const { userId } = req.params;
@@ -299,7 +316,7 @@ exports.editProfileAvatar = async (req, res) => {
 };
 
 exports.fetchFavorites = async (req, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.params;
 
   try {
     const favorites = await userModel.getFavorites(userId);
@@ -325,7 +342,7 @@ exports.fetchFavorites = async (req, res) => {
 };
 
 exports.fetchWatchlist = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const watchlist = await userModel.getWatchlist(userId);
@@ -351,7 +368,7 @@ exports.fetchWatchlist = async (req, res) => {
 };
 
 exports.fetchWatched = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const watched = await userModel.getWatched(userId);
@@ -377,7 +394,7 @@ exports.fetchWatched = async (req, res) => {
 };
 
 exports.fetchWatchedThisYear = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const watchedThisYear = await userModel.getWatchedThisYear(userId);
@@ -403,7 +420,7 @@ exports.fetchWatchedThisYear = async (req, res) => {
 };
 
 exports.fetchReviews = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const reviewsResult = await userModel.getReviews(userId);
@@ -431,7 +448,7 @@ exports.fetchReviews = async (req, res) => {
 };
 
 exports.fetchLikes = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const likes = await userModel.getLikes(userId);
@@ -457,7 +474,7 @@ exports.fetchLikes = async (req, res) => {
 };
 
 exports.fetchRatings = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req.params;
 
   try {
     const ratings = await userModel.getRatings(userId);
@@ -529,7 +546,7 @@ exports.deleteFavorite = async (req, res) => {
 };
 
 exports.fetchCounts = async (req, res) => {
-  const userId = req.user.userId;
+  const { userId } = req.params;
 
   try {
     const counts = await userModel.fetchCounts(userId);

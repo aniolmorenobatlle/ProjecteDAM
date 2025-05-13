@@ -37,7 +37,7 @@ export default function ListInfoProfile({
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/users/${formattedListName}`,
+        `${API_URL}/api/users/${formattedListName}/${userInfo.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -27,11 +27,14 @@ export default function ReviewsInfoProfile({
     const token = await AsyncStorage.getItem("authToken");
 
     try {
-      const response = await axios.get(`${API_URL}/api/users/reviews`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${API_URL}/api/users/reviews/${userInfo.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200 && response.data.reviews.length === 0) {
         setReviews([]);

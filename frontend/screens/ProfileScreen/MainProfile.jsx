@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../config";
@@ -43,9 +43,12 @@ export default function MainProfile({
     try {
       const token = await AsyncStorage.getItem("authToken");
 
-      const response = await axios.get(`${API_URL}/api/users/userCounts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${API_URL}/api/users/userCounts/${userInfo.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.status === 200) {
         setTotalFilms(response.data.counts.totalFilms);
@@ -86,7 +89,7 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              {userInfo.avatar ? (
+              {userInfo?.avatar ? (
                 <Image
                   style={styles.avatar}
                   source={{
@@ -96,15 +99,15 @@ export default function MainProfile({
               ) : (
                 <Image
                   style={styles.avatar}
-                  source={{ uri: userInfo.avatar_binary }}
+                  source={{ uri: userInfo?.avatar_binary }}
                 />
               )}
 
               <Text style={[globalStyles.textBase, styles.name]}>
-                {newName ? newName : userInfo.name}
+                {newName ? newName : userInfo?.name}
               </Text>
               <Text style={[globalStyles.textBase, styles.username]}>
-                @{newUsername ? newUsername : userInfo.username}
+                @{newUsername ? newUsername : userInfo?.username}
               </Text>
             </View>
 
@@ -146,7 +149,7 @@ export default function MainProfile({
 
             <View style={styles.favoritesContainer}>
               <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
-                {userInfo.name.split(" ")[0]}'s Top Favorite Films
+                {userInfo?.name.split(" ")[0]}'s Top Favorite Films
               </Text>
 
               <View style={styles.favorites}>
@@ -173,7 +176,7 @@ export default function MainProfile({
                   )
                 ) : (
                   <Text style={[globalStyles.textBase, styles.noFavoritesText]}>
-                    User didn't put any as favorite
+                    User don't have any favorites yet
                   </Text>
                 )}
               </View>

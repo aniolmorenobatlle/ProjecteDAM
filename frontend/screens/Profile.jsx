@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
@@ -27,9 +27,12 @@ export default function Profile({ setIsModalizeOpen }) {
     try {
       const token = await AsyncStorage.getItem("authToken");
 
-      const response = await axios.get(`${API_URL}/api/users/favorites`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${API_URL}/api/users/favorites/${userInfo.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.status === 200) {
         setFavorites(response.data.favorites);

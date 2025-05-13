@@ -6,25 +6,24 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const { fetchUsers, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
+const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
 
 const router = Router();
 
 router.get('/', fetchUsers);
-router.get('/:userId/avatar', fetchUserAvatar);
+router.get("/me", authMiddleware, me);
 
 router.get('/check-username/:username', checkUsername);
 router.get('/check-email/:email', checkEmail);
 
-router.get("/me", authMiddleware, me);
-router.get('/favorites', authMiddleware, fetchFavorites);
-router.get('/watchlist', authMiddleware, fetchWatchlist);
-router.get('/watched', authMiddleware, fetchWatched);
-router.get('/watchedThisYear', authMiddleware, fetchWatchedThisYear);
-router.get('/reviews', authMiddleware, fetchReviews);
-router.get('/likes', authMiddleware, fetchLikes);
-router.get('/ratings', authMiddleware, fetchRatings);
-router.get('/userCounts', authMiddleware, fetchCounts);
+router.get('/favorites/:userId', authMiddleware, fetchFavorites);
+router.get('/watchlist/:userId', authMiddleware, fetchWatchlist);
+router.get('/watched/:userId', authMiddleware, fetchWatched);
+router.get('/watchedThisYear/:userId', authMiddleware, fetchWatchedThisYear);
+router.get('/reviews/:userId', authMiddleware, fetchReviews);
+router.get('/likes/:userId', authMiddleware, fetchLikes);
+router.get('/ratings/:userId', authMiddleware, fetchRatings);
+router.get('/userCounts/:userId', authMiddleware, fetchCounts);
 
 router.post('/register', register);
 router.post('/login', login);
@@ -43,5 +42,9 @@ router.post('/login-desktop', loginDesktop);
 router.put('/edit-user', authMiddleware, adminMiddleware, updateUserById);
 
 router.delete('/delete-user/:userId', authMiddleware, adminMiddleware, deleteUser);
+
+// 
+router.get('/:userId', fetchUserById)
+router.get('/:userId/avatar', fetchUserAvatar);
 
 module.exports = router;

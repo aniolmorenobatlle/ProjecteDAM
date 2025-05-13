@@ -18,12 +18,14 @@ import Profile from "./screens/Profile";
 import Recommend from "./screens/Recommend";
 import Register from "./screens/Register";
 import Search from "./screens/Search";
+import UserProfile from './screens/UserProfile';
 
 const Stack = createStackNavigator();
 
 export default function App() {
   const navigationRef = useNavigationContainerRef();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [routeName, setRouteName] = useState("Login");
   const [isReady, setIsReady] = useState(false);
   const [isModalizeOpen, setIsModalizeOpen] = useState(false);
@@ -45,8 +47,8 @@ export default function App() {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
-      if (navigationRef.current) navigationRef.navigate("Login");
     }
+    setCheckingAuth(false);
   };
 
   useEffect(() => {
@@ -60,7 +62,6 @@ export default function App() {
         if (navigationRef.current) navigationRef.navigate("Login");
       }
     }, 60000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -84,6 +85,14 @@ export default function App() {
     return unsubscribe;
   }, [navigationRef]);
 
+  if (loading || checkingAuth) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1F1D36' }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
   if (loading) {
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1F1D36' }}>
       <ActivityIndicator size="large" color="#fff" />
@@ -105,11 +114,11 @@ export default function App() {
           <Stack.Screen name="Profile" options={{ headerShown: false }}>
             {(props) => <Profile {...props} setIsModalizeOpen={setIsModalizeOpen} />}
           </Stack.Screen>
+          <Stack.Screen name="UserProfile" component={UserProfile} options={{ headerShown: false }} />
           <Stack.Screen name="Lists" component={Lists} options={{ headerShown: false }} />
           <Stack.Screen name="ListInfo" component={ListInfo} options={{ headerShown: false }} />
         </Stack.Navigator>
 
-        {/* Mostrar navbar només quan calgui */}
         {!isModalizeOpen &&
           !["Recommend", "Film", "Login", "Register", "Lists", "ListInfo"].includes(routeName) && (
             <Navbar currentPage={routeName} />

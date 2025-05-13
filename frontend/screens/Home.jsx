@@ -56,9 +56,9 @@ export default function Home() {
 
   const getFavoritesMovies = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/movies/favorites`, {
-        params: { user_id: userInfo.id },
-      });
+      const response = await axios.get(
+        `${API_URL}/api/movies/favorites/${userInfo.id}`
+      );
       setFavoriteMovies(response.data.movies);
     } catch (error) {
       console.error("Error en obtenir les pel·lícules favorites: " + error);

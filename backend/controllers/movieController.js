@@ -349,14 +349,14 @@ exports.updateMovieRate = async (req, res) => {
 };
 
 exports.fetchFavoriteUserMovies = async (req, res) => {
+  const { userId } = req.params;
+
   try {
-    const { user_id } = req.query;
-    if (!user_id) {
-      console.log("Falta l'identificador de l'usuari");
+    if (!userId) {
       return res.status(400).json({ message: "Falta l'identificador de l'usuari" });
     }
 
-    const favorites = await movieModel.getFavoritesUserMovies(user_id);
+    const favorites = await movieModel.getFavoritesUserMovies(userId);
 
     const detailedMovies = await Promise.all(
       favorites.map(async (movie) => {
