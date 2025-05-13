@@ -1,9 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ScrollView,
   Text,
@@ -13,78 +10,46 @@ import {
 } from "react-native";
 import { Modalize } from "react-native-modalize";
 import Icon from "react-native-vector-icons/Ionicons";
-import { API_URL } from "../../../config";
-import { globalStyles } from "../../../globalStyles";
 
 export default function SearchModalize({
-  userInfo,
   modalizeRef,
-  fetchFavorites,
+  title,
+  userInfo,
+  onSearch,
+  renderItem,
+  onItemPress,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [movies, setMovies] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const searchMovies = async (query) => {
-    if (!searchQuery) return;
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim()) {
+        handleSearch(searchQuery);
+      } else {
+        setResults([]);
+      }
+    }, 300); // evitar crides constants
 
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+
+  const handleSearch = async (query) => {
     setLoading(true);
-
     try {
-      const response = await axios.get(
-        `${API_URL}/api/movies/search?query=${query}`
-      );
-
-      const updatedMovies = response.data.movies.map((movie) => {
-        const releaseYear = movie.release_year.split("-")[0];
-        return {
-          ...movie,
-          release_year: releaseYear,
-        };
-      });
-
-      setMovies(updatedMovies);
+      const data = await onSearch(query);
+      setResults(data);
     } catch (error) {
-      console.error("Error searching movies: " + error);
+      console.error("Error during search:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddFavorite = async (movieId) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      await axios.post(
-        `${API_URL}/api/users/addFavorite`,
-        { movieId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      fetchFavorites();
-
-      modalizeRef.current?.close();
-
-      setSearchQuery("");
-      setMovies([]);
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 400) {
-          Alert.alert("Info", "Movie already in favorites");
-        } else {
-          Alert.alert("Error", "Error adding movie to favorites");
-        }
-      }
-    }
-  };
-
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    searchMovies(text);
+  const clearSearch = () => {
+    setSearchQuery("");
+    setResults([]);
   };
 
   return (
@@ -98,86 +63,45 @@ export default function SearchModalize({
         <View style={styles.headerModal}>
           <TouchableOpacity
             style={styles.btnCloseContainer}
-            activeOpacity={0.8}
             onPress={() => modalizeRef.current?.close()}
           >
             <Text style={styles.cancel}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.searchFilm}>Search a Film</Text>
-          <Image
-            source={{ uri: userInfo.avatar }}
-            style={styles.searchAvatar}
-          />
+          <Text style={styles.searchFilm}>{title}</Text>
+          {userInfo?.avatar && (
+            <Image
+              source={{ uri: userInfo.avatar }}
+              style={styles.searchAvatar}
+            />
+          )}
         </View>
-
-        <View style={styles.shortLine} />
 
         <View style={styles.searchContainer}>
           <View style={styles.inputContainer}>
-            <Icon
-              name="search-outline"
-              size={20}
-              color="rgba(255, 255, 255, 0.7)"
-              style={styles.inputSearchIcon}
-            />
+            <Icon name="search-outline" size={20} color="white" />
             <TextInput
-              style={[globalStyles.textBase, styles.input]}
-              placeholder="Search a film"
-              placeholderTextColor="rgba(255, 255, 255, 0.7)"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoFocus={true}
+              style={styles.input}
+              placeholder={`Search...`}
+              placeholderTextColor="white"
               value={searchQuery}
-              onChangeText={handleSearch}
+              onChangeText={(text) => setSearchQuery(text)}
             />
             <Icon
               name="close-circle-outline"
               size={20}
-              color="rgba(255, 255, 255, 0.7)"
-              style={styles.inputDeleteIcon}
-              onPress={() => {
-                setSearchQuery("");
-                setMovies([]);
-              }}
+              color="white"
+              onPress={clearSearch}
             />
           </View>
-          <View style={styles.separator} />
         </View>
 
         {loading ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color="white" />
-          </View>
+          <ActivityIndicator size="large" color="white" />
         ) : (
-          movies.slice(0, 10).map((item, index) => (
-            <View key={index} style={styles.listItem}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleAddFavorite.bind(this, item.id_api)}
-                style={styles.listSearchContainer}
-              >
-                <Image
-                  source={{ uri: item.poster }}
-                  style={styles.listPoster}
-                />
-                <View style={styles.listSearcTextsContainer}>
-                  <Text style={styles.listSearchListTitle}>{item.title} </Text>
-                  <Text style={styles.listSearchListYear}>
-                    {item.release_year}, directed by{" "}
-                  </Text>
-                  <Text style={styles.listSearchListDirector}>
-                    {item.director_name}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <View style={styles.separator} />
-            </View>
+          results.map((item, index) => (
+            <TouchableOpacity key={index} onPress={() => onItemPress(item)}>
+              {renderItem(item)}
+            </TouchableOpacity>
           ))
         )}
       </ScrollView>
@@ -228,6 +152,7 @@ const styles = {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 10,
     height: 40,
+    paddingHorizontal: 10,
   },
 
   input: {

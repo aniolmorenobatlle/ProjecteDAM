@@ -12,8 +12,10 @@ exports.fetchUsers = async (req, res) => {
   const limit = 20;
   const offset = (page - 1) * limit;
 
+  const query = req.query.query || '';
+
   try {
-    const users = await userModel.getUsers(limit, offset);
+    const users = await userModel.getUsers(limit, offset, query);
     const totalUsers = await userModel.countUsers();
     const totalPages = Math.ceil(totalUsers / limit);
 

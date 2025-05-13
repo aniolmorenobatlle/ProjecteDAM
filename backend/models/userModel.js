@@ -1,17 +1,18 @@
 const { hash, compare } = require('bcrypt');
 const pool = require('../config/db.js');
 
-exports.getUsers = async (limit, offset) => {
-  const query = await pool.query(
+exports.getUsers = async (limit, offset, query) => {
+  const queryUsers = await pool.query(
     `
       SELECT id, name, username, email, avatar, poster, created_at
       FROM users
+      WHERE name ILIKE $1 OR email ILIKE $1 OR username ILIKE $1
       ORDER BY id
-      LIMIT $1 OFFSET $2
-    `, [limit, offset]
+      LIMIT $2 OFFSET $3
+    `, [`%${query || ''}%`, limit, offset]
   )
 
-  return query.rows;
+  return queryUsers.rows;
 };
 
 exports.getUserAvatar = async (userId) => {
