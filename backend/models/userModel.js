@@ -385,12 +385,12 @@ exports.fetchCounts = async (userId) => {
 
   const queryFriend = await pool.query(
     `
-      SELECT COUNT(*) AS total_friends
+      SELECT COUNT(DISTINCT 
+          LEAST(user_id, friend_id) || ',' || GREATEST(user_id, friend_id)
+      ) AS total_friends
       FROM friends
-      WHERE (
-          (user_id = $1 OR friend_id = $1) 
-          AND status = 'accepted'
-      )
+      WHERE (user_id = $1 OR friend_id = $1) 
+      AND status = 'accepted'
       AND user_id != friend_id;
     `, [userId]
   );
