@@ -455,3 +455,24 @@ exports.updateUserById = async (userId, updates) => {
 
   return result.rows[0];
 };
+
+exports.getRequests = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT 
+        f.id AS request_id,
+        u.id AS sender_id,
+        u.name,
+        u.username,
+        u.avatar,
+        f.status,
+        f.created_at
+      FROM friends f
+      JOIN users u ON f.user_id = u.id
+      WHERE f.friend_id = $1
+      ORDER BY f.created_at DESC
+    `, [userId]
+  );
+
+  return query.rows;
+}

@@ -6,7 +6,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings } = require('../controllers/userController.js');
+const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings, fetchRequests } = require('../controllers/userController.js');
 
 const router = Router();
 
@@ -16,6 +16,7 @@ router.get("/me", authMiddleware, me);
 router.get('/check-username/:username', checkUsername);
 router.get('/check-email/:email', checkEmail);
 
+router.get('/requests/:userId', fetchRequests);
 router.get('/favorites/:userId', authMiddleware, fetchFavorites);
 router.get('/watchlist/:userId', authMiddleware, fetchWatchlist);
 router.get('/watched/:userId', authMiddleware, fetchWatched);
@@ -45,6 +46,6 @@ router.delete('/delete-user/:userId', authMiddleware, adminMiddleware, deleteUse
 
 // 
 router.get('/:userId', authMiddleware, fetchUserById)
-router.get('/:userId/avatar', authMiddleware, fetchUserAvatar);
+router.get('/:userId/avatar', fetchUserAvatar);
 
 module.exports = router;

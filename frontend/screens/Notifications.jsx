@@ -1,19 +1,88 @@
-import { FlatList, Image, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { globalStyles } from "../globalStyles";
-
-const paulDano =
-  "https://image.tmdb.org/t/p/w500/zEJJsm0z07EPNl2Pi1h67xuCmcA.jpg";
-
-const notifications = Array.from({ length: 100 }, (_, i) => ({
-  id: (i + 1).toString(),
-  username: `user${i + 1}`,
-  message: "requested to follow you.",
-  avatar: paulDano,
-}));
+import { API_URL } from "../config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import { useUserInfo } from "../hooks/useUserInfo";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Notifications() {
+  const navigation = useNavigation();
+  const { userInfo, loading, error } = useUserInfo();
+
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await axios.get(
+        `${API_URL}/api/users/requests/${userInfo.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setNotifications(response.data.notifications);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      alert("Error fetching notifications");
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo && userInfo.id) {
+      fetchNotifications();
+    }
+  }, [userInfo]);
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <ActivityIndicator size="large" color="white" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1F1D36",
+        }}
+      >
+        <Text style={{ color: "white", fontSize: 16 }}>
+          {error?.message === "401"
+            ? "Unauthorized: Redirecting to login..."
+            : `Error: ${error?.message || "Error desconegut"}`}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={[globalStyles.container]}>
       <View style={styles.header}>
@@ -21,26 +90,60 @@ export default function Notifications() {
           Notifications
         </Text>
       </View>
+      {notifications.length === 0 ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={{ color: "white" }}>No notifications yet</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={notifications}
+          keyExtractor={(item, index) =>
+            item.id?.toString() || index.toString()
+          }
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate("UserProfile", { userId: item.sender_id })
+              }
+              style={styles.messageActivity}
+            >
+              <Image
+                style={styles.avatar}
+                source={{
+                  uri: item?.avatar
+                    ? `${item?.avatar}&nocache=true`
+                    : `${API_URL}/api/users/${item?.sender_id}/avatar`,
+                }}
+              />
 
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.messageActivity}>
-            <Image style={styles.avatar} source={{ uri: item.avatar }} />
-            <Text style={[globalStyles.textBase, styles.notificationText]}>
-              <Text style={{ fontWeight: "bold" }}>{item.username}</Text>{" "}
-              {item.message}
-            </Text>
-            <View style={styles.offerButtons}>
-              <Text style={styles.accept}>Accept</Text>
-              <Text style={styles.decline}>Decline</Text>
-            </View>
-          </View>
-        )}
-        contentContainerStyle={styles.body}
-        showsVerticalScrollIndicator={false}
-      />
+              <Text style={[globalStyles.textBase, styles.notificationText]}>
+                <Text style={{ fontWeight: "bold" }}>{item.username}</Text>{" "}
+                requested to follow you.
+              </Text>
+
+              {item.status === "pending" ? (
+                <View style={styles.offerButtons}>
+                  <Text style={styles.accept}>Accept</Text>
+                  <Text style={styles.decline}>Decline</Text>
+                </View>
+              ) : item.status === "accepted" ? (
+                <View style={styles.offerButtons}>
+                  <Text style={styles.accepted}>Accepted</Text>
+                </View>
+              ) : (
+                <View style={styles.offerButtons}>
+                  <Text style={styles.declined}>Declined</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.body}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -98,8 +201,24 @@ const styles = {
     textAlign: "center",
   },
 
+  accepted: {
+    backgroundColor: "#E9A6A6",
+    color: "white",
+    padding: 5,
+    borderRadius: 5,
+    textAlign: "center",
+  },
+
   decline: {
     backgroundColor: "#F44336",
+    color: "white",
+    padding: 5,
+    borderRadius: 5,
+    textAlign: "center",
+  },
+
+  declined: {
+    backgroundColor: "#8E4A65",
     color: "white",
     padding: 5,
     borderRadius: 5,

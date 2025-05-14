@@ -621,3 +621,23 @@ exports.updateUserById = async (req, res) => {
     res.status(500).json({ message: "Error al modificar l'usuari" });
   }
 };
+
+exports.fetchRequests = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const requests = await userModel.getRequests(userId);
+
+    if (!requests || requests.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat sol·licituds", requests: [] });
+    }
+
+    res.status(200).json({
+      notifications: requests
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir les sol·licituds:", error);
+    res.status(500).json({ message: "Error al obtenir les sol·licituds" });
+  }
+}
