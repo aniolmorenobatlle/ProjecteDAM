@@ -526,3 +526,25 @@ exports.rejectRequest = async (senderId, receiverId, requestId) => {
 
   return query.rows[0];
 };
+
+exports.getFriends = async (userId) => {
+  const query = await pool.query(
+    `
+      SELECT 
+        f.id AS request_id,
+        u.id AS friend_id,
+        u.name,
+        u.username,
+        u.avatar,
+        f.status,
+        f.created_at
+      FROM friends f
+      JOIN users u ON f.friend_id = u.id
+      WHERE f.user_id = $1
+      AND f.status = 'accepted'
+      ORDER BY f.created_at DESC
+    `, [userId]
+  );
+
+  return query.rows;
+};

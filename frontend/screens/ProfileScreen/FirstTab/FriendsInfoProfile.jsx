@@ -29,6 +29,7 @@ export default function FriendsInfoProfile({
 
   const [visible, setVisible] = useState(false);
   const [users, setUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   const modalizeRef = useRef(null);
 
@@ -56,8 +57,29 @@ export default function FriendsInfoProfile({
     }
   };
 
+  const fetchFriends = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/users/friends/${userInfo.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setFriends(response.data.friends);
+    } catch (error) {
+      console.log("Error fetching friends:", error);
+      Alert.alert("Error", "Error fetching friends, please try again later");
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchFriends();
   });
 
   return (
@@ -102,33 +124,42 @@ export default function FriendsInfoProfile({
           )}
         </View>
 
-        {users.length === 0 ? (
+        {friends.length === 0 ? (
           <Text style={styles.emptyMessage}>
-            There are no films on this list yet
+            No friends yet, add some friends to see them here!
           </Text>
         ) : (
           <FlatList
-            data={users}
-            keyExtractor={(user) => user.id}
-            renderItem={({ item: user }) => (
+            data={friends}
+            keyExtractor={(friend) => friend.id}
+            renderItem={({ item: friend }) => (
               <View style={styles.listGrid}>
                 <TouchableOpacity
                   onPress={() =>
-                    navigation.navigate("UserProfile", { userId: user.id })
+                    navigation.navigate("UserProfile", {
+                      userId: friend.friend_id,
+                    })
                   }
                   activeOpacity={0.8}
                   style={styles.listItem}
                 >
                   <Image
                     source={{
-                      uri: user.avatar
-                        ? `${user.avatar}&nocache=true`
-                        : `${API_URL}/api/users/${user.id}/avatar`,
+                      uri: friend.avatar
+                        ? `${friend.avatar}&nocache=true`
+                        : `${API_URL}/api/users/${friend.friend_id}/avatar`,
                     }}
                     style={styles.listImage}
                   />
 
-                  <Text style={globalStyles.textBase}>{user.name}</Text>
+                  <View style={styles.names}>
+                    <Text style={[globalStyles.textBase, styles.username]}>
+                      {friend.username}
+                    </Text>
+                    <Text style={[globalStyles.textBase, styles.name]}>
+                      {friend.name}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 <View style={styles.line}></View>
               </View>
@@ -152,7 +183,11 @@ export default function FriendsInfoProfile({
           <View>
             <View style={styles.listItems}>
               <Image
-                source={{ uri: `${user.avatar}&nocache=true` }}
+                source={{
+                  uri: user.avatar
+                    ? `${user.avatar}&nocache=true`
+                    : `${API_URL}/api/users/${user.id}/avatar`,
+                }}
                 style={styles.userAvatar}
               />
               <View style={styles.searchUserInfo}>
@@ -164,10 +199,10 @@ export default function FriendsInfoProfile({
             <View style={styles.separator} />
           </View>
         )}
-        // onItemPress={(user) => {
-        //   navigation.navigate("UserProfile", { userId: user.id });
-        //   modalizeRef.current?.close();
-        // }}
+        onItemPress={(user) => {
+          navigation.navigate("UserProfile", { userId: user.id });
+          modalizeRef.current?.close();
+        }}
       />
     </Provider>
   );
@@ -217,6 +252,23 @@ const styles = {
     height: 60,
     borderRadius: 60,
     objectFit: "cover",
+  },
+
+  names: {
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 5,
+  },
+
+  username: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+
+  name: {
+    color: "rgba(255, 255, 255, 0.5)",
+    fontSize: 14,
   },
 
   line: {

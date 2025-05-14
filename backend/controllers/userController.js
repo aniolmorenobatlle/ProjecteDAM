@@ -685,3 +685,23 @@ exports.rejectRequest = async (req, res) => {
     res.status(500).json({ message: "Error al rebutjar la sol·licitud" });
   }
 };
+
+exports.fetchFriends = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const friends = await userModel.getFriends(userId);
+
+    if (!friends || friends.length === 0) {
+      return res.status(200).json({ message: "No s'han trobat amics", friends: [] });
+    }
+
+    res.status(200).json({
+      friends: friends
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir els amics:", error);
+    res.status(500).json({ message: "Error al obtenir els amics" });
+  }
+}
