@@ -43,6 +43,66 @@ export default function Notifications() {
     }
   };
 
+  const handleAccept = async (requestId, senderId) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/accept-request/${requestId}`,
+        {
+          senderId: senderId,
+          reciverId: userInfo.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter(
+            (notification) => notification.request_id !== requestId
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      alert("Error accepting request");
+    }
+  };
+
+  const handleDecline = async (requestId, sender_id) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/reject-request/${requestId}`,
+        {
+          senderId: sender_id,
+          reciverId: userInfo.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter(
+            (notification) => notification.request_id !== requestId
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      alert("Error rejecting request");
+    }
+  };
+
   useEffect(() => {
     if (userInfo && userInfo.id) {
       fetchNotifications();
@@ -98,9 +158,9 @@ export default function Notifications() {
         </View>
       ) : (
         <FlatList
-          data={notifications}
+          data={notifications.filter((item) => item.status !== "rejected")}
           keyExtractor={(item, index) =>
-            item.id?.toString() || index.toString()
+            item.request_id?.toString() || index.toString()
           }
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -126,17 +186,30 @@ export default function Notifications() {
 
               {item.status === "pending" ? (
                 <View style={styles.offerButtons}>
-                  <Text style={styles.accept}>Accept</Text>
-                  <Text style={styles.decline}>Decline</Text>
-                </View>
-              ) : item.status === "accepted" ? (
-                <View style={styles.offerButtons}>
-                  <Text style={styles.accepted}>Accepted</Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() =>
+                      handleAccept(item.request_id, item.sender_id)
+                    }
+                  >
+                    <Text style={styles.accept}>Accept</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() =>
+                      handleDecline(item.request_id, item.sender_id)
+                    }
+                  >
+                    <Text style={styles.decline}>Decline</Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
-                <View style={styles.offerButtons}>
-                  <Text style={styles.declined}>Declined</Text>
-                </View>
+                item.status === "accepted" && (
+                  <View style={styles.offerButtons}>
+                    <Text style={styles.accepted}>Accepted</Text>
+                  </View>
+                )
               )}
             </TouchableOpacity>
           )}

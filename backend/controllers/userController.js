@@ -640,4 +640,48 @@ exports.fetchRequests = async (req, res) => {
     console.error("Error en obtenir les sol·licituds:", error);
     res.status(500).json({ message: "Error al obtenir les sol·licituds" });
   }
-}
+};
+
+exports.acceptRequest = async (req, res) => {
+  const { requestId } = req.params;
+  const { senderId, reciverId } = req.body;
+
+  try {
+    const result = await userModel.acceptRequest(senderId, reciverId, requestId);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "No s'ha trobat cap sol·licitud amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Sol·licitud acceptada correctament",
+      requestId: result.request_id
+    });
+
+  } catch (error) {
+    console.error("Error en acceptar la sol·licitud:", error);
+    res.status(500).json({ message: "Error al acceptar la sol·licitud" });
+  }
+};
+
+exports.rejectRequest = async (req, res) => {
+  const { requestId } = req.params;
+  const { senderId, reciverId } = req.body;
+
+  try {
+    const result = await userModel.rejectRequest(senderId, reciverId, requestId);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "No s'ha trobat cap sol·licitud amb aquest ID" });
+    }
+
+    res.status(200).json({
+      message: "Sol·licitud rebutjada correctament",
+      requestId: result.request_id
+    });
+
+  } catch (error) {
+    console.error("Error en rebutjar la sol·licitud:", error);
+    res.status(500).json({ message: "Error al rebutjar la sol·licitud" });
+  }
+};
