@@ -23,6 +23,8 @@ export default function MainProfile({
   editable = editable || false;
 
   const navigation = useNavigation();
+
+  const [followStatus, setFollowStatus] = useState("pending");
   const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
   const [totalFilmsYear, setTotalFilmsYear] = useState(0);
@@ -67,6 +69,16 @@ export default function MainProfile({
     }
   };
 
+  const handleFollowStatus = () => {
+    if (followStatus === "pending") {
+      setFollowStatus("accepted");
+    } else if (followStatus === "accepted") {
+      setFollowStatus("unfollow");
+    } else {
+      setFollowStatus("pending");
+    }
+  };
+
   useEffect(() => {
     if (userInfo) {
       fetchCounts();
@@ -82,13 +94,21 @@ export default function MainProfile({
         >
           <Image source={{ uri: poster }} style={styles.backgroundImage} />
 
-          {editable && (
+          {editable ? (
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={openModalize}
               style={styles.editProfile}
             >
               <Icon name="cog-outline" size={40} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.goBack()}
+              style={styles.goBack}
+            >
+              <Icon name="arrow-back-outline" size={30} />
             </TouchableOpacity>
           )}
 
@@ -118,9 +138,29 @@ export default function MainProfile({
 
             {!editable && (
               <View style={styles.followContainer}>
-                <View style={styles.follow}>
-                  <Text style={[globalStyles.textBase]}>Follow</Text>
-                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.follow,
+                    {
+                      backgroundColor:
+                        followStatus === "pending"
+                          ? "#E9A6A6"
+                          : followStatus === "accepted"
+                            ? "#9C4A8B"
+                            : "#8E4A65",
+                    },
+                  ]}
+                  activeOpacity={0.8}
+                  onPress={handleFollowStatus}
+                >
+                  <Text style={globalStyles.textBase}>
+                    {followStatus === "pending"
+                      ? "Follow"
+                      : followStatus === "accepted"
+                        ? "Follow Requested"
+                        : "Unfollow"}
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -271,6 +311,14 @@ const styles = {
     position: "absolute",
     top: 50,
     right: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 50,
+  },
+
+  goBack: {
+    position: "absolute",
+    top: 50,
+    left: 15,
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 50,
   },

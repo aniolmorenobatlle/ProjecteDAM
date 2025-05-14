@@ -10,7 +10,7 @@ const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, che
 
 const router = Router();
 
-router.get('/', fetchUsers);
+router.get('/', authMiddleware, fetchUsers);
 router.get("/me", authMiddleware, me);
 
 router.get('/check-username/:username', checkUsername);
@@ -44,7 +44,7 @@ router.put('/edit-user', authMiddleware, adminMiddleware, updateUserById);
 router.delete('/delete-user/:userId', authMiddleware, adminMiddleware, deleteUser);
 
 // 
-router.get('/:userId', fetchUserById)
-router.get('/:userId/avatar', fetchUserAvatar);
+router.get('/:userId', authMiddleware, fetchUserById)
+router.get('/:userId/avatar', authMiddleware, fetchUserAvatar);
 
 module.exports = router;
