@@ -173,6 +173,7 @@ export default function Lists() {
             </TouchableOpacity>
 
             <Menu
+              style={{ marginTop: 40 }}
               visible={visible}
               onDismiss={closeMenu}
               anchor={

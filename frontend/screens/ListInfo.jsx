@@ -17,17 +17,23 @@ import CustomModal from "../components/CustomModal";
 import { API_URL } from "../config";
 import { globalStyles } from "../globalStyles";
 import { useUserInfo } from "../hooks/useUserInfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ListInfo() {
   const route = useRoute();
   const { listId, listName } = route.params;
+  const { userInfo } = useUserInfo();
   const navigation = useNavigation();
   const { loading, error } = useUserInfo();
   const [visible, setVisible] = useState(false);
   const [listFilms, setListFilms] = useState([]);
   const [modalDeleteList, setModalDeleteList] = useState(false);
+  const [modalShareList, setModalShareList] = useState(false);
   const [dropdownList, setDropdownList] = useState([]);
   const [selectedFilmId, setSelectedFilmId] = useState(null);
+  const [, setFriends] = useState([]);
+  const [selectedFriendId, setSelectedFriendId] = useState(null);
+  const [friendsDropdown, setFriendsDropdown] = useState([]);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -50,6 +56,35 @@ export default function ListInfo() {
     }
   };
 
+  const fetchFriends = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(
+        `${API_URL}/api/users/friends/${userInfo.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const friendsData = response.data.friends;
+
+      setFriends(friendsData);
+
+      const dropdownData = friendsData.map((friend) => ({
+        label: friend.name,
+        value: friend.friend_id,
+      }));
+
+      setFriendsDropdown(dropdownData);
+    } catch (error) {
+      console.error("Error fetching friends", error);
+      Alert.alert("Error", "Failed to fetch friends");
+    }
+  };
+
   const handleOpenModalDeleteList = () => {
     closeMenu();
     setModalDeleteList(true);
@@ -57,6 +92,16 @@ export default function ListInfo() {
 
   const handleCloseModalDeleteList = () => {
     setModalDeleteList(false);
+  };
+
+  const handleOpenModalShareList = () => {
+    fetchFriends();
+    closeMenu();
+    setModalShareList(true);
+  };
+
+  const handleCloseModalShareList = () => {
+    setModalShareList(false);
   };
 
   const handleDeleteFilmFromList = async () => {
@@ -135,6 +180,7 @@ export default function ListInfo() {
             <Text style={styles.listName}>{listName}</Text>
 
             <Menu
+              style={{ marginTop: 40 }}
               visible={visible}
               onDismiss={closeMenu}
               anchor={
@@ -154,6 +200,10 @@ export default function ListInfo() {
               <Menu.Item
                 onPress={handleOpenModalDeleteList}
                 title="Delete film"
+              />
+              <Menu.Item
+                onPress={handleOpenModalShareList}
+                title="Share list"
               />
             </Menu>
           </View>
@@ -221,6 +271,50 @@ export default function ListInfo() {
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={handleCloseModalDeleteList}
+            >
+              <Text style={styles.confirmButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </CustomModal>
+
+        <CustomModal
+          visible={modalShareList}
+          onClose={() => setModalShareList(false)}
+        >
+          <Text style={styles.modalTitle}>Share the List</Text>
+
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={friendsDropdown}
+            maxHeight={300}
+            search
+            searchPlaceholder="Search"
+            labelField="label"
+            valueField="value"
+            placeholder="Select a friend"
+            value={selectedFriendId}
+            onChange={(item) => {
+              setSelectedFriendId(item.value);
+            }}
+          />
+
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.confirmButton}
+              onPress={() => console.log("Share list", selectedFriendId)}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.cancelButton}
+              onPress={handleCloseModalShareList}
             >
               <Text style={styles.confirmButtonText}>Cancel</Text>
             </TouchableOpacity>

@@ -66,7 +66,7 @@ exports.fetchListInfo = async (req, res) => {
     const listInfo = await listModel.getListInfo(list_id);
 
     if (listInfo.length === 0) {
-      return res.status(404).json({ message: 'No information found for this list' });
+      return res.status(202).json({ message: 'No information found for this list', listInfo: [] });
     }
 
     res.json({
