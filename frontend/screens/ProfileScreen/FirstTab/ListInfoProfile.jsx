@@ -17,7 +17,7 @@ import axios from "axios";
 export default function ListInfoProfile({
   selectedList,
   setSelectedList,
-  userInfo,
+  profileInfo,
 }) {
   const navigation = useNavigation();
   const [movies, setMovies] = useState([]);
@@ -37,7 +37,7 @@ export default function ListInfoProfile({
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/users/${formattedListName}/${userInfo.id}`,
+        `${API_URL}/api/users/${formattedListName}/${profileInfo.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -96,6 +96,7 @@ export default function ListInfoProfile({
             </TouchableOpacity>
           )}
           contentContainerStyle={styles.listGrid}
+          showsHorizontalScrollIndicator={false}
         />
       )}
     </SafeAreaView>

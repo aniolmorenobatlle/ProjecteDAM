@@ -18,7 +18,7 @@ import { globalStyles } from "../../../globalStyles";
 export default function ReviewsInfoProfile({
   selectedList,
   setSelectedList,
-  userInfo,
+  profileInfo,
 }) {
   const navigation = useNavigation();
   const [reviews, setReviews] = useState([]);
@@ -28,7 +28,7 @@ export default function ReviewsInfoProfile({
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/users/reviews/${userInfo.id}`,
+        `${API_URL}/api/users/reviews/${profileInfo.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -111,6 +111,7 @@ export default function ReviewsInfoProfile({
               <View style={styles.line}></View>
             </View>
           )}
+          showsHorizontalScrollIndicator={false}
         />
       )}
     </SafeAreaView>
