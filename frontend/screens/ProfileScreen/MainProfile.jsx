@@ -200,7 +200,7 @@ export default function MainProfile({
     const checkImage = async () => {
       const uri = profileInfo?.avatar
         ? `${profileInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`;
+        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=true`;
 
       try {
         const response = await axios.head(uri);

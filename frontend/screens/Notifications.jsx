@@ -178,7 +178,7 @@ export default function Notifications() {
                 source={{
                   uri: item?.avatar
                     ? `${item?.avatar}&nocache=true`
-                    : `${API_URL}/api/users/${item?.sender_id}/avatar?nocache=${Date.now()}`,
+                    : `${API_URL}/api/users/${item?.sender_id}/avatar?nocache=true`,
                 }}
               />
 

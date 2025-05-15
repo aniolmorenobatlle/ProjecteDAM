@@ -134,7 +134,7 @@ export default function SecondTabModalize({
     const checkImage = async () => {
       const uri = userInfo?.avatar
         ? `${userInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=${Date.now()}`;
+        : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=true`;
 
       try {
         const response = await axios.head(uri);
