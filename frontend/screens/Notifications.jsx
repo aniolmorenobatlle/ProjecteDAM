@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   Text,
@@ -62,14 +63,16 @@ export default function Notifications() {
 
       if (response.status === 200) {
         setNotifications((prevNotifications) =>
-          prevNotifications.filter(
-            (notification) => notification.request_id !== requestId
+          prevNotifications.map((notification) =>
+            notification.request_id === requestId
+              ? { ...notification, status: "accepted" }
+              : notification
           )
         );
       }
     } catch (error) {
       console.error("Error accepting request:", error);
-      alert("Error accepting request");
+      Alert.alert("Error", "Error accepting request");
     }
   };
 
@@ -99,7 +102,7 @@ export default function Notifications() {
       }
     } catch (error) {
       console.error("Error rejecting request:", error);
-      alert("Error rejecting request");
+      Alert.alert("Error", "Error rejecting request");
     }
   };
 
