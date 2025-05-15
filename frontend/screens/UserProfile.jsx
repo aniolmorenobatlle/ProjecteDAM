@@ -53,7 +53,7 @@ export default function UserProfile({}) {
   return (
     <View style={[globalStyles.container]}>
       <MainProfile
-        userInfo={otherUser}
+        profileInfo={otherUser}
         poster={otherUser?.poster}
         filledFavorites={favorites}
       />

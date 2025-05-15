@@ -20,41 +20,21 @@ import { Menu, Provider } from "react-native-paper";
 export default function FriendsInfoProfile({
   selectedList,
   setSelectedList,
-  userInfo,
+  profileInfo,
   editable,
 }) {
   editable = editable || false;
 
   const navigation = useNavigation();
 
-  const [visible, setVisible] = useState(false);
-  const [users, setUsers] = useState([]);
+  const { id: profileId } = profileInfo || {};
+
   const [friends, setFriends] = useState([]);
 
   const modalizeRef = useRef(null);
 
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-
   const onOpen = () => {
     modalizeRef.current?.open();
-  };
-
-  const fetchUsers = async () => {
-    const token = await AsyncStorage.getItem("authToken");
-
-    try {
-      const response = await axios.get(`${API_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setUsers(response.data.users);
-    } catch (error) {
-      console.log("Error fetching reviews:", error);
-      Alert.alert("Error", "Error fetching reviews, please try again later");
-    }
   };
 
   const fetchFriends = async () => {
@@ -62,7 +42,7 @@ export default function FriendsInfoProfile({
 
     try {
       const response = await axios.get(
-        `${API_URL}/api/users/friends/${userInfo.id}`,
+        `${API_URL}/api/users/friends/${profileInfo.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,9 +58,10 @@ export default function FriendsInfoProfile({
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchFriends();
-  });
+    if (profileId) {
+      fetchFriends();
+    }
+  }, [profileId]);
 
   return (
     <Provider>
@@ -99,26 +80,13 @@ export default function FriendsInfoProfile({
           <Text style={styles.listName}>{selectedList}</Text>
 
           {editable ? (
-            <Menu
-              style={{ marginTop: 40 }}
-              visible={visible}
-              onDismiss={closeMenu}
-              anchor={
-                <TouchableOpacity onPress={openMenu}>
-                  <Icon
-                    name="ellipsis-vertical"
-                    size={30}
-                    style={{ color: "white" }}
-                  />
-                </TouchableOpacity>
-              }
-            >
-              <Menu.Item onPress={onOpen} title="Add a friend" />
-              <Menu.Item
-                onPress={() => console.log("delete film")}
-                title="Delete a friend"
+            <TouchableOpacity onPress={onOpen}>
+              <Icon
+                name="add-circle-outline"
+                size={30}
+                style={{ color: "white" }}
               />
-            </Menu>
+            </TouchableOpacity>
           ) : (
             <View />
           )}
@@ -170,7 +138,7 @@ export default function FriendsInfoProfile({
 
       <SearchModalize
         title="Search a Friend"
-        userInfo={userInfo}
+        profileInfo={profileInfo}
         modalizeRef={modalizeRef}
         onSearch={async (query) => {
           const token = await AsyncStorage.getItem("authToken");
@@ -190,7 +158,7 @@ export default function FriendsInfoProfile({
                 }}
                 style={styles.userAvatar}
               />
-              <View style={styles.searchUserInfo}>
+              <View style={styles.searchprofileInfo}>
                 <Text style={styles.searchUsername}>{user.username}</Text>
                 <Text style={styles.searchName}>{user.name}</Text>
               </View>

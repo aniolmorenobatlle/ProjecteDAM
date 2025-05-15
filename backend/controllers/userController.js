@@ -704,4 +704,28 @@ exports.fetchFriends = async (req, res) => {
     console.error("Error en obtenir els amics:", error);
     res.status(500).json({ message: "Error al obtenir els amics" });
   }
-}
+};
+
+exports.fetchFriendsStatus = async (req, res) => {
+  const { userId, friendId } = req.query;
+
+  if (!friendId || isNaN(friendId)) {
+    return res.status(400).json({ message: "Friend ID invàlid" });
+  }
+
+  try {
+    const status = await userModel.getFriendshipStatus(userId, friendId);
+
+    if (!status) {
+      return res.status(200).json({ status: null });
+    }
+
+    res.status(200).json({
+      status: status.status
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir l'estat d'amic:", error);
+    res.status(500).json({ message: "Error al obtenir l'estat d'amic" });
+  }
+};

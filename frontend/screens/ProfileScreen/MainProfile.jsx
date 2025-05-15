@@ -2,16 +2,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../config";
 import { globalStyles } from "../../globalStyles";
 import ListInfoProfile from "./FirstTab/ListInfoProfile";
 import ReviewsInfoProfile from "./FirstTab/ReviewsInfoProfile";
 import FriendsInfoProfile from "./FirstTab/FriendsInfoProfile";
+import { useUserInfo } from "../../hooks/useUserInfo";
 
 export default function MainProfile({
-  userInfo,
+  profileInfo,
   openModalize,
   isModalOpen,
   poster,
@@ -24,7 +32,14 @@ export default function MainProfile({
 
   const navigation = useNavigation();
 
-  const [followStatus, setFollowStatus] = useState("pending");
+  const { userInfo } = useUserInfo();
+
+  const { id: userId } = userInfo || {};
+  const { id: profileId } = profileInfo || {};
+
+  const [imageReady, setImageReady] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
+  const [followStatus, setFollowStatus] = useState(null);
   const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
   const [totalFilmsYear, setTotalFilmsYear] = useState(0);
@@ -49,7 +64,7 @@ export default function MainProfile({
       const token = await AsyncStorage.getItem("authToken");
 
       const response = await axios.get(
-        `${API_URL}/api/users/userCounts/${userInfo.id}`,
+        `${API_URL}/api/users/userCounts/${profileInfo.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -69,21 +84,83 @@ export default function MainProfile({
     }
   };
 
-  const handleFollowStatus = () => {
-    if (followStatus === "pending") {
-      setFollowStatus("accepted");
-    } else if (followStatus === "accepted") {
-      setFollowStatus("unfollow");
-    } else {
-      setFollowStatus("pending");
+  const handleFriendshipStatus = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(`${API_URL}/api/users/friends/status`, {
+        params: { userId: userInfo.id, friendId: profileInfo.id },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFollowStatus(response.data.status);
+      console.log("Friendship status:", response.data.status);
+      console.log("Rendered followStatus:", followStatus);
+    } catch (error) {
+      console.log("Error getting friendship status:", error?.message || error);
+      Alert.alert(
+        "Error",
+        "Error getting friendship status, please try again later"
+      );
     }
   };
 
+  const getFollowButtonColor = (status) => {
+    if (status === "accepted") return "#8E4A65";
+    if (status === "pending") return "#9C4A8B";
+    if (status === null) return "#E9A6A6";
+    return "#CCCCCC";
+  };
+
+  const getFollowButtonLabel = (status) => {
+    if (status === "accepted") return "Unfollow";
+    if (status === "pending") return "Follow requested";
+    if (status === null) return "Follow";
+    return "Unknown";
+  };
+
+  const handleFollowStatus = () => {
+    if (followStatus === null) setFollowStatus("pending");
+    else if (followStatus === "pending") setFollowStatus(null);
+    else if (followStatus === "accepted") setFollowStatus(null);
+    else setFollowStatus(null);
+  };
+
   useEffect(() => {
-    if (userInfo) {
+    if (profileInfo) {
       fetchCounts();
     }
-  }, [userInfo]);
+  }, [profileInfo]);
+
+  useEffect(() => {
+    if (userId && profileId && !editable && userId !== profileId) {
+      handleFriendshipStatus();
+    }
+  }, [userId, profileId, editable]);
+
+  useEffect(() => {
+    const checkImage = async () => {
+      const uri = profileInfo?.avatar
+        ? `${profileInfo.avatar}&nocache=true`
+        : `${API_URL}/api/users/${profileInfo?.id}/avatar`;
+
+      try {
+        const response = await axios.head(uri); // comprova si existeix
+        if (response.status === 200) {
+          setImageUri(uri);
+          setImageReady(true);
+        }
+      } catch (err) {
+        console.log("La imatge encara no està disponible:", err.message);
+        // Intenta de nou després de 500ms
+        setTimeout(checkImage, 500);
+      }
+    };
+
+    if (profileInfo?.id) {
+      checkImage();
+    }
+  }, [profileInfo]);
 
   return (
     <>
@@ -114,20 +191,15 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              <Image
-                style={styles.avatar}
-                source={{
-                  uri: userInfo?.avatar
-                    ? `${userInfo?.avatar}&nocache=true`
-                    : `${API_URL}/api/users/${userInfo?.id}/avatar`,
-                }}
-              />
+              {imageReady && (
+                <Image style={styles.avatar} source={{ uri: imageUri }} />
+              )}
 
               <Text style={[globalStyles.textBase, styles.name]}>
-                {newName ? newName : userInfo?.name}
+                {newName ? newName : profileInfo?.name}
               </Text>
               <Text style={[globalStyles.textBase, styles.username]}>
-                @{newUsername ? newUsername : userInfo?.username}
+                @{newUsername ? newUsername : profileInfo?.username}
               </Text>
             </View>
 
@@ -136,24 +208,13 @@ export default function MainProfile({
                 <TouchableOpacity
                   style={[
                     styles.follow,
-                    {
-                      backgroundColor:
-                        followStatus === "pending"
-                          ? "#E9A6A6"
-                          : followStatus === "accepted"
-                            ? "#9C4A8B"
-                            : "#8E4A65",
-                    },
+                    { backgroundColor: getFollowButtonColor(followStatus) },
                   ]}
                   activeOpacity={0.8}
                   onPress={handleFollowStatus}
                 >
                   <Text style={globalStyles.textBase}>
-                    {followStatus === "pending"
-                      ? "Follow"
-                      : followStatus === "accepted"
-                        ? "Follow Requested"
-                        : "Unfollow"}
+                    {getFollowButtonLabel(followStatus)}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -197,7 +258,7 @@ export default function MainProfile({
 
             <View style={styles.favoritesContainer}>
               <Text style={[globalStyles.textBase, styles.favoritesTitle]}>
-                {userInfo?.name.split(" ")[0]}'s Top Favorite Films
+                {profileInfo?.name.split(" ")[0]}'s Top Favorite Films
               </Text>
 
               <View style={styles.favorites}>
@@ -276,19 +337,19 @@ export default function MainProfile({
         <ListInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
-          userInfo={userInfo}
+          profileInfo={profileInfo}
         />
       ) : selectedList === "Reviews" ? (
         <ReviewsInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
-          userInfo={userInfo}
+          profileInfo={profileInfo}
         />
       ) : selectedList === "Friends" ? (
         <FriendsInfoProfile
           selectedList={selectedList}
           setSelectedList={setSelectedList}
-          userInfo={userInfo}
+          profileInfo={profileInfo}
           editable={editable}
         />
       ) : null}

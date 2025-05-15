@@ -103,7 +103,7 @@ export default function Profile({ setIsModalizeOpen }) {
   return (
     <View style={[globalStyles.container, { flex: 1 }]}>
       <MainProfile
-        userInfo={userInfo}
+        profileInfo={userInfo}
         openModalize={openModalize}
         isModalOpen={isModalOpen}
         poster={poster}
