@@ -94,13 +94,38 @@ export default function MainProfile({
       });
 
       setFollowStatus(response.data.status);
-      console.log("Friendship status:", response.data.status);
-      console.log("Rendered followStatus:", followStatus);
     } catch (error) {
       console.log("Error getting friendship status:", error?.message || error);
       Alert.alert(
         "Error",
         "Error getting friendship status, please try again later"
+      );
+    }
+  };
+
+  const setFriendRequest = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/friends/send-request`,
+        {
+          userId: userInfo.id,
+          friendId: profileInfo.id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setFollowStatus("pending");
+      }
+    } catch (error) {
+      console.log("Error sending friend request:", error?.message || error);
+      Alert.alert(
+        "Error",
+        "Error sending friend request, please try again later"
       );
     }
   };
@@ -120,8 +145,10 @@ export default function MainProfile({
   };
 
   const handleFollowStatus = () => {
-    if (followStatus === null) setFollowStatus("pending");
-    else if (followStatus === "pending") setFollowStatus(null);
+    if (followStatus === null) {
+      setFriendRequest();
+      setFollowStatus("pending");
+    } else if (followStatus === "pending") setFollowStatus(null);
     else if (followStatus === "accepted") setFollowStatus(null);
     else setFollowStatus(null);
   };
@@ -145,7 +172,7 @@ export default function MainProfile({
         : `${API_URL}/api/users/${profileInfo?.id}/avatar`;
 
       try {
-        const response = await axios.head(uri); // comprova si existeix
+        const response = await axios.head(uri);
         if (response.status === 200) {
           setImageUri(uri);
           setImageReady(true);

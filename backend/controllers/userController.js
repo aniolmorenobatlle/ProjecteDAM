@@ -729,3 +729,27 @@ exports.fetchFriendsStatus = async (req, res) => {
     res.status(500).json({ message: "Error al obtenir l'estat d'amic" });
   }
 };
+
+exports.setFriendRequest = async (req, res) => {
+  const { userId, friendId } = req.body;
+
+  if (!friendId || isNaN(friendId)) {
+    return res.status(400).json({ message: "Friend ID invàlid" });
+  }
+
+  try {
+    const request = await userModel.setFriendRequest(userId, friendId);
+
+    if (!request) {
+      return res.status(200).json({ request: null });
+    }
+
+    res.status(200).json({
+      request: request
+    });
+
+  } catch (error) {
+    console.error("Error en obtenir la sol·licitud d'amic:", error);
+    res.status(500).json({ message: "Error al obtenir la sol·licitud d'amic" });
+  }
+}

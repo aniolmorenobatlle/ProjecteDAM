@@ -559,4 +559,38 @@ exports.getFriendshipStatus = async (userId, friendId) => {
   );
 
   return query.rows[0];
+};
+
+exports.setFriendRequest = async (userId, friendId) => {
+  const existingRequest = await pool.query(
+    `
+      SELECT * 
+      FROM friends 
+      WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
+    `, [userId, friendId]
+  );
+
+  if (existingRequest.rows.length > 0) {
+    const updateQuery = await pool.query(
+      `
+        UPDATE friends
+        SET status = 'pending', created_at = NOW()
+        WHERE user_id = $1 AND friend_id = $2
+        RETURNING *
+      `, [userId, friendId]
+    );
+
+    return updateQuery.rows[0];
+
+  } else {
+    const insertQuery = await pool.query(
+      `
+        INSERT INTO friends (user_id, friend_id, status, created_at)
+        VALUES ($1, $2, 'pending', NOW())
+        RETURNING *
+      `, [userId, friendId]
+    );
+
+    return insertQuery.rows[0];
+  }
 }
