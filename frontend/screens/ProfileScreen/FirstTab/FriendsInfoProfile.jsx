@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { globalStyles } from "../../../globalStyles";
 import SearchModalize from "./SearchModalize";
+import { Provider } from "react-native-paper";
 
 export default function FriendsInfoProfile({
   selectedList,
@@ -66,7 +67,7 @@ export default function FriendsInfoProfile({
   );
 
   return (
-    <View>
+    <Provider>
       <SafeAreaView style={{ paddingHorizontal: 15, paddingBottom: 50 }}>
         <View style={styles.header}>
           <TouchableOpacity
@@ -175,7 +176,7 @@ export default function FriendsInfoProfile({
           modalizeRef.current?.close();
         }}
       />
-    </View>
+    </Provider>
   );
 }
 
