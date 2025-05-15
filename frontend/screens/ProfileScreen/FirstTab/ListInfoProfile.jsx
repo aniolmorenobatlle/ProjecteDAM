@@ -96,7 +96,7 @@ export default function ListInfoProfile({
             </TouchableOpacity>
           )}
           contentContainerStyle={styles.listGrid}
-          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </SafeAreaView>

@@ -372,14 +372,16 @@ export default function MainProfile({
           setSelectedList={setSelectedList}
           profileInfo={profileInfo}
         />
-      ) : selectedList === "Friends" ? (
-        <FriendsInfoProfile
-          selectedList={selectedList}
-          setSelectedList={setSelectedList}
-          profileInfo={profileInfo}
-          editable={editable}
-        />
-      ) : null}
+      ) : (
+        selectedList === "Friends" && (
+          <FriendsInfoProfile
+            selectedList={selectedList}
+            setSelectedList={setSelectedList}
+            profileInfo={profileInfo}
+            editable={editable}
+          />
+        )
+      )}
     </>
   );
 }

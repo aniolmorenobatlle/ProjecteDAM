@@ -111,7 +111,7 @@ export default function ReviewsInfoProfile({
               <View style={styles.line}></View>
             </View>
           )}
-          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </SafeAreaView>

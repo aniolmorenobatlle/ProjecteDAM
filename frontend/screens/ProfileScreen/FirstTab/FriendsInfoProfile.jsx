@@ -132,7 +132,7 @@ export default function FriendsInfoProfile({
                 <View style={styles.line}></View>
               </View>
             )}
-            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
           />
         )}
       </SafeAreaView>
