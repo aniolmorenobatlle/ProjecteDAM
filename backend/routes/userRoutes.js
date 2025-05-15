@@ -6,7 +6,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings, fetchRequests, acceptRequest, rejectRequest, fetchFriends, fetchFriendsStatus, setFriendRequest } = require('../controllers/userController.js');
+const { fetchUsers, fetchUserById, fetchUserAvatar, register, checkUsername, checkEmail, login, me, editProfile, editProfilePoster, editProfileAvatar, fetchFavorites, addFavorite, deleteFavorite, fetchCounts, loginDesktop, fetchUsersDesktop, deleteUser, updateUserById, fetchWatchlist, fetchWatched, fetchWatchedThisYear, fetchReviews, fetchLikes, fetchRatings, fetchRequests, acceptRequest, rejectRequest, fetchFriends, fetchFriendsStatus, setFriendRequest, deleteFriend } = require('../controllers/userController.js');
 
 const router = Router();
 
@@ -19,7 +19,8 @@ router.get('/check-email/:email', checkEmail);
 router.get('/requests/:userId', fetchRequests);
 
 router.get('/friends/status', authMiddleware, fetchFriendsStatus);
-router.post('/friends/send-request', authMiddleware, setFriendRequest)
+router.post('/friends/send-request', authMiddleware, setFriendRequest);
+router.post('/friends/delete-friend', authMiddleware, deleteFriend);
 router.get('/friends/:userId', authMiddleware, fetchFriends);
 
 router.get('/favorites/:userId', authMiddleware, fetchFavorites);

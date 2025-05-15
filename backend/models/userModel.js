@@ -593,4 +593,16 @@ exports.setFriendRequest = async (userId, friendId) => {
 
     return insertQuery.rows[0];
   }
-}
+};
+
+exports.deleteFriend = async (userId, friendId) => {
+  const query = await pool.query(
+    `
+      DELETE FROM friends
+      WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
+      RETURNING *
+    `, [userId, friendId]
+  );
+
+  return query.rows[0];
+};

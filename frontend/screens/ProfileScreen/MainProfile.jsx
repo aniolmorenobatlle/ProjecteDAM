@@ -130,6 +130,33 @@ export default function MainProfile({
     }
   };
 
+  const deleteFriend = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.post(
+        `${API_URL}/api/users/friends/delete-friend`,
+        {
+          userId: userInfo.id,
+          friendId: profileInfo.id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setFollowStatus(null);
+      }
+    } catch (error) {
+      console.log("Error deleting friend request:", error?.message || error);
+      Alert.alert(
+        "Error",
+        "Error deleting friend request, please try again later"
+      );
+    }
+  };
+
   const getFollowButtonColor = (status) => {
     if (status === "accepted") return "#8E4A65";
     if (status === "pending") return "#9C4A8B";
@@ -148,9 +175,13 @@ export default function MainProfile({
     if (followStatus === null) {
       setFriendRequest();
       setFollowStatus("pending");
-    } else if (followStatus === "pending") setFollowStatus(null);
-    else if (followStatus === "accepted") setFollowStatus(null);
-    else setFollowStatus(null);
+    } else if (followStatus === "pending") {
+      deleteFriend();
+      setFollowStatus(null);
+    } else if (followStatus === "accepted") {
+      deleteFriend();
+      setFollowStatus(null);
+    } else setFollowStatus(null);
   };
 
   useEffect(() => {

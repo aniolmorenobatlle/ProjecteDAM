@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -15,7 +16,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { globalStyles } from "../../../globalStyles";
 import SearchModalize from "./SearchModalize";
-import { Menu, Provider } from "react-native-paper";
 
 export default function FriendsInfoProfile({
   selectedList,
@@ -57,14 +57,16 @@ export default function FriendsInfoProfile({
     }
   };
 
-  useEffect(() => {
-    if (profileId) {
-      fetchFriends();
-    }
-  }, [profileId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (profileId) {
+        fetchFriends();
+      }
+    }, [profileId])
+  );
 
   return (
-    <Provider>
+    <View>
       <SafeAreaView style={{ paddingHorizontal: 15, paddingBottom: 50 }}>
         <View style={styles.header}>
           <TouchableOpacity
@@ -173,7 +175,7 @@ export default function FriendsInfoProfile({
           modalizeRef.current?.close();
         }}
       />
-    </Provider>
+    </View>
   );
 }
 
