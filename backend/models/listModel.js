@@ -57,3 +57,15 @@ exports.deleteFilmFromList = async (list_id, movie_id) => {
   `;
   await pool.query(query, [list_id, movie_id]);
 };
+
+exports.shareList = async (list_id, user_id, friend_id) => {
+  const query = await pool.query(
+    `
+      INSERT INTO shared_lists (list_id, user_id, friend_id, created_at)
+      VALUES ($1, $2, $3, NOW())
+      RETURNING *;
+    `, [list_id, user_id, friend_id]
+  );
+
+  return query.rows[0];
+};

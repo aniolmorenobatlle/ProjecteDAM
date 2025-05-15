@@ -93,6 +93,14 @@ CREATE TABLE lists (
   created_at TIMESTAMP
 );
 
+CREATE TABLE shared_lists (
+  id SERIAL PRIMARY KEY,
+  list_id int,
+  user_id int,
+  friend_id int,
+  created_at TIMESTAMP
+);
+
 CREATE TABLE directors (
   id SERIAL PRIMARY KEY,
   name varchar,
@@ -176,6 +184,9 @@ ALTER TABLE to_watch ADD FOREIGN KEY (movie_id) REFERENCES movies (id_api) ON DE
 CREATE UNIQUE INDEX to_watch_user_movie_idx ON to_watch(user_id, movie_id);
 
 ALTER TABLE lists ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+ALTER TABLE shared_lists ADD FOREIGN KEY (list_id) REFERENCES lists (id) ON DELETE CASCADE;
+ALTER TABLE shared_lists ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+ALTER TABLE shared_lists ADD FOREIGN KEY (friend_id) REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE movies ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors(id);
 

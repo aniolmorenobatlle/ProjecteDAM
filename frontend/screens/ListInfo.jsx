@@ -1,7 +1,8 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   ActivityIndicator,
   Image,
   ScrollView,
@@ -118,6 +119,31 @@ export default function ListInfo() {
     }
   };
 
+  const handleShareList = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      await axios.post(
+        `${API_URL}/api/lists/share-list/${listId}`,
+        {
+          user_id: userInfo.id,
+          friend_id: selectedFriendId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      handleCloseModalShareList();
+      Alert.alert("Success", "List shared successfully");
+    } catch (error) {
+      console.error("Error sharing list", error);
+      Alert.alert("Error", "Failed to share list");
+    }
+  };
+
   useEffect(() => {
     fetchListInfo();
   }, [listId]);
@@ -227,7 +253,6 @@ export default function ListInfo() {
                       source={{ uri: list.poster }}
                       style={styles.listImage}
                     />
-                    <Text style={styles.listTitle}>{list.title}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -306,9 +331,9 @@ export default function ListInfo() {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.confirmButton}
-              onPress={() => console.log("Share list", selectedFriendId)}
+              onPress={handleShareList}
             >
-              <Text style={styles.confirmButtonText}>Done</Text>
+              <Text style={styles.confirmButtonText}>Share</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

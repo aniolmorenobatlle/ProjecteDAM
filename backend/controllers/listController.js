@@ -113,3 +113,23 @@ exports.fetchDeleteFilmFromList = async (req, res) => {
     res.status(500).json({ message: 'Error deleting film from list' });
   }
 };
+
+exports.shareList = async (req, res) => {
+  const { list_id } = req.params;
+  const { user_id, friend_id } = req.body;
+
+  console.log("Sharing list", list_id, user_id, friend_id);
+
+  try {
+    const shareList = await listModel.shareList(list_id, user_id, friend_id);
+
+    if (!shareList) {
+      return res.status(400).json({ message: 'Error sharing the list' });
+    }
+
+    res.json({ message: 'List shared successfully' });
+  } catch (error) {
+    console.error("Error sharing list", error);
+    res.status(500).json({ message: 'Error sharing the list' });
+  }
+};

@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { fetchLists, fetchAddList, fetchDeleteList, fetchListInfo, fetchAddFilmToList, fetchDeleteFilmFromList } = require('../controllers/listController.js');
+const { fetchLists, fetchAddList, fetchDeleteList, fetchListInfo, fetchAddFilmToList, fetchDeleteFilmFromList, shareList } = require('../controllers/listController.js');
 const authMiddleware = require('../middleware/authMiddleware.js');
 
 const router = Router();
@@ -11,5 +11,6 @@ router.post('/addList', fetchAddList);
 router.post('/deleteList', fetchDeleteList);
 router.post('/addFilmToList', fetchAddFilmToList);
 router.post('/deleteFilmFromList', fetchDeleteFilmFromList);
+router.post('/share-list/:list_id', authMiddleware, shareList)
 
 module.exports = router;
