@@ -200,7 +200,7 @@ export default function MainProfile({
     const checkImage = async () => {
       const uri = profileInfo?.avatar
         ? `${profileInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${profileInfo?.id}/avatar`;
+        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`;
 
       try {
         const response = await axios.head(uri);
@@ -210,7 +210,6 @@ export default function MainProfile({
         }
       } catch (err) {
         console.log("La imatge encara no està disponible:", err.message);
-        // Intenta de nou després de 500ms
         setTimeout(checkImage, 500);
       }
     };

@@ -44,6 +44,8 @@ export default function SecondTabModalize({
 }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
     if (userInfo && !selectedPoster) {
@@ -128,6 +130,29 @@ export default function SecondTabModalize({
     }
   };
 
+  useEffect(() => {
+    const checkImage = async () => {
+      const uri = userInfo?.avatar
+        ? `${userInfo.avatar}&nocache=true`
+        : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=${Date.now()}`;
+
+      try {
+        const response = await axios.head(uri);
+        if (response.status === 200) {
+          setImageUri(uri);
+          setImageReady(true);
+        }
+      } catch (err) {
+        console.log("La imatge encara no està disponible:", err.message);
+        setTimeout(checkImage, 500);
+      }
+    };
+
+    if (userInfo?.id) {
+      checkImage();
+    }
+  }, [userInfo]);
+
   return (
     <ScrollView
       style={{ flex: 1, marginBottom: 20 }}
@@ -164,13 +189,7 @@ export default function SecondTabModalize({
                 style={styles.avatarPreview}
               />
             ) : (
-              <Image
-                source={{
-                  uri:
-                    `${userInfo.avatar}&nocache=true` || userInfo.avatar_binary,
-                }}
-                style={styles.avatarPreview}
-              />
+              <Image source={{ uri: imageUri }} style={styles.avatarPreview} />
             )}
 
             {uploading && (
