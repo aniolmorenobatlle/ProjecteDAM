@@ -54,10 +54,57 @@ export default function Lists() {
       }));
 
       setDropdownList(formattedData);
-      setLists(response.data.lists);
+
+      return response.data.lists.map((list) => ({
+        id: list.id,
+        name: list.name,
+        owner: userInfo.username,
+        movie_count: list.movie_count,
+      }));
     } catch (error) {
       console.log("Error fetching the lists", error);
+      return [];
     }
+  };
+
+  const fetchSharedLists = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    const userId = userInfo.id;
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/lists/shared/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data.sharedLists.map((shared) => ({
+        id: shared.list_id,
+        name: shared.list_name,
+        owner: shared.user_username,
+        movie_count: shared.movie_count,
+      }));
+    } catch (error) {
+      console.log("Error fetching the shared lists", error);
+      return [];
+    }
+  };
+
+  const refreshAllLists = async () => {
+    const ownLists = await fetchLists();
+    const sharedLists = await fetchSharedLists();
+
+    const combined = [...ownLists, ...sharedLists];
+    const uniqueLists = Object.values(
+      combined.reduce((acc, list) => {
+        acc[list.id] = list;
+        return acc;
+      }, {})
+    );
+    setLists(uniqueLists);
   };
 
   const handleOpenModalAddList = () => {
@@ -75,7 +122,7 @@ export default function Lists() {
 
         setModalAddList(false);
         setName("");
-        fetchLists();
+        refreshAllLists();
       } catch (error) {
         console.error("Error creating the list", error);
         Alert.alert("Error", "Error creating the list");
@@ -105,7 +152,7 @@ export default function Lists() {
       });
 
       setModalDeleteList(false);
-      fetchLists();
+      refreshAllLists();
     } catch (error) {
       console.error("Error deleting the list", error);
     }
@@ -113,7 +160,7 @@ export default function Lists() {
 
   useEffect(() => {
     if (userInfo && userInfo.id) {
-      fetchLists();
+      refreshAllLists();
     }
   }, [userInfo]);
 
@@ -221,6 +268,18 @@ export default function Lists() {
                           style={[globalStyles.textBase, styles.listInfoTitle]}
                         >
                           {list.name}
+                          {list.owner && list.owner !== userInfo.username && (
+                            <Text
+                              style={{
+                                color: "gray",
+                                fontSize: 12,
+                                fontStyle: "italic",
+                              }}
+                            >
+                              {" "}
+                              ({list.owner})
+                            </Text>
+                          )}
                         </Text>
                         <Text
                           style={[globalStyles.textBase, styles.listInfoNumber]}

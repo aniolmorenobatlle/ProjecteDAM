@@ -21,6 +21,28 @@ exports.fetchLists = async (req, res) => {
   }
 };
 
+exports.fetchSharedLists = async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    if (!user_id) {
+      return res.status(400).json({ message: 'User ID no proporcionat' });
+    }
+
+    const sharedLists = await listModel.getSharedLists(user_id);
+
+    if (!sharedLists || sharedLists.length === 0) {
+      return res.status(200).json({ sharedLists: [] });
+    }
+
+    res.json({ sharedLists });
+
+  } catch (error) {
+    console.error("Error en obtenir les llistes compartides", error);
+    res.status(500).json({ message: "Error obtenint les llistes compartides" });
+  }
+}
+
 exports.fetchAddList = async (req, res) => {
   try {
     const { name, user_id } = req.body;

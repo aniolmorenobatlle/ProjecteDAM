@@ -1,10 +1,11 @@
 const { Router } = require('express');
-const { fetchLists, fetchAddList, fetchDeleteList, fetchListInfo, fetchAddFilmToList, fetchDeleteFilmFromList, shareList } = require('../controllers/listController.js');
+const { fetchLists, fetchSharedLists, fetchAddList, fetchDeleteList, fetchListInfo, fetchAddFilmToList, fetchDeleteFilmFromList, shareList } = require('../controllers/listController.js');
 const authMiddleware = require('../middleware/authMiddleware.js');
 
 const router = Router();
 
 router.get('/', authMiddleware, fetchLists);
+router.get('/shared/:user_id', authMiddleware, fetchSharedLists);
 router.get('/listInfo/:list_id', fetchListInfo);
 
 router.post('/addList', fetchAddList);

@@ -13,6 +13,24 @@ exports.getLists = async (user_id) => {
   return result.rows;
 };
 
+exports.getSharedLists = async (user_id) => {
+  const query = await pool.query(`
+    SELECT 
+      sl.*, 
+      l.name AS list_name,
+      u1.username AS user_username,
+      u2.username AS friend_username
+    FROM shared_lists sl
+    JOIN lists l ON sl.list_id = l.id
+    JOIN users u1 ON sl.user_id = u1.id
+    JOIN users u2 ON sl.friend_id = u2.id
+    WHERE sl.friend_id = $1
+    ORDER BY sl.created_at DESC;
+  `, [user_id]);
+
+  return query.rows;
+};
+
 exports.addList = async (name, user_id) => {
   const query = `
     INSERT INTO lists (user_id, name, created_at)
