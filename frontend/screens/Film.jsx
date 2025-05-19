@@ -106,7 +106,6 @@ export default function Film() {
     const ownLists = await fetchLists();
     const sharedLists = await fetchSharedLists();
 
-    // Combina i elimina duplicats per id
     const combined = [...ownLists, ...sharedLists];
     const uniqueLists = Object.values(
       combined.reduce((acc, list) => {
@@ -115,7 +114,6 @@ export default function Film() {
       }, {})
     );
 
-    // Prepara el format pel dropdown
     const formattedData = uniqueLists.map((list) => ({
       label:
         list.name +
@@ -674,22 +672,14 @@ export default function Film() {
               (review, index) => (
                 <View key={index} style={styles.reviewContainer}>
                   <View style={styles.reviewHeader}>
-                    {review.avatar ? (
-                      <Image
-                        style={styles.reviewImageUser}
-                        source={{
-                          uri:
-                            `${review.avatar}&nocache=true` ||
-                            review.avatar_binary,
-                        }}
-                      />
-                    ) : (
-                      <Icon
-                        name="person-circle-outline"
-                        size={50}
-                        style={styles.reviewImageUserNull}
-                      />
-                    )}
+                    <Image
+                      style={styles.reviewImageUser}
+                      source={{
+                        uri: review.avatar
+                          ? `${review.avatar}&nocache=true`
+                          : `${API_URL}/api/users/${review.user_id}/avatar`,
+                      }}
+                    />
 
                     <Text style={[globalStyles.textBase, styles.reviewText]}>
                       Review by{" "}

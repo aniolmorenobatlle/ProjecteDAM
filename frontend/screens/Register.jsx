@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Alert,
   Image,
@@ -157,6 +157,15 @@ export default function Register() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const originalConsoleError = console.error;
+    console.error = () => {};
+
+    return () => {
+      console.error = originalConsoleError;
+    };
+  }, []);
 
   return (
     <KeyboardAvoidingView

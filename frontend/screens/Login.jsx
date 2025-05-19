@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Alert,
   Image,
@@ -28,6 +28,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [incorrectUser, setIncorrectUser] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+
+  useEffect(() => {
+    const originalConsoleError = console.error;
+    console.error = () => {};
+
+    return () => {
+      console.error = originalConsoleError;
+    };
+  }, []);
 
   const handleLogin = async () => {
     try {
