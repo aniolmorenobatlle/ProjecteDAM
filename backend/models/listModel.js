@@ -61,13 +61,21 @@ exports.getListInfo = async (list_id) => {
 };
 
 exports.addFilmToList = async (list_id, movie_id) => {
-  const query = `
+  const checkQuery = `
+    SELECT 1 FROM movie_list WHERE list_id = $1 AND movie_id = $2
+  `;
+  const checkResult = await pool.query(checkQuery, [list_id, movie_id]);
+  if (checkResult.rowCount > 0) {
+    return { alreadyExists: true };
+  }
+
+  const insertQuery = `
     INSERT INTO movie_list (list_id, movie_id, created_at)
     VALUES ($1, $2, NOW());
   `;
-  await pool.query(query, [list_id, movie_id]);
+  await pool.query(insertQuery, [list_id, movie_id]);
+  return { alreadyExists: false };
 };
-
 exports.deleteFilmFromList = async (list_id, movie_id) => {
   const query = `
     DELETE FROM movie_list

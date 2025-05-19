@@ -64,15 +64,68 @@ export default function Film() {
         }
       );
 
-      const formattedData = response.data.lists.map((list) => ({
-        label: list.name,
-        value: list.id,
+      return response.data.lists.map((list) => ({
+        id: list.id,
+        name: list.name,
+        owner: userInfo.username,
+        movie_count: list.movie_count,
       }));
-
-      setDropdownList(formattedData);
     } catch (error) {
-      console.error("Error fetching the lists", error);
+      console.log("Error fetching the lists", error);
+      return [];
     }
+  };
+
+  const fetchSharedLists = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    const userId = userInfo.id;
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/lists/shared/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data.sharedLists.map((shared) => ({
+        id: shared.list_id,
+        name: shared.list_name,
+        owner: shared.user_username,
+        movie_count: shared.movie_count,
+      }));
+    } catch (error) {
+      console.log("Error fetching the shared lists", error);
+      return [];
+    }
+  };
+
+  const refreshAllLists = async () => {
+    const ownLists = await fetchLists();
+    const sharedLists = await fetchSharedLists();
+
+    // Combina i elimina duplicats per id
+    const combined = [...ownLists, ...sharedLists];
+    const uniqueLists = Object.values(
+      combined.reduce((acc, list) => {
+        acc[list.id] = list;
+        return acc;
+      }, {})
+    );
+
+    // Prepara el format pel dropdown
+    const formattedData = uniqueLists.map((list) => ({
+      label:
+        list.name +
+        (list.owner && list.owner !== userInfo.username
+          ? ` (${list.owner})`
+          : ""),
+      value: list.id,
+    }));
+
+    setDropdownList(formattedData);
   };
 
   const fetchMovieStatus = async () => {
@@ -336,7 +389,7 @@ export default function Film() {
   useEffect(() => {
     if (userInfo && userInfo.id) {
       fetchMovieStatus();
-      fetchLists();
+      refreshAllLists();
     }
 
     fetchMovieDetails();
