@@ -7,7 +7,7 @@ const genresURL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKe
 // Configura les credencials de PostgreSQL
 const dbUser = 'aniol';
 const dbHost = 'postgres';
-const dbName = 'movies';
+const dbName = 'movies_knex';
 const dbPassword = 'password';
 const dbPort = 5432;
 

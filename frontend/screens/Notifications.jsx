@@ -65,7 +65,7 @@ export default function Notifications() {
         setNotifications((prevNotifications) =>
           prevNotifications.map((notification) =>
             notification.request_id === requestId
-              ? { ...notification, status: "accepted" }
+              ? { ...notification, is_friend: true }
               : notification
           )
         );
@@ -187,7 +187,7 @@ export default function Notifications() {
                 requested to follow you.
               </Text>
 
-              {item.status === "pending" ? (
+              {item.is_friend === false ? (
                 <View style={styles.offerButtons}>
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -208,11 +208,9 @@ export default function Notifications() {
                   </TouchableOpacity>
                 </View>
               ) : (
-                item.status === "accepted" && (
-                  <View style={styles.offerButtons}>
-                    <Text style={styles.accepted}>Accepted</Text>
-                  </View>
-                )
+                <View style={styles.offerButtons}>
+                  <Text style={styles.accepted}>Accepted</Text>
+                </View>
               )}
             </TouchableOpacity>
           )}

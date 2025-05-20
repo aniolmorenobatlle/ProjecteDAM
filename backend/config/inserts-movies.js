@@ -47,13 +47,18 @@ async function fetchAndInsertMovies() {
         const movieQuery = `
           INSERT INTO "movies"("title", "release_year", "poster", "cover", "synopsis", "vote_average", "id_api", "created_at")
           VALUES($1, $2, $3, $4, $5, $6, $7, NOW())
-          RETURNING id
-          ON CONFLICT ("id_api") DO NOTHING;
+          ON CONFLICT ("id_api") DO NOTHING
+          RETURNING id;
         `;
 
         const movieValues = [title, releaseDate, poster, cover, synopsis, vote_average, id];
         const result = await client.query(movieQuery, movieValues);
-        const newMovieId = result.rows[0].id;
+        const newMovieId = result.rows.length > 0 ? result.rows[0].id : null;
+
+        if (!newMovieId) {
+          console.log(`No s'ha inserit la pel·lícula amb id_api ${id} perquè ja existia.`);
+          continue;
+        }
 
         // Inserir els gèneres associats a la pel·lícula
         for (let genreId of genre_ids) {

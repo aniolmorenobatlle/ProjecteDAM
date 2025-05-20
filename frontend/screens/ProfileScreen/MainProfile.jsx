@@ -93,7 +93,7 @@ export default function MainProfile({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setFollowStatus(response.data.status);
+      setFollowStatus(response.data.is_friend);
     } catch (error) {
       console.log("Error getting friendship status:", error?.message || error);
       Alert.alert(
@@ -119,7 +119,7 @@ export default function MainProfile({
       );
 
       if (response.status === 200) {
-        setFollowStatus("pending");
+        setFollowStatus(false);
       }
     } catch (error) {
       console.log("Error sending friend request:", error?.message || error);
@@ -158,15 +158,15 @@ export default function MainProfile({
   };
 
   const getFollowButtonColor = (status) => {
-    if (status === "accepted") return "#8E4A65";
-    if (status === "pending") return "#9C4A8B";
+    if (status === true) return "#8E4A65";
+    if (status === false) return "#9C4A8B";
     if (status === null) return "#E9A6A6";
     return "#CCCCCC";
   };
 
   const getFollowButtonLabel = (status) => {
-    if (status === "accepted") return "Unfollow";
-    if (status === "pending") return "Follow requested";
+    if (status === true) return "Unfollow";
+    if (status === false) return "Follow requested";
     if (status === null) return "Follow";
     return "Unknown";
   };
@@ -174,18 +174,18 @@ export default function MainProfile({
   const handleFollowStatus = () => {
     if (followStatus === null) {
       setFriendRequest();
-      setFollowStatus("pending");
-    } else if (followStatus === "pending") {
+      setFollowStatus(false);
+    } else if (followStatus === false) {
       deleteFriend();
       setFollowStatus(null);
-    } else if (followStatus === "accepted") {
+    } else if (followStatus === true) {
       deleteFriend();
       setFollowStatus(null);
     } else setFollowStatus(null);
   };
 
   useEffect(() => {
-    if (profileInfo) {
+    if (profileInfo && profileInfo.id) {
       fetchCounts();
     }
   }, [profileInfo]);
