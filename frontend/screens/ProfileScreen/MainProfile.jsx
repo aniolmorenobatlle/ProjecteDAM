@@ -158,17 +158,23 @@ export default function MainProfile({
   };
 
   const getFollowButtonColor = (status) => {
-    if (status === true) return "#8E4A65";
-    if (status === false) return "#9C4A8B";
-    if (status === null) return "#E9A6A6";
-    return "#CCCCCC";
+    if (status === true) {
+      return "#8E4A65";
+    } else if (status === false) {
+      return "#9C4A8B";
+    } else {
+      return "#E9A6A6";
+    }
   };
 
   const getFollowButtonLabel = (status) => {
-    if (status === true) return "Unfollow";
-    if (status === false) return "Follow requested";
-    if (status === null) return "Follow";
-    return "Unknown";
+    if (status === true) {
+      return "Unfollow";
+    } else if (status === false) {
+      return "Follow requested";
+    } else {
+      return "Follow";
+    }
   };
 
   const handleFollowStatus = () => {
