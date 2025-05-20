@@ -149,8 +149,6 @@ export default function Register() {
       });
 
       if (response.status === 200) {
-        const { token } = response.data;
-        await AsyncStorage.setItem("authToken", token);
         navigation.navigate("Login");
       }
     } catch (error) {

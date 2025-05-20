@@ -26,29 +26,8 @@ export default function Home() {
 
   const getPopularFilms = async () => {
     try {
-      const storedMovies = await AsyncStorage.getItem("popularMovies");
-      const storedTimestamp = await AsyncStorage.getItem("trending");
-
-      const now = Date.now();
-      const oneWeek = 7 * 24 * 60 * 60 * 1000;
-
-      if (
-        storedMovies &&
-        storedTimestamp &&
-        now - Number(storedTimestamp) < oneWeek
-      ) {
-        setFilms(JSON.parse(storedMovies));
-        return;
-      }
-
       const response = await axios.get(`${API_URL}/api/movies/trending`);
       setFilms(response.data.movies);
-
-      await AsyncStorage.setItem(
-        "popularMovies",
-        JSON.stringify(response.data.movies)
-      );
-      await AsyncStorage.setItem("trending", JSON.stringify(now));
     } catch (error) {
       console.error("Error en obtenir les pel·lícules populars: " + error);
     }
@@ -66,9 +45,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    getPopularFilms();
-
     if (userInfo && userInfo.id) {
+      getPopularFilms();
       getFavoritesMovies();
     }
   }, [userInfo]);
