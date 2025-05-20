@@ -1,7 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -45,8 +44,9 @@ export default function Home() {
   };
 
   useEffect(() => {
+    getPopularFilms();
+
     if (userInfo && userInfo.id) {
-      getPopularFilms();
       getFavoritesMovies();
     }
   }, [userInfo]);

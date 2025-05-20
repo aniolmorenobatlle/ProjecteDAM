@@ -36,7 +36,11 @@ export default function Notifications() {
       );
 
       if (response.status === 200) {
-        setNotifications(response.data.notifications);
+        setNotifications(
+          Array.isArray(response.data.notifications)
+            ? response.data.notifications
+            : []
+        );
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -157,7 +161,7 @@ export default function Notifications() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{ color: "white" }}>No notifications yet</Text>
+          <Text style={{ color: "gray" }}>No notifications yet</Text>
         </View>
       ) : (
         <FlatList
