@@ -727,7 +727,7 @@ export default function Film() {
       </CustomModal>
 
       <CustomModal visible={modalList} onClose={handleCloseModalList}>
-        <Text style={styles.modalTitle}>Delete a list</Text>
+        <Text style={styles.modalTitle}>Add to a list</Text>
 
         <Dropdown
           style={styles.dropdown}

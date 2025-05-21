@@ -150,7 +150,7 @@ export default function FriendsInfoProfile({
             const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            return res.data.users;
+            return res.data.users.filter((user) => user.id !== profileInfo.id);
           }}
           renderItem={(user) => (
             <View>
