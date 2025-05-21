@@ -292,7 +292,6 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
-    height: 280,
   },
 
   filmCardImage: {
