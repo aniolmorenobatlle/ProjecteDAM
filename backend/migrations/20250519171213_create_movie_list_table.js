@@ -9,7 +9,7 @@ exports.up = async function (knex) {
     table.integer('movie_id').unsigned();
     table.timestamp('created_at');
 
-    table.foreign('list_id').references('id').inTable('lists');
+    table.foreign('list_id').references('id').inTable('lists').onDelete('CASCADE');
     table.foreign('movie_id').references('id_api').inTable('movies').onDelete('CASCADE');
   });
 };
