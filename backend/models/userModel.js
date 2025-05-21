@@ -481,9 +481,8 @@ exports.acceptRequest = async (senderId, receiverId, requestId) => {
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN'); // Inicia la transacció
+    await client.query('BEGIN');
 
-    // 1. Actualitzem l'estat de la sol·licitud a 'accepted' basant-nos en l'ID
     const updateQuery = `
       UPDATE friends
       SET is_friend = TRUE
@@ -497,15 +496,14 @@ exports.acceptRequest = async (senderId, receiverId, requestId) => {
       return null;
     }
 
-    // 2. Fem un INSERT invers (de receiver cap a sender)
     const insertQuery = `
       INSERT INTO friends (user_id, friend_id, is_friend, created_at)
-      VALUES ($1, $2, 'accepted', NOW())
+      VALUES ($1, $2, TRUE, NOW())
     `;
     await client.query(insertQuery, [receiverId, senderId]);
 
     await client.query('COMMIT');
-    return updateResult; // retornem la resposta de l'UPDATE
+    return updateResult;
   } catch (error) {
     await client.query('ROLLBACK');
     console.error("Error a la base de dades en acceptar la sol·licitud:", error);
@@ -573,15 +571,14 @@ exports.setFriendRequest = async (userId, friendId) => {
   if (existingRequest.rows.length > 0) {
     const updateQuery = await pool.query(
       `
-        UPDATE friends
-        SET is_friend = FALSE, created_at = NOW()
-        WHERE user_id = $1 AND friend_id = $2
-        RETURNING *
-      `, [userId, friendId]
+      UPDATE friends
+      SET is_friend = FALSE, created_at = NOW()
+      WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
+      RETURNING *
+    `, [userId, friendId]
     );
 
     return updateQuery.rows[0];
-
   } else {
     const insertQuery = await pool.query(
       `

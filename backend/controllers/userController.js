@@ -721,7 +721,7 @@ exports.fetchFriendsStatus = async (req, res) => {
     }
 
     res.status(200).json({
-      status: status.status
+      is_friend: status?.is_friend ?? null
     });
 
   } catch (error) {

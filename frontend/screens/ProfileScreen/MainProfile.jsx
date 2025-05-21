@@ -179,6 +179,7 @@ export default function MainProfile({
 
   const handleFollowStatus = () => {
     if (followStatus === null) {
+      // No hi ha cap relació: enviem sol·licitud
       setFriendRequest();
       setFollowStatus(false);
     } else if (followStatus === false) {
@@ -187,7 +188,7 @@ export default function MainProfile({
     } else if (followStatus === true) {
       deleteFriend();
       setFollowStatus(null);
-    } else setFollowStatus(null);
+    }
   };
 
   useEffect(() => {
