@@ -1,5 +1,9 @@
 emulator -avd Pixel_6
 
+eas build -p android --profile preview
+
+ngrok http 3000
+
 ------------------------------------------------------
 
 cd frontend

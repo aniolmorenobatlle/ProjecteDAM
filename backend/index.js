@@ -19,6 +19,6 @@ app.use('/api/movies', movieRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/lists', listRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor en funcionament a http://localhost:${PORT}`);
 });

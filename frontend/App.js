@@ -73,11 +73,6 @@ export default function App() {
   }, [unauthenticated]);
 
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
-    return () => backHandler.remove();
-  }, []);
-
-  useEffect(() => {
     const unsubscribe = navigationRef.addListener('state', () => {
       const currentRoute = navigationRef.getCurrentRoute();
       setRouteName(currentRoute?.name);
