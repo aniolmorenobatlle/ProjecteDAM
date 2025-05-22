@@ -6,7 +6,7 @@ services:
     image: postgres:17.4
     container_name: postgres_container
     env_file:
-      - ./postgres/.env
+      - ./backend/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
