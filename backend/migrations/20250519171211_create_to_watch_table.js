@@ -12,7 +12,7 @@ exports.up = async function (knex) {
     table.boolean('watchlist');
     table.boolean('favorite').defaultTo(false);
     table.decimal('rating', 2, 1);
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
 
     table.foreign('user_id').references('id').inTable('users').onDelete('CASCADE');
     table.foreign('movie_id').references('id_api').inTable('movies').onDelete('CASCADE');

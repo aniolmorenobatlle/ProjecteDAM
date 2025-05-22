@@ -8,16 +8,19 @@ exports.seed = async function (knex) {
       list_id: 3,
       user_id: 1,
       friend_id: 2,
+      created_at: new Date(),
     },
     {
       list_id: 5,
       user_id: 2,
       friend_id: 1,
+      created_at: new Date(),
     },
     {
       list_id: 6,
       user_id: 2,
       friend_id: 4,
+      created_at: new Date(),
     }
   ]);
 };

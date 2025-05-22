@@ -14,7 +14,7 @@ exports.up = async function (knex) {
     table.boolean('is_trending').defaultTo(false);
     table.integer('director_id').unsigned().references('id').inTable('directors');
     table.integer('id_api').unique();
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 };
 

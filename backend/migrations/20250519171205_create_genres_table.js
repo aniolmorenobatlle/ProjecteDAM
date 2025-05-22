@@ -6,7 +6,7 @@ exports.up = async function (knex) {
   await knex.schema.createTable('genres', table => {
     table.increments('id').primary();
     table.string('name');
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 };
 

@@ -8,7 +8,7 @@ exports.up = async function (knex) {
     table.integer('list_id').unsigned();
     table.integer('user_id');
     table.integer('friend_id');
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
 
     table.foreign('list_id').references('id').inTable('lists').onDelete('CASCADE');
     table.foreign('user_id').references('id').inTable('users').onDelete('CASCADE');

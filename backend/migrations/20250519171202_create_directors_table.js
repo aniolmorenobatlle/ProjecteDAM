@@ -7,7 +7,7 @@ exports.up = async function (knex) {
     table.increments('id').primary();
     table.string('name');
     table.integer('id_api').unique();
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 };
 

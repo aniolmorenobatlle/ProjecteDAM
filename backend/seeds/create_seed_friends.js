@@ -8,31 +8,37 @@ exports.seed = async function (knex) {
       user_id: 1,
       friend_id: 2,
       is_friend: true,
+      created_at: new Date(),
     },
     {
       user_id: 2,
       friend_id: 1,
       is_friend: true,
+      created_at: new Date(),
     },
     {
       user_id: 1,
       friend_id: 3,
       is_friend: true,
+      created_at: new Date(),
     },
     {
       user_id: 3,
       friend_id: 1,
       is_friend: true,
+      created_at: new Date(),
     },
     {
       user_id: 2,
       friend_id: 4,
       is_friend: true,
+      created_at: new Date(),
     },
     {
       user_id: 4,
       friend_id: 2,
       is_friend: true,
+      created_at: new Date(),
     }
   ]);
 };

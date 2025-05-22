@@ -6,7 +6,7 @@ module.exports = {
     host: "postgres",
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: 'movies_knex',
+    database: process.env.DB_NAME,
   },
   migrations: {
     tableName: 'knex_migrations',

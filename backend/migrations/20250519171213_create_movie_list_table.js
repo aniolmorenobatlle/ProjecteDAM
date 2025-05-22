@@ -7,7 +7,7 @@ exports.up = async function (knex) {
     table.increments('id').primary();
     table.integer('list_id').unsigned();
     table.integer('movie_id').unsigned();
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
 
     table.foreign('list_id').references('id').inTable('lists').onDelete('CASCADE');
     table.foreign('movie_id').references('id_api').inTable('movies').onDelete('CASCADE');

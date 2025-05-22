@@ -3,14 +3,10 @@ version: "3.8"
 services:
   # Base de dades
   postgres:
-    image: postgres:latest
+    image: postgres:17.4
     container_name: postgres_container
-    environment:
-      POSTGRES_USER: aniol
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: movies
-    ports:
-      - "5432:5432"
+    env_file:
+      - ./postgres/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

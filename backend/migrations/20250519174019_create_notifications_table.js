@@ -9,7 +9,7 @@ exports.up = async function (knex) {
     table.integer('friend_id').notNullable();
     table.integer('movie_id').unsigned();
     table.boolean('is_friend').defaultTo(false);
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
 
     table.foreign('user_id').references('id').inTable('users');
     table.foreign('friend_id').references('id').inTable('users');

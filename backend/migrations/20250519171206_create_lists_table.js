@@ -7,7 +7,7 @@ exports.up = async function (knex) {
     table.increments('id').primary();
     table.integer('user_id');
     table.string('name');
-    table.timestamp('created_at');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
 
     table.foreign('user_id').references('id').inTable('users').onDelete('CASCADE');
   });
