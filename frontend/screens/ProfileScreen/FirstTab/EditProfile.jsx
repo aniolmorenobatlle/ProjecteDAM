@@ -23,6 +23,7 @@ export default function EditProfile({
   poster,
   filledFavorites,
   setIndex,
+  avatarUri,
   onOpen,
   fetchFavorites,
   handleClose,
@@ -115,7 +116,6 @@ export default function EditProfile({
           contentContainerStyle={{ alignItems: "center" }}
         >
           <View style={{ width: "100%" }}>
-            {/* Full Name */}
             <View style={styles.profileInfoContainer}>
               <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
                 Full Name
@@ -134,7 +134,6 @@ export default function EditProfile({
 
             <View style={styles.profileLineSeparator}></View>
 
-            {/* Username */}
             <View style={styles.profileInfoContainer}>
               <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
                 Username
@@ -153,7 +152,6 @@ export default function EditProfile({
 
             <View style={styles.profileLineSeparator}></View>
 
-            {/* Email */}
             <View style={styles.profileInfoContainer}>
               <Text style={[globalStyles.textBase, styles.listInfoTitle]}>
                 Email
@@ -170,7 +168,6 @@ export default function EditProfile({
 
             <View style={styles.profileLineSeparator}></View>
 
-            {/* Avatar */}
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => setIndex(1)}
@@ -183,10 +180,10 @@ export default function EditProfile({
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
-                {userInfo.avatar ? (
+                {avatarUri ? (
                   <Image
                     source={{
-                      uri: `${userInfo.avatar}&nocache=true`,
+                      uri: `${avatarUri}&nocache=${Date.now()}`,
                     }}
                     style={{ width: 50, height: 50, borderRadius: 50 }}
                   />

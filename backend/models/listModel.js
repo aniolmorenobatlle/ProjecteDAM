@@ -95,3 +95,15 @@ exports.shareList = async (list_id, user_id, friend_id) => {
 
   return query.rows[0];
 };
+
+exports.checkMovieInList = async (listId, movieId) => {
+  const query = `
+    SELECT EXISTS (
+      SELECT 1 
+      FROM movie_list 
+      WHERE list_id = $1 AND movie_id = $2
+    ) AS exists;
+  `;
+  const result = await pool.query(query, [listId, movieId]);
+  return result.rows[0].exists;
+};

@@ -7,6 +7,7 @@ import {
   Image,
   Alert,
   FlatList,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -16,7 +17,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { globalStyles } from "../../../globalStyles";
 import SearchModalize from "./SearchModalize";
-import { Provider } from "react-native-paper";
 
 export default function FriendsInfoProfile({
   selectedList,
@@ -67,34 +67,30 @@ export default function FriendsInfoProfile({
   );
 
   return (
-    <Provider>
-      <SafeAreaView style={{ paddingHorizontal: 15, paddingBottom: 50 }}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setSelectedList(null)}
-          >
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 15, paddingBottom: 50 }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setSelectedList(null)}
+        >
+          <Icon name="arrow-back-outline" size={30} style={styles.headerIcon} />
+        </TouchableOpacity>
+        <Text style={styles.listName}>{selectedList}</Text>
+
+        {editable ? (
+          <TouchableOpacity onPress={onOpen}>
             <Icon
-              name="arrow-back-outline"
+              name="add-circle-outline"
               size={30}
-              style={styles.headerIcon}
+              style={{ color: "white" }}
             />
           </TouchableOpacity>
-          <Text style={styles.listName}>{selectedList}</Text>
+        ) : (
+          <View />
+        )}
+      </View>
 
-          {editable ? (
-            <TouchableOpacity onPress={onOpen}>
-              <Icon
-                name="add-circle-outline"
-                size={30}
-                style={{ color: "white" }}
-              />
-            </TouchableOpacity>
-          ) : (
-            <View />
-          )}
-        </View>
-
+      <View style={{ flex: 1 }}>
         {friends.length === 0 ? (
           <Text style={styles.emptyMessage}>
             No friends yet, add some friends to see them here!
@@ -117,8 +113,8 @@ export default function FriendsInfoProfile({
                   <Image
                     source={{
                       uri: friend.avatar
-                        ? `${friend.avatar}&nocache=true`
-                        : `${API_URL}/api/users/${friend.friend_id}/avatar`,
+                        ? `${friend.avatar}&nocache=${Date.now()}`
+                        : `${API_URL}/api/users/${friend.friend_id}/avatar?nocache=${Date.now()}`,
                     }}
                     style={styles.listImage}
                   />
@@ -138,7 +134,7 @@ export default function FriendsInfoProfile({
             showsVerticalScrollIndicator={false}
           />
         )}
-      </SafeAreaView>
+      </View>
 
       <SearchModalize
         title="Search a Friend"
@@ -149,16 +145,16 @@ export default function FriendsInfoProfile({
           const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          return res.data.users;
+          return res.data.users.filter((user) => user.id !== profileInfo.id);
         }}
         renderItem={(user) => (
-          <View>
+          <>
             <View style={styles.listItems}>
               <Image
                 source={{
                   uri: user.avatar
-                    ? `${user.avatar}&nocache=true`
-                    : `${API_URL}/api/users/${user.id}/avatar`,
+                    ? `${user.avatar}&nocache=${Date.now()}`
+                    : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
                 }}
                 style={styles.userAvatar}
               />
@@ -169,14 +165,14 @@ export default function FriendsInfoProfile({
             </View>
 
             <View style={styles.separator} />
-          </View>
+          </>
         )}
         onItemPress={(user) => {
           navigation.navigate("UserProfile", { userId: user.id });
           modalizeRef.current?.close();
         }}
       />
-    </Provider>
+    </SafeAreaView>
   );
 }
 

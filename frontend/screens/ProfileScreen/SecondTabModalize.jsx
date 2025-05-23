@@ -41,10 +41,11 @@ export default function SecondTabModalize({
   setSelectedPoster,
   setPoster,
   setIndex,
+  setAvatarUri,
 }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [imageReady, setImageReady] = useState(false);
+  const [, setImageReady] = useState(false);
   const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
@@ -121,6 +122,14 @@ export default function SecondTabModalize({
       if (response.status === 200) {
         alert("Imatge carregada correctament!");
         setSelectedImage(null);
+
+        const newUri = userInfo?.avatar
+          ? `${userInfo.avatar}&nocache=${Date.now()}`
+          : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=${Date.now()}`;
+
+        setImageUri(newUri);
+        setImageReady(true);
+        setAvatarUri(newUri);
       }
     } catch (error) {
       console.log("Error al carregar la imatge:", error);
@@ -133,8 +142,8 @@ export default function SecondTabModalize({
   useEffect(() => {
     const checkImage = async () => {
       const uri = userInfo?.avatar
-        ? `${userInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=true`;
+        ? `${userInfo.avatar}&nocache=${Date.now()}`
+        : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=${Date.now()}`;
 
       try {
         const response = await axios.head(uri);

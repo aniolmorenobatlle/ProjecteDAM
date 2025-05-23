@@ -36,7 +36,11 @@ export default function Notifications() {
       );
 
       if (response.status === 200) {
-        setNotifications(response.data.notifications);
+        setNotifications(
+          Array.isArray(response.data.notifications)
+            ? response.data.notifications
+            : []
+        );
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -65,7 +69,7 @@ export default function Notifications() {
         setNotifications((prevNotifications) =>
           prevNotifications.map((notification) =>
             notification.request_id === requestId
-              ? { ...notification, status: "accepted" }
+              ? { ...notification, is_friend: true }
               : notification
           )
         );
@@ -157,7 +161,7 @@ export default function Notifications() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{ color: "white" }}>No notifications yet</Text>
+          <Text style={{ color: "gray" }}>No notifications yet</Text>
         </View>
       ) : (
         <FlatList
@@ -177,8 +181,8 @@ export default function Notifications() {
                 style={styles.avatar}
                 source={{
                   uri: item?.avatar
-                    ? `${item?.avatar}&nocache=true`
-                    : `${API_URL}/api/users/${item?.sender_id}/avatar?nocache=true`,
+                    ? `${item?.avatar}&nocache=${Date.now()}`
+                    : `${API_URL}/api/users/${item?.sender_id}/avatar?nocache=${Date.now()}`,
                 }}
               />
 
@@ -187,7 +191,7 @@ export default function Notifications() {
                 requested to follow you.
               </Text>
 
-              {item.status === "pending" ? (
+              {item.is_friend === false ? (
                 <View style={styles.offerButtons}>
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -208,11 +212,9 @@ export default function Notifications() {
                   </TouchableOpacity>
                 </View>
               ) : (
-                item.status === "accepted" && (
-                  <View style={styles.offerButtons}>
-                    <Text style={styles.accepted}>Accepted</Text>
-                  </View>
-                )
+                <View style={styles.offerButtons}>
+                  <Text style={styles.accepted}>Accepted</Text>
+                </View>
               )}
             </TouchableOpacity>
           )}

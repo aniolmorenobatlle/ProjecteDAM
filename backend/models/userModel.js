@@ -390,7 +390,7 @@ exports.fetchCounts = async (userId) => {
       ) AS total_friends
       FROM friends
       WHERE (user_id = $1 OR friend_id = $1) 
-      AND status = 'accepted'
+      AND is_friend = TRUE
       AND user_id != friend_id;
     `, [userId]
   );
@@ -465,7 +465,7 @@ exports.getRequests = async (userId) => {
         u.name,
         u.username,
         u.avatar,
-        f.status,
+        f.is_friend,
         f.created_at
       FROM friends f
       JOIN users u ON f.user_id = u.id
@@ -481,12 +481,11 @@ exports.acceptRequest = async (senderId, receiverId, requestId) => {
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN'); // Inicia la transacció
+    await client.query('BEGIN');
 
-    // 1. Actualitzem l'estat de la sol·licitud a 'accepted' basant-nos en l'ID
     const updateQuery = `
       UPDATE friends
-      SET status = 'accepted'
+      SET is_friend = TRUE
       WHERE id = $1 AND user_id = $2 AND friend_id = $3
       RETURNING *
     `;
@@ -497,15 +496,14 @@ exports.acceptRequest = async (senderId, receiverId, requestId) => {
       return null;
     }
 
-    // 2. Fem un INSERT invers (de receiver cap a sender)
     const insertQuery = `
-      INSERT INTO friends (user_id, friend_id, status, created_at)
-      VALUES ($1, $2, 'accepted', NOW())
+      INSERT INTO friends (user_id, friend_id, is_friend, created_at)
+      VALUES ($1, $2, TRUE, NOW())
     `;
     await client.query(insertQuery, [receiverId, senderId]);
 
     await client.query('COMMIT');
-    return updateResult; // retornem la resposta de l'UPDATE
+    return updateResult;
   } catch (error) {
     await client.query('ROLLBACK');
     console.error("Error a la base de dades en acceptar la sol·licitud:", error);
@@ -536,12 +534,12 @@ exports.getFriends = async (userId) => {
         u.name,
         u.username,
         u.avatar,
-        f.status,
+        f.is_friend,
         f.created_at
       FROM friends f
       JOIN users u ON f.friend_id = u.id
       WHERE f.user_id = $1
-      AND f.status = 'accepted'
+      AND f.is_friend = TRUE
       ORDER BY f.created_at DESC
     `, [userId]
   );
@@ -552,7 +550,7 @@ exports.getFriends = async (userId) => {
 exports.getFriendshipStatus = async (userId, friendId) => {
   const query = await pool.query(
     `
-      SELECT status
+      SELECT is_friend
       FROM friends
       WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
     `, [userId, friendId]
@@ -573,20 +571,19 @@ exports.setFriendRequest = async (userId, friendId) => {
   if (existingRequest.rows.length > 0) {
     const updateQuery = await pool.query(
       `
-        UPDATE friends
-        SET status = 'pending', created_at = NOW()
-        WHERE user_id = $1 AND friend_id = $2
-        RETURNING *
-      `, [userId, friendId]
+      UPDATE friends
+      SET is_friend = FALSE, created_at = NOW()
+      WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
+      RETURNING *
+    `, [userId, friendId]
     );
 
     return updateQuery.rows[0];
-
   } else {
     const insertQuery = await pool.query(
       `
-        INSERT INTO friends (user_id, friend_id, status, created_at)
-        VALUES ($1, $2, 'pending', NOW())
+        INSERT INTO friends (user_id, friend_id, is_friend, created_at)
+        VALUES ($1, $2, FALSE, NOW())
         RETURNING *
       `, [userId, friendId]
     );

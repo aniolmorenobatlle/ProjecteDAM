@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, SafeAreaView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function Navbar({ currentPage }) {
@@ -11,7 +10,7 @@ export default function Navbar({ currentPage }) {
   };
 
   return (
-    <View style={styles.navbar}>
+    <SafeAreaView style={styles.navbar}>
       <TouchableOpacity onPress={() => handleIconClick("Home")}>
         <Icon
           name="home-outline"
@@ -56,20 +55,17 @@ export default function Navbar({ currentPage }) {
           style={styles.navbarIcon}
         />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = {
   navbar: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
-    height: Platform.OS === "ios" ? 80 : 70,
-    width: "100%",
+    height: Platform.OS === "ios" ? 85 : 70,
     backgroundColor: "#1F1D36",
-    paddingHorizontal: 30,
-    paddingBottom: Platform.OS === "ios" ? 30 : 0,
     borderTopWidth: 1,
     borderTopColor: "#2A2634",
   },

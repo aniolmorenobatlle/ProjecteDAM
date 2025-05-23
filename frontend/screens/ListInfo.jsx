@@ -227,10 +227,12 @@ export default function ListInfo() {
                 onPress={handleOpenModalDeleteList}
                 title="Delete film"
               />
-              <Menu.Item
-                onPress={handleOpenModalShareList}
-                title="Share list"
-              />
+              {!route.params.isShared && (
+                <Menu.Item
+                  onPress={handleOpenModalShareList}
+                  title="Share list"
+                />
+              )}
             </Menu>
           </View>
 

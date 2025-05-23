@@ -132,8 +132,8 @@ export default function Lists() {
     }
   };
 
-  const handleListClick = (listId, listName) => {
-    navigation.navigate("ListInfo", { listId, listName });
+  const handleListClick = (listId, listName, isShared) => {
+    navigation.navigate("ListInfo", { listId, listName, isShared });
   };
 
   const handleOpenModalDeleteList = () => {
@@ -255,7 +255,13 @@ export default function Lists() {
                   <View key={index} style={{ width: "100%", marginTop: 10 }}>
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      onPress={() => handleListClick(list.id, list.name)}
+                      onPress={() =>
+                        handleListClick(
+                          list.id,
+                          list.name,
+                          list.owner && list.owner !== userInfo.username
+                        )
+                      }
                     >
                       <View
                         style={{

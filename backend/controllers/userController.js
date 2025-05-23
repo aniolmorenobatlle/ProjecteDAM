@@ -717,11 +717,11 @@ exports.fetchFriendsStatus = async (req, res) => {
     const status = await userModel.getFriendshipStatus(userId, friendId);
 
     if (!status) {
-      return res.status(200).json({ status: null });
+      return res.status(200).json({ is_friend: null });
     }
 
     res.status(200).json({
-      status: status.status
+      is_friend: status?.is_friend ?? null
     });
 
   } catch (error) {

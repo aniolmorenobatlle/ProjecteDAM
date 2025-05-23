@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
+  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -26,6 +27,7 @@ export default function MainProfile({
   newName,
   newUsername,
   filledFavorites,
+  avatarUri,
   editable,
 }) {
   editable = editable || false;
@@ -48,6 +50,8 @@ export default function MainProfile({
   const [totalFavorites, setTotalFavorites] = useState(0);
   const [totalRates, setTotalRates] = useState(0);
   const [totalFriends, setTotalFriends] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 
   const lists = [
     { title: "Watchlist", number: totalWatchlist },
@@ -86,6 +90,7 @@ export default function MainProfile({
 
   const handleFriendshipStatus = async () => {
     try {
+      setIsLoadingInitial(true);
       const token = await AsyncStorage.getItem("authToken");
 
       const response = await axios.get(`${API_URL}/api/users/friends/status`, {
@@ -93,19 +98,34 @@ export default function MainProfile({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setFollowStatus(response.data.status);
+      setFollowStatus(response.data.is_friend);
     } catch (error) {
-      console.log("Error getting friendship status:", error?.message || error);
+      console.error(
+        "Error getting friendship status:",
+        error?.message || error
+      );
       Alert.alert(
         "Error",
         "Error getting friendship status, please try again later"
       );
+    } finally {
+      setIsLoadingInitial(false);
     }
   };
 
   const setFriendRequest = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        console.error("No auth token found");
+        return false;
+      }
+
+      console.log("Sending request with:", {
+        // Debug log
+        userId: userInfo.id,
+        friendId: profileInfo.id,
+      });
 
       const response = await axios.post(
         `${API_URL}/api/users/friends/send-request`,
@@ -118,15 +138,20 @@ export default function MainProfile({
         }
       );
 
+      console.log("Server response:", response.data); // Debug log
+
       if (response.status === 200) {
-        setFollowStatus("pending");
+        return true;
       }
+      return false;
     } catch (error) {
-      console.log("Error sending friend request:", error?.message || error);
+      console.error("Full error object:", error); // Debug log
+      console.error("Error response:", error.response?.data); // Debug log
       Alert.alert(
         "Error",
-        "Error sending friend request, please try again later"
+        error.response?.data?.message || "Error sending friend request"
       );
+      return false;
     }
   };
 
@@ -145,47 +170,69 @@ export default function MainProfile({
         }
       );
 
-      if (response.status === 200) {
-        setFollowStatus(null);
-      }
+      return response.status === 200;
     } catch (error) {
-      console.log("Error deleting friend request:", error?.message || error);
-      Alert.alert(
-        "Error",
-        "Error deleting friend request, please try again later"
-      );
+      console.error("Error deleting friend:", error?.message || error);
+      Alert.alert("Error", "Error deleting friend, please try again later");
+      return false;
+    }
+  };
+  const getFollowButtonColor = (status) => {
+    if (status === true) {
+      return "#8E4A65";
+    } else if (status === false) {
+      return "#9C4A8B";
+    } else {
+      return "#E9A6A6";
     }
   };
 
-  const getFollowButtonColor = (status) => {
-    if (status === "accepted") return "#8E4A65";
-    if (status === "pending") return "#9C4A8B";
-    if (status === null) return "#E9A6A6";
-    return "#CCCCCC";
-  };
-
   const getFollowButtonLabel = (status) => {
-    if (status === "accepted") return "Unfollow";
-    if (status === "pending") return "Follow requested";
-    if (status === null) return "Follow";
-    return "Unknown";
+    if (status === true) {
+      return "Unfollow";
+    } else if (status === false) {
+      return "Follow requested";
+    } else {
+      return "Follow";
+    }
   };
 
-  const handleFollowStatus = () => {
-    if (followStatus === null) {
-      setFriendRequest();
-      setFollowStatus("pending");
-    } else if (followStatus === "pending") {
-      deleteFriend();
-      setFollowStatus(null);
-    } else if (followStatus === "accepted") {
-      deleteFriend();
-      setFollowStatus(null);
-    } else setFollowStatus(null);
+  const handleFollowStatus = async () => {
+    if (isLoadingInitial) return;
+
+    try {
+      console.log("Current follow status:", followStatus);
+
+      if (followStatus === null) {
+        setIsProcessing(true);
+        const result = await setFriendRequest();
+        console.log("Friend request result:", result);
+
+        if (result) {
+          setFollowStatus(false);
+        }
+      } else if (followStatus === false || followStatus === true) {
+        setIsProcessing(true);
+        const result = await deleteFriend();
+        console.log("Delete friend result:", result);
+
+        if (result) {
+          setFollowStatus(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling follow status:", error);
+      Alert.alert(
+        "Error",
+        "Something went wrong while updating follow status. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   useEffect(() => {
-    if (profileInfo) {
+    if (profileInfo && profileInfo.id) {
       fetchCounts();
     }
   }, [profileInfo]);
@@ -199,8 +246,8 @@ export default function MainProfile({
   useEffect(() => {
     const checkImage = async () => {
       const uri = profileInfo?.avatar
-        ? `${profileInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=true`;
+        ? `${profileInfo.avatar}&nocache=${Date.now()}`
+        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`;
 
       try {
         const response = await axios.head(uri);
@@ -248,8 +295,17 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              {imageReady && (
+              {imageReady ? (
                 <Image style={styles.avatar} source={{ uri: imageUri }} />
+              ) : (
+                <Image
+                  style={styles.avatar}
+                  source={{
+                    uri: avatarUri
+                      ? `${avatarUri}?nocache=${Date.now()}`
+                      : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`,
+                  }}
+                />
               )}
 
               <Text style={[globalStyles.textBase, styles.name]}>
@@ -266,12 +322,18 @@ export default function MainProfile({
                   style={[
                     styles.follow,
                     { backgroundColor: getFollowButtonColor(followStatus) },
+                    (isProcessing || isLoadingInitial) && { opacity: 0.7 },
                   ]}
                   activeOpacity={0.8}
+                  disabled={isProcessing || isLoadingInitial}
                   onPress={handleFollowStatus}
                 >
                   <Text style={globalStyles.textBase}>
-                    {getFollowButtonLabel(followStatus)}
+                    {isLoadingInitial
+                      ? "Loading..."
+                      : isProcessing
+                        ? "Processing..."
+                        : getFollowButtonLabel(followStatus)}
                   </Text>
                 </TouchableOpacity>
               </View>

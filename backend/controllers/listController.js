@@ -155,3 +155,16 @@ exports.shareList = async (req, res) => {
     res.status(500).json({ message: 'Error sharing the list' });
   }
 };
+
+exports.checkMovieInList = async (req, res) => {
+  try {
+    const { listId, movieId } = req.params;
+
+    const exists = await listModel.checkMovieInList(listId, movieId);
+
+    res.json({ exists });
+  } catch (error) {
+    console.error('Error checking movie in list:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

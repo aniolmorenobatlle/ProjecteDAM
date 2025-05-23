@@ -149,8 +149,6 @@ export default function Register() {
       });
 
       if (response.status === 200) {
-        const { token } = response.data;
-        await AsyncStorage.setItem("authToken", token);
         navigation.navigate("Login");
       }
     } catch (error) {
@@ -169,76 +167,75 @@ export default function Register() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -50}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
+          style={globalStyles.container}
         >
-          <View style={globalStyles.container}>
-            <Image style={styles.image} source={lalaland} />
+          <Image style={styles.image} source={lalaland} />
 
-            <View style={styles.main}>
-              <View style={styles.signUp}>
-                <Text style={[globalStyles.textBase, styles.signUpText]}>
-                  Sign Up
-                </Text>
-                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
-                  Create your account for free!
-                </Text>
-              </View>
-
-              <View style={styles.buttonsSign}>
-                <InputLogin
-                  text="Full Name"
-                  icon="person-circle-outline"
-                  type="default"
-                  value={name}
-                  onChange={handleNameChange}
-                />
-
-                <InputLogin
-                  text="Username"
-                  icon="person-circle-outline"
-                  type="default"
-                  value={username}
-                  onChange={setUsername}
-                />
-
-                <InputLogin
-                  text="Email"
-                  icon="mail-outline"
-                  type="email-address"
-                  autoComplete="email"
-                  value={email}
-                  onChange={setEmail}
-                />
-
-                <InputLogin
-                  text="Password"
-                  icon="lock-closed-outline"
-                  type="password"
-                  value={password}
-                  onChange={setPassword}
-                />
-
-                <TouchableOpacity activeOpacity={0.8} onPress={handleRegister}>
-                  <ButtonConfirm text="Register" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.haveAccount}>
-                Already have an account? Go to the{" "}
-                <Text
-                  style={styles.loginLink}
-                  onPress={() => navigation.navigate("Login")}
-                >
-                  Login page.
-                </Text>
+          <View style={styles.main}>
+            <View style={styles.signUp}>
+              <Text style={[globalStyles.textBase, styles.signUpText]}>
+                Sign Up
+              </Text>
+              <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
+                Create your account for free!
               </Text>
             </View>
+
+            <View style={styles.buttonsSign}>
+              <InputLogin
+                text="Full Name"
+                icon="person-circle-outline"
+                type="default"
+                value={name}
+                onChange={handleNameChange}
+              />
+
+              <InputLogin
+                text="Username"
+                icon="person-circle-outline"
+                type="default"
+                value={username}
+                onChange={setUsername}
+              />
+
+              <InputLogin
+                text="Email"
+                icon="mail-outline"
+                type="email-address"
+                autoComplete="email"
+                value={email}
+                onChange={setEmail}
+              />
+
+              <InputLogin
+                text="Password"
+                icon="lock-closed-outline"
+                type="password"
+                value={password}
+                onChange={setPassword}
+              />
+
+              <TouchableOpacity activeOpacity={0.8} onPress={handleRegister}>
+                <ButtonConfirm text="Register" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.haveAccount}>
+              Already have an account? Go to the{" "}
+              <Text
+                style={styles.loginLink}
+                onPress={() => navigation.navigate("Login")}
+              >
+                Login page.
+              </Text>
+            </Text>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>

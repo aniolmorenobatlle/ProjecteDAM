@@ -32,8 +32,8 @@ async function fetchAndInsertStreamingPlatforms(movieId) {
       uniqueProviders.set(provider_name, { provider_id, providerLogo });
 
       // Comprovar si la plataforma ja existeix
-      const checkStreamingQuery = `SELECT id FROM "streaming" WHERE "name" = $1 LIMIT 1`;
-      const checkStreamingValues = [provider_name];
+      const checkStreamingQuery = `SELECT id_api FROM "streaming" WHERE id_api = $1 LIMIT 1`;
+      const checkStreamingValues = [provider_id];
       const checkStreamingResult = await client.query(checkStreamingQuery, checkStreamingValues);
 
       let streamingId;
@@ -43,16 +43,17 @@ async function fetchAndInsertStreamingPlatforms(movieId) {
 
         const insertStreamingQuery = `
           INSERT INTO "streaming" ("name", "logo", "id_api", "created_at")
-          VALUES ($1, $2, $3, NOW()) RETURNING id;
+          VALUES ($1, $2, $3, NOW()) RETURNING id_api;
         `;
+
         const insertStreamingValues = [provider_name, providerLogo, provider_id];
         const insertStreamingResult = await client.query(insertStreamingQuery, insertStreamingValues);
-        streamingId = insertStreamingResult.rows[0].id;
+        streamingId = insertStreamingResult.rows[0].id_api;
 
-        console.log(`✅ Plataforma inserida correctament: ${provider_name} amb id ${streamingId}`);
+        console.log(`Plataforma inserida correctament: ${provider_name} amb id ${streamingId}`);
       } else {
-        streamingId = checkStreamingResult.rows[0].id;
-        console.log(`🔄 Plataforma ja existent: ${provider_name} amb id ${streamingId}`);
+        streamingId = checkStreamingResult.rows[0].id_api;
+        console.log(`Plataforma ja existent: ${provider_name} amb id ${streamingId}`);
       }
 
       // Inserir la relació a la taula "movies_streaming"
@@ -63,13 +64,13 @@ async function fetchAndInsertStreamingPlatforms(movieId) {
       `;
       const movieStreamingValues = [movieId, streamingId, display_priority];
 
-      console.log(`💾 Inserint relació movie_id=${movieId}, streaming_id=${streamingId}, display_priority=${display_priority}`);
+      console.log(`Inserint relació movie_id=${movieId}, streaming_id=${streamingId}, display_priority=${display_priority}`);
       await client.query(movieStreamingQuery, movieStreamingValues);
 
-      console.log(`✅ Afegida plataforma "${provider_name}" per a la pel·lícula ${movieId}`);
+      console.log(`Afegida plataforma "${provider_name}" per a la pel·lícula ${movieId}`);
     }
   } catch (error) {
-    console.error(`❌ Error al inserir streaming per a la pel·lícula ${movieId}:`, error);
+    console.error(`Error al inserir streaming per a la pel·lícula ${movieId}:`, error);
   } finally {
     client.release();
   }

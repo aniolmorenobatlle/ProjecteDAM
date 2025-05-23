@@ -9,6 +9,7 @@ export default function CustomModalize({
   setIsModalOpen,
   setIsModalizeOpen,
   setIndex,
+  avatarUri,
   children,
   title = "Edit your Profile",
 }) {
@@ -56,14 +57,18 @@ export default function CustomModalize({
             <Text style={styles.cancel}>Close</Text>
           </TouchableOpacity>
           <Text style={styles.searchFilm}>{title}</Text>
-          {userInfo.avatar ? (
+          {avatarUri ? (
             <Image
-              source={{ uri: `${userInfo.avatar}&nocache=true` }}
+              source={{ uri: `${avatarUri}?nocache=${Date.now()}` }}
               style={styles.searchAvatar}
             />
           ) : (
             <Image
-              source={{ uri: userInfo.avatar_binary }}
+              source={{
+                uri: userInfo.avatar
+                  ? `${userInfo.avatar}&nocache=${Date.now()}`
+                  : userInfo.avatar_binary,
+              }}
               style={styles.searchAvatar}
             />
           )}
