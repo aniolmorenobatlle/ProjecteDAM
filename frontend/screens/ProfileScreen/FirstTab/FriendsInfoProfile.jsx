@@ -7,6 +7,7 @@ import {
   Image,
   Alert,
   FlatList,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -139,42 +140,88 @@ export default function FriendsInfoProfile({
         )}
       </SafeAreaView>
 
-      <SearchModalize
-        title="Search a Friend"
-        profileInfo={profileInfo}
-        modalizeRef={modalizeRef}
-        onSearch={async (query) => {
-          const token = await AsyncStorage.getItem("authToken");
-          const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          return res.data.users.filter((user) => user.id !== profileInfo.id);
-        }}
-        renderItem={(user) => (
-          <View>
-            <View style={styles.listItems}>
-              <Image
-                source={{
-                  uri: user.avatar
-                    ? `${user.avatar}&nocache=true`
-                    : `${API_URL}/api/users/${user.id}/avatar`,
-                }}
-                style={styles.userAvatar}
-              />
-              <View style={styles.searchprofileInfo}>
-                <Text style={styles.searchUsername}>{user.username}</Text>
-                <Text style={styles.searchName}>{user.name}</Text>
-              </View>
-            </View>
+      {Platform.OS === "ios" ? (
+        <View style={{ marginTop: -260 }}>
+          <SearchModalize
+            title="Search a Friend"
+            profileInfo={profileInfo}
+            modalizeRef={modalizeRef}
+            onSearch={async (query) => {
+              const token = await AsyncStorage.getItem("authToken");
+              const res = await axios.get(
+                `${API_URL}/api/users?query=${query}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              return res.data.users.filter(
+                (user) => user.id !== profileInfo.id
+              );
+            }}
+            renderItem={(user) => (
+              <View>
+                <View style={styles.listItems}>
+                  <Image
+                    source={{
+                      uri: user.avatar
+                        ? `${user.avatar}&nocache=true`
+                        : `${API_URL}/api/users/${user.id}/avatar`,
+                    }}
+                    style={styles.userAvatar}
+                  />
+                  <View style={styles.searchprofileInfo}>
+                    <Text style={styles.searchUsername}>{user.username}</Text>
+                    <Text style={styles.searchName}>{user.name}</Text>
+                  </View>
+                </View>
 
-            <View style={styles.separator} />
-          </View>
-        )}
-        onItemPress={(user) => {
-          navigation.navigate("UserProfile", { userId: user.id });
-          modalizeRef.current?.close();
-        }}
-      />
+                <View style={styles.separator} />
+              </View>
+            )}
+            onItemPress={(user) => {
+              navigation.navigate("UserProfile", { userId: user.id });
+              modalizeRef.current?.close();
+            }}
+          />
+        </View>
+      ) : (
+        <SearchModalize
+          title="Search a Friend"
+          profileInfo={profileInfo}
+          modalizeRef={modalizeRef}
+          onSearch={async (query) => {
+            const token = await AsyncStorage.getItem("authToken");
+            const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            return res.data.users.filter((user) => user.id !== profileInfo.id);
+          }}
+          renderItem={(user) => (
+            <View>
+              <View style={styles.listItems}>
+                <Image
+                  source={{
+                    uri: user.avatar
+                      ? `${user.avatar}&nocache=true`
+                      : `${API_URL}/api/users/${user.id}/avatar`,
+                  }}
+                  style={styles.userAvatar}
+                />
+                <View style={styles.searchprofileInfo}>
+                  <Text style={styles.searchUsername}>{user.username}</Text>
+                  <Text style={styles.searchName}>{user.name}</Text>
+                </View>
+              </View>
+
+              <View style={styles.separator} />
+            </View>
+          )}
+          onItemPress={(user) => {
+            navigation.navigate("UserProfile", { userId: user.id });
+            modalizeRef.current?.close();
+          }}
+        />
+      )}
     </>
   );
 }
