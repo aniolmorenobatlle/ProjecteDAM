@@ -19,6 +19,7 @@ export default function FirstTabModalize({
   modalizeRef,
   filledFavorites,
   fetchFavorites,
+  avatarUri,
 }) {
   const modalizeRef2 = useRef(null);
 
@@ -44,6 +45,7 @@ export default function FirstTabModalize({
         poster={poster}
         filledFavorites={filledFavorites}
         setIndex={setIndex}
+        avatarUri={avatarUri}
         onOpen={onOpen}
         fetchFavorites={fetchFavorites}
         handleClose={handleClose}

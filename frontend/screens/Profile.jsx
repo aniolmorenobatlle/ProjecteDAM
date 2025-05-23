@@ -22,6 +22,7 @@ export default function Profile({ setIsModalizeOpen }) {
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [filledFavorites, setFilledFavorites] = useState([]);
+  const [avatarUri, setAvatarUri] = useState(null);
 
   const fetchFavorites = async () => {
     try {
@@ -55,6 +56,7 @@ export default function Profile({ setIsModalizeOpen }) {
       setNewName(userInfo.name);
       setNewUsername(userInfo.username);
       setPoster(userInfo.poster);
+      setAvatarUri(userInfo.avatar);
       fetchFavorites();
     }
   }, [userInfo]);
@@ -111,6 +113,7 @@ export default function Profile({ setIsModalizeOpen }) {
         newUsername={newUsername}
         filledFavorites={filledFavorites}
         fetchFavorites={fetchFavorites}
+        avatarUri={avatarUri}
         editable={true}
       />
 
@@ -120,6 +123,7 @@ export default function Profile({ setIsModalizeOpen }) {
         setIsModalOpen={setIsModalOpen}
         setIsModalizeOpen={setIsModalizeOpen}
         setIndex={setIndex}
+        avatarUri={avatarUri}
         title="Edit your Profile"
       >
         {index === 0 ? (
@@ -134,6 +138,7 @@ export default function Profile({ setIsModalizeOpen }) {
             setIsModalizeOpen={setIsModalizeOpen}
             modalizeRef={modalizeRef}
             setIndex={setIndex}
+            avatarUri={avatarUri}
             filledFavorites={filledFavorites}
             fetchFavorites={fetchFavorites}
           />
@@ -144,6 +149,7 @@ export default function Profile({ setIsModalizeOpen }) {
             setSelectedPoster={setSelectedPoster}
             setPoster={setPoster}
             setIndex={setIndex}
+            setAvatarUri={setAvatarUri}
           />
         )}
       </CustomModalize>

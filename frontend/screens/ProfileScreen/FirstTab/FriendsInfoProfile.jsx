@@ -117,8 +117,8 @@ export default function FriendsInfoProfile({
                   <Image
                     source={{
                       uri: friend.avatar
-                        ? `${friend.avatar}&nocache=true`
-                        : `${API_URL}/api/users/${friend.friend_id}/avatar`,
+                        ? `${friend.avatar}&nocache=${Date.now()}`
+                        : `${API_URL}/api/users/${friend.friend_id}/avatar?nocache=${Date.now()}`,
                     }}
                     style={styles.listImage}
                   />
@@ -164,8 +164,8 @@ export default function FriendsInfoProfile({
                   <Image
                     source={{
                       uri: user.avatar
-                        ? `${user.avatar}&nocache=true`
-                        : `${API_URL}/api/users/${user.id}/avatar`,
+                        ? `${user.avatar}&nocache=${Date.now()}`
+                        : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
                     }}
                     style={styles.userAvatar}
                   />
@@ -202,8 +202,8 @@ export default function FriendsInfoProfile({
                 <Image
                   source={{
                     uri: user.avatar
-                      ? `${user.avatar}&nocache=true`
-                      : `${API_URL}/api/users/${user.id}/avatar`,
+                      ? `${user.avatar}&nocache=${Date.now()}`
+                      : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
                   }}
                   style={styles.userAvatar}
                 />

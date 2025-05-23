@@ -103,8 +103,8 @@ export default function Home() {
             style={styles.menuIconAvatar}
             source={{
               uri: userInfo?.avatar
-                ? `${userInfo?.avatar}&nocache=true`
-                : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=true`,
+                ? `${userInfo?.avatar}&nocache=${Date.now()}`
+                : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=${Date.now()}`,
             }}
           />
         </TouchableOpacity>

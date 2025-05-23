@@ -26,6 +26,7 @@ export default function MainProfile({
   newName,
   newUsername,
   filledFavorites,
+  avatarUri,
   editable,
 }) {
   editable = editable || false;
@@ -206,8 +207,8 @@ export default function MainProfile({
   useEffect(() => {
     const checkImage = async () => {
       const uri = profileInfo?.avatar
-        ? `${profileInfo.avatar}&nocache=true`
-        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=true`;
+        ? `${profileInfo.avatar}&nocache=${Date.now()}`
+        : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`;
 
       try {
         const response = await axios.head(uri);
@@ -255,9 +256,14 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              {imageReady && (
-                <Image style={styles.avatar} source={{ uri: imageUri }} />
-              )}
+              <Image
+                style={styles.avatar}
+                source={{
+                  uri: avatarUri
+                    ? `${avatarUri}?nocache=${Date.now()}`
+                    : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`,
+                }}
+              />
 
               <Text style={[globalStyles.textBase, styles.name]}>
                 {newName ? newName : profileInfo?.name}

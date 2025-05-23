@@ -618,8 +618,8 @@ export default function Film() {
                       style={styles.reviewImageUser}
                       source={{
                         uri: review?.avatar
-                          ? `${review?.avatar}&nocache=true`
-                          : `${API_URL}/api/users/${review?.user_id}/avatar?nocache=true`,
+                          ? `${review?.avatar}&nocache=${Date.now()}`
+                          : `${API_URL}/api/users/${review?.user_id}/avatar?nocache=${Date.now()}`,
                       }}
                     />
 
