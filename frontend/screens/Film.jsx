@@ -48,7 +48,8 @@ export default function Film() {
     const userId = userInfo.id;
 
     try {
-      const response = await axios.get(
+      // Fetch normal lists
+      const normalListsResponse = await axios.get(
         `${API_URL}/api/lists?user_id=${userId}`,
         {
           headers: {
@@ -57,14 +58,49 @@ export default function Film() {
         }
       );
 
-      const formattedData = response.data.lists.map((list) => ({
-        label: list.name,
-        value: list.id,
-      }));
+      // Fetch shared lists
+      const sharedListsResponse = await axios.get(
+        `${API_URL}/api/lists/shared/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      setDropdownList(formattedData);
+      // Format normal lists
+      const normalLists =
+        normalListsResponse.data?.lists?.map((list) => ({
+          label: list.name,
+          value: list.id,
+          type: "normal",
+        })) || [];
+
+      // Format shared lists
+      const sharedLists =
+        sharedListsResponse.data?.sharedLists?.map((list) => ({
+          label: `${list.list_name} (${list.user_username})`,
+          value: list.list_id,
+          type: "shared",
+          owner: list.user_username,
+        })) || [];
+
+      // Combinar les dos llistes
+      const allLists = [...normalLists, ...sharedLists].sort((a, b) =>
+        a.label.localeCompare(b.label)
+      );
+
+      setDropdownList(allLists);
     } catch (error) {
-      console.error("Error fetching the lists", error);
+      console.error("Error fetching the lists:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      Alert.alert(
+        "Error",
+        "There was an error fetching your lists. Please try again."
+      );
     }
   };
 
@@ -224,6 +260,24 @@ export default function Film() {
 
   const handleAddToList = async () => {
     try {
+      const token = await AsyncStorage.getItem("authToken");
+
+      // Comprovar si ja existeix
+      const checkResponse = await axios.get(
+        `${API_URL}/api/lists/${selectedListId}/movies/${filmId}/check`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (checkResponse.data.exists) {
+        Alert.alert("Warning", "This movie is already in the selected list!");
+        return;
+      }
+
+      // Si no, l'afegim
       await axios.post(`${API_URL}/api/lists/addFilmToList`, {
         list_id: selectedListId,
         movie_id: filmId,
@@ -231,11 +285,11 @@ export default function Film() {
 
       setModalList(false);
     } catch (error) {
+      console.error("Error checking/adding movie to list:", error);
       Alert.alert(
         "Error",
         "There was an error adding the movie to the list. Please try again."
       );
-      console.error("Error afegint la pel·lícula a la llista: " + error);
     }
   };
 
