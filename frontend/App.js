@@ -59,7 +59,10 @@ export default function App() {
       if (!token || isTokenExpired(token)) {
         await AsyncStorage.removeItem('authToken');
         setIsAuthenticated(false);
-        if (navigationRef.current) navigationRef.navigate("Login");
+        const currentRoute = navigationRef.current?.getCurrentRoute()?.name;
+        if (navigationRef.current && !["Register", "Login"].includes(currentRoute)) {
+          navigationRef.navigate("Login");
+        }
       }
     }, 60000);
     return () => clearInterval(interval);

@@ -26,8 +26,8 @@ export default function Login() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [incorrectUser, setIncorrectUser] = useState(false);
-  const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [, setIncorrectUser] = useState(false);
+  const [, setIncorrectPassword] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -79,62 +79,65 @@ export default function Login() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -50}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
+          style={globalStyles.container}
         >
-          <View style={globalStyles.container}>
-            <Image style={styles.image} source={lionKing} />
+          <Image style={styles.image} source={lionKing} />
 
-            <View style={styles.main}>
-              <Text style={styles.text}>RecomendMe</Text>
+          <View style={styles.main}>
+            <Text style={styles.text}>RecomendMe</Text>
 
-              <View style={styles.signUp}>
-                <Text style={[globalStyles.textBase, styles.signUpText]}>
-                  Sign In
-                </Text>
-                <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
-                  Please sign in to continue.
-                </Text>
-              </View>
-
-              <View style={styles.buttonsSign}>
-                <InputLogin
-                  text="Username"
-                  icon="person-circle-outline"
-                  type="default"
-                  value={username}
-                  onChange={setUsername}
-                />
-                <InputLogin
-                  text="Password"
-                  icon="lock-closed-outline"
-                  type="password"
-                  value={password}
-                  onChange={setPassword}
-                />
-                <TouchableOpacity activeOpacity={0.8} onPress={handleLogin}>
-                  <ButtonConfirm text="Log In" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.haveAccount}>
-                Don't have an account? Please{" "}
-                <Text
-                  style={styles.loginLink}
-                  onPress={() => navigation.navigate("Register")}
-                >
-                  Sign up
-                </Text>{" "}
-                first.
+            <View style={styles.signUp}>
+              <Text style={[globalStyles.textBase, styles.signUpText]}>
+                Sign In
+              </Text>
+              <Text style={[globalStyles.textBase, styles.signUpTextCreate]}>
+                Please sign in to continue.
               </Text>
             </View>
+
+            <View style={styles.buttonsSign}>
+              <InputLogin
+                text="Username"
+                icon="person-circle-outline"
+                type="default"
+                value={username}
+                onChange={setUsername}
+              />
+              <InputLogin
+                text="Password"
+                icon="lock-closed-outline"
+                type="password"
+                value={password}
+                onChange={setPassword}
+              />
+              <TouchableOpacity activeOpacity={0.8} onPress={handleLogin}>
+                <ButtonConfirm text="Log In" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.haveAccount}>
+              Don't have an account? Please{" "}
+              <Text
+                style={styles.loginLink}
+                onPress={() => navigation.navigate("Register")}
+              >
+                Sign up
+              </Text>{" "}
+              first.
+            </Text>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
