@@ -39,8 +39,8 @@ export default function MainProfile({
   const { id: userId } = userInfo || {};
   const { id: profileId } = profileInfo || {};
 
-  const [, setImageReady] = useState(false);
-  const [, setImageUri] = useState(null);
+  const [imageReady, setImageReady] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
   const [followStatus, setFollowStatus] = useState(null);
   const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
@@ -257,14 +257,18 @@ export default function MainProfile({
 
           <View style={styles.contentContainer}>
             <View style={styles.avatarContainer}>
-              <Image
-                style={styles.avatar}
-                source={{
-                  uri: avatarUri
-                    ? `${avatarUri}?nocache=true`
-                    : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`,
-                }}
-              />
+              {imageReady ? (
+                <Image style={styles.avatar} source={{ uri: imageUri }} />
+              ) : (
+                <Image
+                  style={styles.avatar}
+                  source={{
+                    uri: avatarUri
+                      ? `${avatarUri}?nocache=${Date.now()}`
+                      : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`,
+                  }}
+                />
+              )}
 
               <Text style={[globalStyles.textBase, styles.name]}>
                 {newName ? newName : profileInfo?.name}
