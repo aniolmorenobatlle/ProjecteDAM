@@ -193,6 +193,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     width: 80,
+    height: 40,
   },
 
   buttonText: {
