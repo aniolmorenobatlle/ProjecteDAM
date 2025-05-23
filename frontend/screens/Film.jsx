@@ -409,7 +409,7 @@ export default function Film() {
         </ImageBackground>
 
         <SafeAreaView style={[globalStyles.container, styles.mainContainer]}>
-          <View style={[styles.filmHeader, expanded && { height: "auto" }]}>
+          <View style={[styles.filmHeader]}>
             <View style={styles.bodyLeft}>
               <Image
                 style={styles.poster}
@@ -477,22 +477,15 @@ export default function Film() {
                   <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
                 </Text>
               </View>
+
               <View style={styles.description}>
                 <Text
                   style={[globalStyles.textBase, styles.descriptionText]}
-                  numberOfLines={expanded ? 0 : 20}
-                >
-                  {movieDetails.synopsis}
-                </Text>
-                <Text
-                  style={[
-                    globalStyles.textBase,
-                    styles.descriptionText,
-                    { color: "#E9A6A6" },
-                  ]}
+                  numberOfLines={expanded ? undefined : 5}
+                  ellipsizeMode="tail"
                   onPress={() => setExpanded(!expanded)}
                 >
-                  {expanded ? "See less" : "See more"}
+                  {movieDetails.synopsis}
                 </Text>
               </View>
             </View>
@@ -621,22 +614,14 @@ export default function Film() {
               (review, index) => (
                 <View key={index} style={styles.reviewContainer}>
                   <View style={styles.reviewHeader}>
-                    {review.avatar ? (
-                      <Image
-                        style={styles.reviewImageUser}
-                        source={{
-                          uri:
-                            `${review.avatar}&nocache=true` ||
-                            review.avatar_binary,
-                        }}
-                      />
-                    ) : (
-                      <Icon
-                        name="person-circle-outline"
-                        size={50}
-                        style={styles.reviewImageUserNull}
-                      />
-                    )}
+                    <Image
+                      style={styles.reviewImageUser}
+                      source={{
+                        uri: review?.avatar
+                          ? `${review?.avatar}&nocache=true`
+                          : `${API_URL}/api/users/${review?.user_id}/avatar?nocache=true`,
+                      }}
+                    />
 
                     <Text style={[globalStyles.textBase, styles.reviewText]}>
                       Review by{" "}
@@ -809,8 +794,6 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     gap: 15,
-    height: 270,
-    transition: "height 0.3s",
   },
 
   bodyLeft: {

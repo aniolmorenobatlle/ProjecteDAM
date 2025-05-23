@@ -99,19 +99,14 @@ export default function Home() {
           <Icon name="menu" size={50} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          {userInfo.avatar ? (
-            <Image
-              style={styles.menuIconAvatar}
-              source={{
-                uri: `${userInfo.avatar}&nocache=true`,
-              }}
-            />
-          ) : (
-            <Image
-              style={styles.menuIconAvatar}
-              source={{ uri: userInfo.avatar_binary }}
-            />
-          )}
+          <Image
+            style={styles.menuIconAvatar}
+            source={{
+              uri: userInfo?.avatar
+                ? `${userInfo?.avatar}&nocache=true`
+                : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=true`,
+            }}
+          />
         </TouchableOpacity>
       </View>
 
@@ -243,6 +238,7 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
   },
 
   menuIconAvatar: {
@@ -266,7 +262,6 @@ const styles = {
   welcomeback: {
     fontSize: 25,
     fontWeight: "bold",
-    marginTop: 20,
   },
 
   welcomebackUser: {

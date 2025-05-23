@@ -95,8 +95,6 @@ npx expo start
 
 ## Contacte
 
-## Contacte
-
 Per qualsevol dubte o consulta, podeu contactar amb mi a:
 
 - Correu: [aniolmoreno@gmail.com](mailto:aniolmoreno@gmail.com)

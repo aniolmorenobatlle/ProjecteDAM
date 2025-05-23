@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useUserInfo } from "../hooks/useUserInfo";
+import { API_URL } from "../config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -118,19 +119,14 @@ export default function Sidebar({ isOpen, closeMenu }) {
           </TouchableOpacity>
 
           <View style={styles.avatar}>
-            {userInfo.avatar ? (
-              <Image
-                style={styles.menuIconAvatar}
-                source={{
-                  uri: `${userInfo.avatar}&nocache=true`,
-                }}
-              />
-            ) : (
-              <Image
-                style={styles.menuIconAvatar}
-                source={{ uri: userInfo.avatar_binary }}
-              />
-            )}
+            <Image
+              style={styles.menuIconAvatar}
+              source={{
+                uri: userInfo?.avatar
+                  ? `${userInfo?.avatar}&nocache=true`
+                  : `${API_URL}/api/users/${userInfo?.id}/avatar?nocache=true`,
+              }}
+            />
             <View style={styles.avatarTexts}>
               <Text style={[styles.username, { color: "#e9a6a6" }]}>
                 {userInfo.name.split(" ")[0]}
