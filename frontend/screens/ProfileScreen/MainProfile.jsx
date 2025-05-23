@@ -50,6 +50,8 @@ export default function MainProfile({
   const [totalFavorites, setTotalFavorites] = useState(0);
   const [totalRates, setTotalRates] = useState(0);
   const [totalFriends, setTotalFriends] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 
   const lists = [
     { title: "Watchlist", number: totalWatchlist },
@@ -88,6 +90,7 @@ export default function MainProfile({
 
   const handleFriendshipStatus = async () => {
     try {
+      setIsLoadingInitial(true);
       const token = await AsyncStorage.getItem("authToken");
 
       const response = await axios.get(`${API_URL}/api/users/friends/status`, {
@@ -97,17 +100,32 @@ export default function MainProfile({
 
       setFollowStatus(response.data.is_friend);
     } catch (error) {
-      console.log("Error getting friendship status:", error?.message || error);
+      console.error(
+        "Error getting friendship status:",
+        error?.message || error
+      );
       Alert.alert(
         "Error",
         "Error getting friendship status, please try again later"
       );
+    } finally {
+      setIsLoadingInitial(false);
     }
   };
 
   const setFriendRequest = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        console.error("No auth token found");
+        return false;
+      }
+
+      console.log("Sending request with:", {
+        // Debug log
+        userId: userInfo.id,
+        friendId: profileInfo.id,
+      });
 
       const response = await axios.post(
         `${API_URL}/api/users/friends/send-request`,
@@ -120,15 +138,20 @@ export default function MainProfile({
         }
       );
 
+      console.log("Server response:", response.data); // Debug log
+
       if (response.status === 200) {
-        setFollowStatus(false);
+        return true;
       }
+      return false;
     } catch (error) {
-      console.log("Error sending friend request:", error?.message || error);
+      console.error("Full error object:", error); // Debug log
+      console.error("Error response:", error.response?.data); // Debug log
       Alert.alert(
         "Error",
-        "Error sending friend request, please try again later"
+        error.response?.data?.message || "Error sending friend request"
       );
+      return false;
     }
   };
 
@@ -147,18 +170,13 @@ export default function MainProfile({
         }
       );
 
-      if (response.status === 200) {
-        setFollowStatus(null);
-      }
+      return response.status === 200;
     } catch (error) {
-      console.log("Error deleting friend request:", error?.message || error);
-      Alert.alert(
-        "Error",
-        "Error deleting friend request, please try again later"
-      );
+      console.error("Error deleting friend:", error?.message || error);
+      Alert.alert("Error", "Error deleting friend, please try again later");
+      return false;
     }
   };
-
   const getFollowButtonColor = (status) => {
     if (status === true) {
       return "#8E4A65";
@@ -179,17 +197,37 @@ export default function MainProfile({
     }
   };
 
-  const handleFollowStatus = () => {
-    if (followStatus === null) {
-      // No hi ha cap relació: enviem sol·licitud
-      setFriendRequest();
-      setFollowStatus(false);
-    } else if (followStatus === false) {
-      deleteFriend();
-      setFollowStatus(null);
-    } else if (followStatus === true) {
-      deleteFriend();
-      setFollowStatus(null);
+  const handleFollowStatus = async () => {
+    if (isLoadingInitial) return;
+
+    try {
+      console.log("Current follow status:", followStatus);
+
+      if (followStatus === null) {
+        setIsProcessing(true);
+        const result = await setFriendRequest();
+        console.log("Friend request result:", result);
+
+        if (result) {
+          setFollowStatus(false);
+        }
+      } else if (followStatus === false || followStatus === true) {
+        setIsProcessing(true);
+        const result = await deleteFriend();
+        console.log("Delete friend result:", result);
+
+        if (result) {
+          setFollowStatus(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling follow status:", error);
+      Alert.alert(
+        "Error",
+        "Something went wrong while updating follow status. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -284,12 +322,18 @@ export default function MainProfile({
                   style={[
                     styles.follow,
                     { backgroundColor: getFollowButtonColor(followStatus) },
+                    (isProcessing || isLoadingInitial) && { opacity: 0.7 },
                   ]}
                   activeOpacity={0.8}
+                  disabled={isProcessing || isLoadingInitial}
                   onPress={handleFollowStatus}
                 >
                   <Text style={globalStyles.textBase}>
-                    {getFollowButtonLabel(followStatus)}
+                    {isLoadingInitial
+                      ? "Loading..."
+                      : isProcessing
+                        ? "Processing..."
+                        : getFollowButtonLabel(followStatus)}
                   </Text>
                 </TouchableOpacity>
               </View>
