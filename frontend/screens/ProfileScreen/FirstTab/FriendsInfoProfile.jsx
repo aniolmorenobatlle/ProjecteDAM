@@ -67,34 +67,30 @@ export default function FriendsInfoProfile({
   );
 
   return (
-    <>
-      <SafeAreaView style={{ paddingHorizontal: 15, paddingBottom: 50 }}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setSelectedList(null)}
-          >
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 15, paddingBottom: 50 }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setSelectedList(null)}
+        >
+          <Icon name="arrow-back-outline" size={30} style={styles.headerIcon} />
+        </TouchableOpacity>
+        <Text style={styles.listName}>{selectedList}</Text>
+
+        {editable ? (
+          <TouchableOpacity onPress={onOpen}>
             <Icon
-              name="arrow-back-outline"
+              name="add-circle-outline"
               size={30}
-              style={styles.headerIcon}
+              style={{ color: "white" }}
             />
           </TouchableOpacity>
-          <Text style={styles.listName}>{selectedList}</Text>
+        ) : (
+          <View />
+        )}
+      </View>
 
-          {editable ? (
-            <TouchableOpacity onPress={onOpen}>
-              <Icon
-                name="add-circle-outline"
-                size={30}
-                style={{ color: "white" }}
-              />
-            </TouchableOpacity>
-          ) : (
-            <View />
-          )}
-        </View>
-
+      <View style={{ flex: 1 }}>
         {friends.length === 0 ? (
           <Text style={styles.emptyMessage}>
             No friends yet, add some friends to see them here!
@@ -138,91 +134,45 @@ export default function FriendsInfoProfile({
             showsVerticalScrollIndicator={false}
           />
         )}
-      </SafeAreaView>
+      </View>
 
-      {Platform.OS === "ios" ? (
-        <View style={{ marginTop: -260 }}>
-          <SearchModalize
-            title="Search a Friend"
-            profileInfo={profileInfo}
-            modalizeRef={modalizeRef}
-            onSearch={async (query) => {
-              const token = await AsyncStorage.getItem("authToken");
-              const res = await axios.get(
-                `${API_URL}/api/users?query=${query}`,
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              );
-              return res.data.users.filter(
-                (user) => user.id !== profileInfo.id
-              );
-            }}
-            renderItem={(user) => (
-              <View>
-                <View style={styles.listItems}>
-                  <Image
-                    source={{
-                      uri: user.avatar
-                        ? `${user.avatar}&nocache=${Date.now()}`
-                        : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
-                    }}
-                    style={styles.userAvatar}
-                  />
-                  <View style={styles.searchprofileInfo}>
-                    <Text style={styles.searchUsername}>{user.username}</Text>
-                    <Text style={styles.searchName}>{user.name}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.separator} />
+      <SearchModalize
+        title="Search a Friend"
+        profileInfo={profileInfo}
+        modalizeRef={modalizeRef}
+        onSearch={async (query) => {
+          const token = await AsyncStorage.getItem("authToken");
+          const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          return res.data.users.filter((user) => user.id !== profileInfo.id);
+        }}
+        renderItem={(user) => (
+          <>
+            <View style={styles.listItems}>
+              <Image
+                source={{
+                  uri: user.avatar
+                    ? `${user.avatar}&nocache=${Date.now()}`
+                    : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
+                }}
+                style={styles.userAvatar}
+              />
+              <View style={styles.searchprofileInfo}>
+                <Text style={styles.searchUsername}>{user.username}</Text>
+                <Text style={styles.searchName}>{user.name}</Text>
               </View>
-            )}
-            onItemPress={(user) => {
-              navigation.navigate("UserProfile", { userId: user.id });
-              modalizeRef.current?.close();
-            }}
-          />
-        </View>
-      ) : (
-        <SearchModalize
-          title="Search a Friend"
-          profileInfo={profileInfo}
-          modalizeRef={modalizeRef}
-          onSearch={async (query) => {
-            const token = await AsyncStorage.getItem("authToken");
-            const res = await axios.get(`${API_URL}/api/users?query=${query}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            return res.data.users.filter((user) => user.id !== profileInfo.id);
-          }}
-          renderItem={(user) => (
-            <View>
-              <View style={styles.listItems}>
-                <Image
-                  source={{
-                    uri: user.avatar
-                      ? `${user.avatar}&nocache=${Date.now()}`
-                      : `${API_URL}/api/users/${user.id}/avatar?nocache=${Date.now()}`,
-                  }}
-                  style={styles.userAvatar}
-                />
-                <View style={styles.searchprofileInfo}>
-                  <Text style={styles.searchUsername}>{user.username}</Text>
-                  <Text style={styles.searchName}>{user.name}</Text>
-                </View>
-              </View>
-
-              <View style={styles.separator} />
             </View>
-          )}
-          onItemPress={(user) => {
-            navigation.navigate("UserProfile", { userId: user.id });
-            modalizeRef.current?.close();
-          }}
-        />
-      )}
-    </>
+
+            <View style={styles.separator} />
+          </>
+        )}
+        onItemPress={(user) => {
+          navigation.navigate("UserProfile", { userId: user.id });
+          modalizeRef.current?.close();
+        }}
+      />
+    </SafeAreaView>
   );
 }
 

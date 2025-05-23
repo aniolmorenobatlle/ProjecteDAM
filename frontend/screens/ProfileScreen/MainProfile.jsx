@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
+  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -38,8 +39,8 @@ export default function MainProfile({
   const { id: userId } = userInfo || {};
   const { id: profileId } = profileInfo || {};
 
-  const [imageReady, setImageReady] = useState(false);
-  const [imageUri, setImageUri] = useState(null);
+  const [, setImageReady] = useState(false);
+  const [, setImageUri] = useState(null);
   const [followStatus, setFollowStatus] = useState(null);
   const [selectedList, setSelectedList] = useState(null);
   const [totalFilms, setTotalFilms] = useState(0);
@@ -260,7 +261,7 @@ export default function MainProfile({
                 style={styles.avatar}
                 source={{
                   uri: avatarUri
-                    ? `${avatarUri}?nocache=${Date.now()}`
+                    ? `${avatarUri}?nocache=true`
                     : `${API_URL}/api/users/${profileInfo?.id}/avatar?nocache=${Date.now()}`,
                 }}
               />
