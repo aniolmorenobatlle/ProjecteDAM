@@ -71,7 +71,7 @@ exports.checkUserExists = async (username) => {
     [username]
   );
   return query.rows.length > 0;
-}
+};
 
 exports.checkEmailExists = async (email) => {
   const query = await pool.query(
@@ -115,6 +115,14 @@ exports.getCurrentUsername = async (userId) => {
   return query.rows[0]?.username;
 };
 
+exports.getCurrentEmail = async (userId) => {
+  const query = await pool.query(
+    `SELECT email FROM "users" WHERE id = $1`,
+    [userId]
+  );
+  return query.rows[0]?.username;
+};
+
 exports.editProfile = async (userId, updates) => {
   const setClauses = [];
   const values = [];
@@ -132,13 +140,19 @@ exports.editProfile = async (userId, updates) => {
     paramIndex++;
   }
 
+  if (updates.email !== undefined) {
+    setClauses.push(`email = $${paramIndex}`);
+    values.push(updates.email);
+    paramIndex++;
+  }
+
   values.push(userId);
 
   const query = `
     UPDATE "users"
     SET ${setClauses.join(', ')}
     WHERE id = $${paramIndex}
-    RETURNING id, name, username;
+    RETURNING id, name, username, email;
   `;
 
   return await pool.query(query, values);

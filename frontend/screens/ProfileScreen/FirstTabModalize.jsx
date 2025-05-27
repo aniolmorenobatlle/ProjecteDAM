@@ -12,6 +12,8 @@ export default function FirstTabModalize({
   setNewName,
   newUsername,
   setNewUsername,
+  newEmail,
+  setNewEmail,
   poster,
   setIndex,
   setIsModalOpen,
@@ -42,6 +44,8 @@ export default function FirstTabModalize({
         setNewName={setNewName}
         newUsername={newUsername}
         setNewUsername={setNewUsername}
+        newEmail={newEmail}
+        setNewEmail={setNewEmail}
         poster={poster}
         filledFavorites={filledFavorites}
         setIndex={setIndex}

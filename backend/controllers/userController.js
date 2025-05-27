@@ -229,7 +229,7 @@ exports.me = async (req, res) => {
 };
 
 exports.editProfile = async (req, res) => {
-  const { name, username } = req.body;
+  const { name, username, email } = req.body;
   const userId = req.user.userId;
 
   try {
@@ -242,9 +242,18 @@ exports.editProfile = async (req, res) => {
       }
     }
 
+    const currentEmail = await userModel.getCurrentEmail(userId);
+    if (email && email !== currentEmail) {
+      const exists = await userModel.checkEmailExists(email);
+      if (exists) {
+        return res.status(400).json({ message: "El correu ja està en ús" });
+      }
+    }
+
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (username !== undefined) updates.username = username;
+    if (email !== undefined) updates.email = email;
 
     // Actualitzar només si hi ha canvis
     const user = await userModel.editProfile(userId, updates);
@@ -254,9 +263,9 @@ exports.editProfile = async (req, res) => {
     }
 
     res.status(200).json({
-      message: "Perfil modificat correctament",
       name: user.rows[0].name,
-      username: user.rows[0].username
+      username: user.rows[0].username,
+      email: user.rows[0].email,
     });
 
   } catch (error) {

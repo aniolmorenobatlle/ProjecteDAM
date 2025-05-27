@@ -21,6 +21,8 @@ export default function EditProfile({
   setNewName,
   newUsername,
   setNewUsername,
+  newEmail,
+  setNewEmail,
   poster,
   filledFavorites,
   setIndex,
@@ -32,7 +34,17 @@ export default function EditProfile({
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedFavoriteId, setSelectedFavoriteId] = useState(null);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailRegex.test(email);
+  };
+
   const handleSaveChangesProfile = async () => {
+    if (newEmail && !validateEmail(newEmail)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem("authToken");
 
@@ -41,6 +53,7 @@ export default function EditProfile({
         {
           name: newName,
           username: newUsername,
+          email: newEmail,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -50,16 +63,24 @@ export default function EditProfile({
       if (response.status === 200) {
         setNewName(response.data.name);
         setNewUsername(response.data.username);
+        setNewEmail(response.data.email);
 
         handleClose();
       }
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {
-          Alert.alert(
-            "Error",
-            "Username already in use, please choose another one"
-          );
+          if (error.response.data.message.includes("email")) {
+            Alert.alert(
+              "Error",
+              "Email already in use, please choose another one"
+            );
+          } else {
+            Alert.alert(
+              "Error",
+              "Username already in use, please choose another one"
+            );
+          }
         } else {
           Alert.alert(
             "Error",
@@ -175,9 +196,11 @@ export default function EditProfile({
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
-                <Text style={[globalStyles.textBase, styles.listInfoResult]}>
-                  {userInfo.email}
-                </Text>
+                <TextInput
+                  style={[globalStyles.textBase, styles.listInfoResult]}
+                  value={newEmail}
+                  onChangeText={(text) => setNewEmail(text)}
+                />
               </View>
             </View>
 
@@ -455,31 +478,11 @@ const styles = {
     color: "white",
   },
 
-  columnContainer: {
+  buttonsContainerList: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 40,
+    justifyContent: "space-between",
+    width: "100%",
     marginTop: 20,
-  },
-
-  columnContainerRate: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginVertical: 20,
-  },
-
-  optionContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-  },
-
-  optionText: {
-    fontSize: 12,
-    paddingVertical: 10,
-    color: "#D3D3D3",
-    fontWeight: "bold",
   },
 
   confirmButton: {
@@ -495,46 +498,6 @@ const styles = {
     fontSize: 16,
     color: "#000",
     fontWeight: "bold",
-  },
-
-  dropdown: {
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "white",
-    padding: 10,
-  },
-
-  icon: {
-    marginRight: 5,
-  },
-
-  placeholderStyle: {
-    color: "white",
-    fontSize: 16,
-  },
-
-  selectedTextStyle: {
-    color: "white",
-    fontSize: 16,
-  },
-
-  iconStyle: {
-    width: 25,
-    height: 25,
-  },
-
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-
-  buttonsContainerList: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 20,
   },
 
   confirmButtonList: {

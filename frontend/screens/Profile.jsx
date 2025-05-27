@@ -17,6 +17,7 @@ export default function Profile({ setIsModalizeOpen }) {
   const [index, setIndex] = useState(0);
   const [newName, setNewName] = useState("");
   const [newUsername, setNewUsername] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [selectedPoster, setSelectedPoster] = useState(null);
   const [poster, setPoster] = useState(userInfo?.poster);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
@@ -55,6 +56,7 @@ export default function Profile({ setIsModalizeOpen }) {
     if (userInfo) {
       setNewName(userInfo.name);
       setNewUsername(userInfo.username);
+      setNewEmail(userInfo.email);
       setPoster(userInfo.poster);
       setAvatarUri(userInfo.avatar);
       fetchFavorites();
@@ -133,6 +135,8 @@ export default function Profile({ setIsModalizeOpen }) {
             setNewName={setNewName}
             newUsername={newUsername}
             setNewUsername={setNewUsername}
+            newEmail={newEmail}
+            setNewEmail={setNewEmail}
             poster={poster}
             setIsModalOpen={setIsModalOpen}
             setIsModalizeOpen={setIsModalizeOpen}

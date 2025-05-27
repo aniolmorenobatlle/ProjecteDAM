@@ -26,6 +26,7 @@ export default function MainProfile({
   poster,
   newName,
   newUsername,
+  newEmail,
   filledFavorites,
   avatarUri,
   editable,
@@ -177,6 +178,7 @@ export default function MainProfile({
       return false;
     }
   };
+
   const getFollowButtonColor = (status) => {
     if (status === true) {
       return "#8E4A65";
