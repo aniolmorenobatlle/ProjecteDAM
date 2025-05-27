@@ -66,6 +66,11 @@ export default function Register() {
     }
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailRegex.test(email);
+  };
+
   const validatePassword = (password) => {
     const regex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
@@ -123,7 +128,7 @@ export default function Register() {
       return;
     }
 
-    if (!email.includes("@") || !email.includes(".")) {
+    if (!validateEmail(email)) {
       Alert.alert("Error", "Email is not valid!");
       return;
     }
