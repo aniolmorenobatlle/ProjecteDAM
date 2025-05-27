@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import React from "react";
 import {
   Alert,
   Image,
@@ -13,6 +12,8 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../../config";
 import { globalStyles } from "../../../globalStyles";
+import CustomModal from "../../../components/CustomModal";
+import { useState } from "react";
 
 export default function EditProfile({
   userInfo,
@@ -28,6 +29,9 @@ export default function EditProfile({
   fetchFavorites,
   handleClose,
 }) {
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedFavoriteId, setSelectedFavoriteId] = useState(null);
+
   const handleSaveChangesProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -84,12 +88,23 @@ export default function EditProfile({
       );
 
       if (response.status === 200) {
+        handleCloseModalDelete();
         fetchFavorites();
       }
     } catch (error) {
       Alert.alert("Error", "Error deleting favorite, please try again later");
       console.error("Error deleting favorite:", error);
     }
+  };
+
+  const handleOpenModalDelete = (favoriteId) => {
+    setSelectedFavoriteId(favoriteId);
+    setDeleteModal(true);
+  };
+
+  const handleCloseModalDelete = () => {
+    setDeleteModal(false);
+    setSelectedFavoriteId(null);
   };
 
   return (
@@ -239,7 +254,7 @@ export default function EditProfile({
                   <View>
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      onPress={() => handleDeleteFavorite(favorite.id_api)}
+                      onPress={() => handleOpenModalDelete(favorite.id_api)}
                       style={styles.favoriteFilmDelete}
                     >
                       <Icon name="close-outline" size={20} />
@@ -267,6 +282,27 @@ export default function EditProfile({
           </View>
         </View>
       </View>
+
+      <CustomModal visible={deleteModal} onClose={handleCloseModalDelete}>
+        <Text style={styles.modalTitle}>
+          Are you sure you want to delete this film?
+        </Text>
+
+        <View style={styles.buttonsContainerList}>
+          <TouchableOpacity
+            style={styles.confirmButtonList}
+            onPress={() => handleDeleteFavorite(selectedFavoriteId)}
+          >
+            <Text style={styles.confirmButtonText}>Confirm</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cancelButtonList}
+            onPress={handleCloseModalDelete}
+          >
+            <Text style={styles.confirmButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </CustomModal>
     </ScrollView>
   );
 }
@@ -410,5 +446,110 @@ const styles = {
     width: 82,
     height: 130,
     borderRadius: 10,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "white",
+  },
+
+  columnContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 40,
+    marginTop: 20,
+  },
+
+  columnContainerRate: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginVertical: 20,
+  },
+
+  optionContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+  },
+
+  optionText: {
+    fontSize: 12,
+    paddingVertical: 10,
+    color: "#D3D3D3",
+    fontWeight: "bold",
+  },
+
+  confirmButton: {
+    width: "100%",
+    padding: 10,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  confirmButtonText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
+  },
+
+  dropdown: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "white",
+    padding: 10,
+  },
+
+  icon: {
+    marginRight: 5,
+  },
+
+  placeholderStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  selectedTextStyle: {
+    color: "white",
+    fontSize: 16,
+  },
+
+  iconStyle: {
+    width: 25,
+    height: 25,
+  },
+
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+
+  buttonsContainerList: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+  },
+
+  confirmButtonList: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#E9A6A6",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  cancelButtonList: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#9C4A8B",
+    borderRadius: 10,
+    alignItems: "center",
   },
 };
