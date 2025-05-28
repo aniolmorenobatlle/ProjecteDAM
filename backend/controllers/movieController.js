@@ -500,3 +500,24 @@ exports.updateMovie = async (req, res) => {
     return res.status(500).json({ message: "Error del servidor" });
   }
 }
+
+exports.fetchActorMovies = async (req, res) => {
+  const { actor_id } = req.params;
+
+  try {
+    if (!actor_id) {
+      return res.status(400).json({ message: "Falta l'identificador de l'actor" });
+    }
+
+    const movies = await movieModel.getActorMovies(actor_id);
+
+    if (!movies.length) {
+      return res.status(404).json({ message: 'Pel·lícules no trobades per aquest actor' });
+    }
+
+    res.json({ movies });
+  } catch (error) {
+    console.error('Error obtenint les pel·lícules de l\'actor:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}

@@ -3,11 +3,12 @@ import { NavigationContainer, useNavigationContainerRef } from "@react-navigatio
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { BackHandler, View } from 'react-native';
+import { View } from 'react-native';
 import Navbar from "./components/Navbar";
 import { useUserInfo } from "./hooks/useUserInfo";
 
 import { ActivityIndicator } from 'react-native-paper';
+import ActorInfo from "./screens/ActorInfo";
 import Film from "./screens/Film";
 import Home from "./screens/Home";
 import ListInfo from './screens/ListInfo';
@@ -108,6 +109,7 @@ export default function App() {
           <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
           <Stack.Screen name="Recommend" component={Recommend} options={{ headerShown: false }} />
           <Stack.Screen name="Film" component={Film} options={{ headerShown: false }} />
+          <Stack.Screen name="ActorInfo" component={ActorInfo} options={{ headerShown: false }} />
           <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: false }} />
           <Stack.Screen name="Profile" options={{ headerShown: false }}>
             {(props) => <Profile {...props} setIsModalizeOpen={setIsModalizeOpen} />}
@@ -118,7 +120,7 @@ export default function App() {
         </Stack.Navigator>
 
         {!isModalizeOpen &&
-          !["Recommend", "Film", "Login", "Register", "Lists", "ListInfo"].includes(routeName) && (
+          !["Recommend", "Film", "Login", "Register", "Lists", "ListInfo", "ActorInfo"].includes(routeName) && (
             <Navbar currentPage={routeName} />
           )}
       </NavigationContainer>

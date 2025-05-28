@@ -273,7 +273,7 @@ exports.addMovieIsWatched = async (user_id, id_api) => {
 
   const result = await pool.query(query, [user_id, id_api]);
   return result.rows[0];
-}
+};
 
 exports.addMovieIsLike = async (user_id, id_api) => {
   const query = `
@@ -286,7 +286,7 @@ exports.addMovieIsLike = async (user_id, id_api) => {
 
   const result = await pool.query(query, [user_id, id_api]);
   return result.rows[0];
-}
+};
 
 exports.addMovieIsWatchlist = async (user_id, id_api) => {
   const query = `
@@ -299,7 +299,7 @@ exports.addMovieIsWatchlist = async (user_id, id_api) => {
 
   const result = await pool.query(query, [user_id, id_api]);
   return result.rows[0];
-}
+};
 
 exports.deleteMovie = async (id_api) => {
   const query = await pool.query(
@@ -308,7 +308,7 @@ exports.deleteMovie = async (id_api) => {
   );
 
   return query.rows[0];
-}
+};
 
 exports.updateMovie = async (id_api, title, release_year, synopsis, director_id) => {
   const query = await pool.query(
@@ -324,4 +324,18 @@ exports.updateMovie = async (id_api, title, release_year, synopsis, director_id)
   );
 
   return query.rows[0];
+};
+
+exports.getActorMovies = async (actor_id) => {
+  const query = await pool.query(`
+    SELECT 
+      m.id_api,
+      m.poster
+    FROM movies m
+    JOIN movies_actors ma ON m.id_api = ma.movie_id
+    JOIN actors a ON ma.actor_id = a.id
+    WHERE a.id = $1
+  `, [actor_id]);
+
+  return query.rows;
 }

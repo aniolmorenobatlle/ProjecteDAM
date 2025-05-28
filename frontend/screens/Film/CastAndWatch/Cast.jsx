@@ -1,7 +1,10 @@
-import { View, Text, Image } from "react-native";
+import { TouchableOpacity, View, Text, Image } from "react-native";
 import { globalStyles } from "../../../globalStyles";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Cast({ cast }) {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.cast}>
       {cast.length > 0 ? (
@@ -12,7 +15,14 @@ export default function Cast({ cast }) {
             nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
           return (
-            <View
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                navigation.navigate("ActorInfo", {
+                  actorId: cast.id,
+                  name: cast.name,
+                })
+              }
               key={index}
               style={{
                 flexDirection: "column",
@@ -35,7 +45,7 @@ export default function Cast({ cast }) {
                   </Text>
                 )}
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })
       ) : (
