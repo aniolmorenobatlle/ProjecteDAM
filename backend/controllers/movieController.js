@@ -521,3 +521,48 @@ exports.fetchActorMovies = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 }
+
+exports.deleteComment = async (req, res) => {
+  const { id_api, comment_id } = req.params;
+
+  try {
+    if (!id_api || !comment_id) {
+      return res.status(400).json({ message: "Falten dades (id_api o comment_id)" });
+    }
+
+    const deletedComment = await movieModel.deleteComment(id_api, comment_id);
+
+    if (!deletedComment) {
+      return res.status(404).json({ message: 'Comentari no trobat' });
+    }
+
+    res.json({ message: 'Comentari eliminat correctament' });
+
+  } catch (error) {
+    console.error('Error eliminant el comentari:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+exports.editComment = async (req, res) => {
+  const { id_api, comment_id } = req.params;
+  const { content } = req.body;
+
+  try {
+    if (!id_api || !comment_id || !content) {
+      return res.status(400).json({ message: "Falten dades (id_api, comment_id o content)" });
+    }
+
+    const updatedComment = await movieModel.editComment(id_api, comment_id, content);
+
+    if (!updatedComment) {
+      return res.status(404).json({ message: 'Comentari no trobat' });
+    }
+
+    res.json({ message: 'Comentari actualitzat correctament', updatedComment });
+
+  } catch (error) {
+    console.error('Error actualitzant el comentari:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+}

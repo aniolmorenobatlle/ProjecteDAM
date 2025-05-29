@@ -29,6 +29,7 @@
     "react-native-element-dropdown": "^2.12.4",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-iconify": "^2.0.3",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-menu": "^0.23.0",
     "react-native-modalize": "^2.1.1",
     "react-native-pager-view": "6.7.1",

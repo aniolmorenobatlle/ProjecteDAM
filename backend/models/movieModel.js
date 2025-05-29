@@ -338,4 +338,26 @@ exports.getActorMovies = async (actor_id) => {
   `, [actor_id]);
 
   return query.rows;
-}
+};
+
+exports.deleteComment = async (id_api, comment_id) => {
+  const query = await pool.query(`
+    DELETE FROM comments 
+    WHERE movie_id = $1 AND id = $2 
+    RETURNING *
+  `, [id_api, comment_id]
+  );
+
+  return query.rows[0];
+};
+
+exports.editComment = async (id_api, comment_id, comment) => {
+  const query = await pool.query(`
+    UPDATE comments 
+    SET comment = $1
+    WHERE movie_id = $2 AND id = $3 
+    RETURNING *
+  `, [comment, id_api, comment_id]);
+
+  return query.rows[0];
+};
