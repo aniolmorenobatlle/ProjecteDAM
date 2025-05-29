@@ -51,31 +51,34 @@ async function fetchAndInsertActorsAndDirector(movieId) {
     }
 
 
-    const director = crew.find(person => person.job === 'Director');
-    if (director) {
+    const directors = crew.filter(person => person.job === 'Director');
+    for (const director of directors) {
       const { id: directorId, name: directorName } = director;
 
+      // comprovar si existeix
       const checkDirectorQuery = `SELECT id FROM "directors" WHERE "id_api" = $1 LIMIT 1`;
-      const checkDirectorValues = [directorId];
-      const checkDirectorResult = await client.query(checkDirectorQuery, checkDirectorValues);
-
+      const checkDirectorResult = await client.query(checkDirectorQuery, [directorId]);
       let directorDbId;
 
       if (checkDirectorResult.rowCount === 0) {
-        const directorQuery = `
-          INSERT INTO "directors" ("name", "id_api", "created_at")
-          VALUES($1, $2, NOW()) RETURNING id;
-        `;
-        const directorValues = [directorName, directorId];
-        const directorResult = await client.query(directorQuery, directorValues);
+        const insertDirectorQuery = `
+      INSERT INTO "directors" ("name", "id_api", "created_at")
+      VALUES($1, $2, NOW()) RETURNING id;
+    `;
+        const directorResult = await client.query(insertDirectorQuery, [directorName, directorId]);
         directorDbId = directorResult.rows[0].id;
       } else {
         directorDbId = checkDirectorResult.rows[0].id;
       }
 
-      const movieDirectorQuery = 'UPDATE "movies" SET "director_id" = $1 WHERE "id_api" = $2';
-      const movieDirectorValues = [directorDbId, movieId];
-      await client.query(movieDirectorQuery, movieDirectorValues);
+      // Inserir relació
+      const movieDirectorQuery = `
+        INSERT INTO "movies_directors" ("movie_id", "director_id")
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING;
+      `;
+      await client.query(movieDirectorQuery, [movieId, directorDbId]);
+
       console.log(`Director associat a la pel·lícula ${movieId}: ${directorName}`);
     }
   } catch (error) {

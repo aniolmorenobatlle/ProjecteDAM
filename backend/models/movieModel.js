@@ -191,12 +191,12 @@ exports.getMovieCreditsDirector = async (id) => {
       d.id AS director_id, 
       d.name AS director_name 
     FROM "movies" m 
-    LEFT JOIN "directors" d 
-    ON m.director_id = d.id 
+    LEFT JOIN "movies_directors" md ON m.id_api = md.movie_id 
+    LEFT JOIN "directors" d ON md.director_id = d.id 
     WHERE m.id_api = $1;
   `;
 
-  const result = await pool.query(query, [id])
+  const result = await pool.query(query, [id]);
   return result.rows;
 };
 

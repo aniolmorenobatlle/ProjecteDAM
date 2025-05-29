@@ -247,13 +247,13 @@ exports.fetchMovieCast = async (req, res) => {
 exports.fetchMovieDirector = async (req, res) => {
   try {
     const { id_api } = req.params;
-    const director = await movieModel.getMovieCreditsDirector(id_api);
+    const directors = await movieModel.getMovieCreditsDirector(id_api);
 
-    if (!director.length) {
-      return res.status(404).json({ message: 'Director no trobat' });
+    if (!directors.length) {
+      return res.status(404).json({ message: 'Cap director trobat per aquesta pel·lícula' });
     }
 
-    const directorResponse = director.map(credit => ({
+    const directorResponse = directors.map(credit => ({
       id: credit.director_id,
       known_for_department: 'Directing',
       name: credit.director_name,
@@ -263,7 +263,7 @@ exports.fetchMovieDirector = async (req, res) => {
     res.json({ id: id_api, crew: directorResponse });
 
   } catch (error) {
-    console.error('Error obtenint el director de la pel·lícula:', error);
+    console.error('Error obtenint els directors de la pel·lícula:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
 };

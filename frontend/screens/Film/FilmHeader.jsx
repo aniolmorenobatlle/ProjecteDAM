@@ -13,14 +13,17 @@ export default function FilmHeader({
   handleOpenModalWatchlist,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [director, setDirector] = useState({});
+  const [director, setDirector] = useState("");
 
   const fetchMovieDetailsDirector = async () => {
     try {
       const response = await axios.get(
         `${API_URL}/api/movies/${movieDetails.id_api}/credits/director`
       );
-      setDirector(response.data.crew[0]);
+
+      const nomsDirectors = response.data.crew.map((d) => d.name).join(", ");
+
+      setDirector(nomsDirectors);
     } catch (error) {
       console.error(
         "Error obtenint els actors/actrius de la pel·lícula: " + error
@@ -81,8 +84,7 @@ export default function FilmHeader({
             {movieDetails.title} <Text style={styles.year}>{year}</Text>
           </Text>
           <Text style={[globalStyles.textBase, styles.director]}>
-            Directed by{" "}
-            <Text style={{ fontWeight: "bold" }}>{director?.name}</Text>
+            Directed by <Text style={{ fontWeight: "bold" }}>{director}</Text>
           </Text>
         </View>
 
