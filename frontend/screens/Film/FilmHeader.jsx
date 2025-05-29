@@ -14,6 +14,7 @@ export default function FilmHeader({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [director, setDirector] = useState("");
+  const [voteAverage, setVoteAverage] = useState(0);
 
   const fetchMovieDetailsDirector = async () => {
     try {
@@ -31,9 +32,22 @@ export default function FilmHeader({
     }
   };
 
+  const fetchMovieAverage = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/movies/${movieDetails.id_api}/vote_average`
+      );
+
+      setVoteAverage(response.data.average);
+    } catch (error) {
+      console.error("Error obtenint la valoració de la pel·lícula: " + error);
+    }
+  };
+
   useEffect(() => {
     if (movieDetails.id_api) {
       fetchMovieDetailsDirector();
+      fetchMovieAverage();
     }
   }, [movieDetails.id_api]);
 
@@ -75,6 +89,23 @@ export default function FilmHeader({
               </Text>
             </View>
           </TouchableOpacity>
+
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: "white", fontSize: 12 }}>
+              Vote average:{" "}
+              <Text
+                style={{ color: "white", fontSize: 12, fontWeight: "bold" }}
+              >
+                {voteAverage}
+              </Text>
+            </Text>
+            <Icon
+              name="star"
+              size={12}
+              color="#FFD700"
+              style={{ marginLeft: 5 }}
+            />
+          </View>
         </View>
       </View>
 

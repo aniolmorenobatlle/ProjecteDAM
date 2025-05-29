@@ -565,4 +565,26 @@ exports.editComment = async (req, res) => {
     console.error('Error actualitzant el comentari:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
-}
+};
+
+exports.fetchMovieAverage = async (req, res) => {
+  const { id_api } = req.params;
+
+  try {
+    if (!id_api) {
+      return res.status(400).json({ message: "Falta l'identificador de la pel·lícula" });
+    }
+
+    const average = await movieModel.getVoteAverage(id_api);
+
+    if (average === null) {
+      return res.status(404).json({ message: 'Pel·lícula no trobada o sense valoracions' });
+    }
+
+    res.json({ average });
+
+  } catch (error) {
+    console.error('Error obtenint la valoració mitjana de la pel·lícula:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};

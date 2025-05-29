@@ -361,3 +361,13 @@ exports.editComment = async (id_api, comment_id, comment) => {
 
   return query.rows[0];
 };
+
+exports.getVoteAverage = async (id_api) => {
+  const query = await pool.query(`
+    SELECT get_vote_average_by_id_api($1) AS vote_average
+  `, [id_api]);
+
+  if (query.rows.length === 0) return null;
+
+  return query.rows[0].vote_average;
+};
