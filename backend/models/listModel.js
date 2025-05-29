@@ -107,3 +107,14 @@ exports.checkMovieInList = async (listId, movieId) => {
   const result = await pool.query(query, [listId, movieId]);
   return result.rows[0].exists;
 };
+
+exports.deleteSharedListToUser = async (listId, friendId) => {
+  const query = await pool.query(
+    `
+      DELETE FROM shared_lists 
+      WHERE list_id = $1 AND friend_id = $2
+    `, [listId, friendId]
+  )
+
+  return query.rowCount[0];
+}

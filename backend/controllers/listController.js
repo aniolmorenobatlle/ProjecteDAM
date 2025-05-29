@@ -168,3 +168,15 @@ exports.checkMovieInList = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.deleteSharedListToUser = async (req, res) => {
+  const { listId, friendId } = req.params;
+
+  try {
+    await listModel.deleteSharedListToUser(listId, friendId);
+    res.json({ message: 'Shared list deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting shared list:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

@@ -39,6 +39,7 @@ export default function Lists() {
     const userId = userInfo.id;
 
     try {
+      // Obtenir les llistes pròpies
       const response = await axios.get(
         `${API_URL}/api/lists?user_id=${userId}`,
         {
@@ -48,12 +49,34 @@ export default function Lists() {
         }
       );
 
-      const formattedData = response.data.lists.map((list) => ({
+      // Format per les llistes pròpies al dropdown
+      const ownListsFormatted = response.data.lists.map((list) => ({
         label: list.name,
         value: list.id,
+        isShared: false,
       }));
 
-      setDropdownList(formattedData);
+      // Obtenir les llistes compartides
+      const sharedResponse = await axios.get(
+        `${API_URL}/api/lists/shared/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Format per les llistes compartides al dropdown
+      const sharedListsFormatted = sharedResponse.data.sharedLists.map(
+        (shared) => ({
+          label: `${shared.list_name} (${shared.user_username})`,
+          value: shared.list_id,
+          isShared: true,
+        })
+      );
+
+      // Combinar les dues llistes pel dropdown
+      setDropdownList([...ownListsFormatted, ...sharedListsFormatted]);
 
       return response.data.lists.map((list) => ({
         id: list.id,
@@ -147,14 +170,52 @@ export default function Lists() {
 
   const handleDeleteList = async () => {
     try {
-      await axios.post(`${API_URL}/api/lists/deleteList`, {
-        list_id: selectedListId,
-      });
+      const selectedList = dropdownList.find(
+        (list) => list.value === selectedListId
+      );
+
+      if (!selectedList) {
+        Alert.alert("Error", "Please select a list");
+        return;
+      }
+
+      const token = await AsyncStorage.getItem("authToken");
+
+      if (selectedList.isShared) {
+        // Delete shared list access
+        await axios.delete(
+          `${API_URL}/api/lists/${selectedList.value}/shared/${userInfo.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        // Delete owned list
+        await axios.post(
+          `${API_URL}/api/lists/deleteList`,
+          {
+            list_id: selectedListId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
       setModalDeleteList(false);
       refreshAllLists();
     } catch (error) {
       console.error("Error deleting the list", error);
+      Alert.alert(
+        "Error",
+        selectedList?.isShared
+          ? "Error removing shared list access"
+          : "Error deleting the list"
+      );
     }
   };
 
@@ -379,6 +440,7 @@ export default function Lists() {
 const styles = {
   mainContainer: {
     paddingHorizontal: 15,
+    paddingTop: 10,
   },
 
   header: {
