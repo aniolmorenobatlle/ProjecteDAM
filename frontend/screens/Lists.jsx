@@ -135,6 +135,11 @@ export default function Lists() {
     setModalAddList(true);
   };
 
+  const handleCloseModalAddList = () => {
+    setModalAddList(false);
+    setName("");
+  };
+
   const handleAddList = async () => {
     if (name !== "") {
       try {
@@ -385,12 +390,23 @@ export default function Lists() {
               onChangeText={setName}
             />
           </View>
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handleAddList}
-          >
-            <Text style={styles.confirmButtonText}>Done</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.confirmButton}
+              onPress={handleAddList}
+            >
+              <Text style={styles.confirmButtonText}>Done</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.cancelButton}
+              onPress={handleCloseModalAddList}
+            >
+              <Text style={styles.confirmButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </CustomModal>
 
         <CustomModal
@@ -418,6 +434,7 @@ export default function Lists() {
 
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
+              activeOpacity={0.8}
               style={styles.confirmButton}
               onPress={handleDeleteList}
             >
@@ -425,6 +442,7 @@ export default function Lists() {
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.8}
               style={styles.cancelButton}
               onPress={handleCloseModalDeleteList}
             >

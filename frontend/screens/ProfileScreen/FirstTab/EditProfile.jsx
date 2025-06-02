@@ -70,17 +70,10 @@ export default function EditProfile({
     } catch (error) {
       if (error.response) {
         if (error.response.status === 400) {
-          if (error.response.data.message.includes("email")) {
-            Alert.alert(
-              "Error",
-              "Email already in use, please choose another one"
-            );
-          } else {
-            Alert.alert(
-              "Error",
-              "Username already in use, please choose another one"
-            );
-          }
+          Alert.alert(
+            "Error",
+            "Email or Username already in use, please choose another one"
+          );
         } else {
           Alert.alert(
             "Error",

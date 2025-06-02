@@ -18,7 +18,9 @@ export default function SearchModalize({
   onSearch,
   renderItem,
   onItemPress,
+  navbar,
 }) {
+  navbar = navbar || false;
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ export default function SearchModalize({
       ref={modalizeRef}
       panGestureEnabled={false}
       withHandle={false}
-      modalStyle={styles.modalize}
+      modalStyle={[styles.modalize, { marginTop: navbar ? 100 : 0 }]}
     >
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={styles.headerModal}>

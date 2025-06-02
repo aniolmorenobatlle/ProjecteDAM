@@ -137,6 +137,7 @@ export default function FriendsInfoProfile({
       </View>
 
       <SearchModalize
+        navbar={true}
         title="Search a Friend"
         profileInfo={profileInfo}
         modalizeRef={modalizeRef}
