@@ -17,12 +17,9 @@ exports.getMovies = async (limit, offset, sort = 'created_at', order = 'DESC') =
       m.synopsis,
       m.vote_average,
       m.id_api,
-      d.name AS director,
-      m.director_id,
       m.created_at,
       m.is_trending
     FROM movies m
-    JOIN directors d ON m.director_id = d.id
     ORDER BY m.${safeSort} ${safeOrder}
     LIMIT $1 OFFSET $2;`,
     [limit, offset]
@@ -76,13 +73,10 @@ exports.getMoviesQuery = async (limit, offset, query, sort = 'created_at', order
       m.synopsis,
       m.vote_average,
       m.id_api,
-      d.name AS director,
-      m.director_id,
       m.created_at,
       m.is_trending
     FROM movies m
-    LEFT JOIN directors d ON m.director_id = d.id
-    WHERE (LOWER(m.title) LIKE LOWER($1) OR LOWER(d.name) LIKE LOWER($1))
+    WHERE (LOWER(m.title) LIKE LOWER($1))
       AND m.poster IS NOT NULL
     ORDER BY m.${safeSort} ${safeOrder}
     LIMIT $2 OFFSET $3;`,
@@ -105,9 +99,8 @@ exports.getMoviesCountByQuery = async (query) => {
 
 exports.getMoviesMin = async (limit, offset, query) => {
   const movieQuery = `
-    SELECT m.id_api, m.title, m.poster, m.release_year, d.name AS director_name
+    SELECT m.id_api, m.title, m.poster, m.release_year AS director_name
     FROM movies m
-    LEFT JOIN directors d ON m.director_id = d.id
     WHERE LOWER(m.title) LIKE LOWER($1)
     AND m.poster IS NOT NULL
     LIMIT $2 OFFSET $3
